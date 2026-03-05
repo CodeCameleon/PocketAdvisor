@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\PocketAdvisor.Repositories\PocketAdvisor.Repositories.csproj" />
+    <ProjectReference Include="..\PocketAdvisor.Requests\PocketAdvisor.Requests.csproj" />
+    <ProjectReference Include="..\PocketAdvisor.Responses\PocketAdvisor.Responses.csproj" />
+  </ItemGroup>
+
+</Project>

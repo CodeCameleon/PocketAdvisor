@@ -1,0 +1,7 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\PocketAdvisor.Entities\PocketAdvisor.Entities.csproj" />
+  </ItemGroup>
+
+</Project>
