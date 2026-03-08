@@ -37,4 +37,9 @@ public class User
     /// The role of the user.
     /// </summary>
     public required EUserRole Role { get; set; }
+    
+    /// <summary>
+    /// The navigational property of the tokens, which belong to the user.
+    /// </summary>
+    public virtual List<Token>? Tokens { get; set; }
 }
