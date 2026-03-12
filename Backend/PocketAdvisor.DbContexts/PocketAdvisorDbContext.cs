@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PocketAdvisor.Entities;
 
 namespace PocketAdvisor.DbContexts;
@@ -9,6 +10,23 @@ namespace PocketAdvisor.DbContexts;
 public sealed class PocketAdvisorDbContext
     : DbContext
 {
+    #region Constants
+    
+    /// <summary>
+    /// The database column type used for whole number values.
+    /// </summary>
+    private const string IntegerType = "INTEGER";
+    
+    /// <summary>
+    /// The value converter used for converting decimal values to long values.
+    /// </summary>
+    private static readonly ValueConverter<decimal, long> DecimalToLongConverter = new(
+        d => (long)(Math.Round(d, 2, MidpointRounding.AwayFromZero) * 100),
+        l => l / 100m
+    );
+    
+    #endregion
+    
     #region Constructors
     
     /// <summary>
@@ -21,6 +39,11 @@ public sealed class PocketAdvisorDbContext
     #endregion
     
     #region DbSets
+    
+    /// <summary>
+    /// The database table for the account entities.
+    /// </summary>
+    public DbSet<Account> Accounts { get; set; }
     
     /// <summary>
     /// The database table for the category entities.
@@ -49,6 +72,18 @@ public sealed class PocketAdvisorDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        
+        modelBuilder.Entity<Account>(entity =>
+        {
+            entity.HasIndex(a => new { a.Name, a.UserId }).IsUnique();
+            entity.HasOne(a => a.User)
+                .WithMany(u => u.Accounts)
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.Property(a => a.Balance)
+                .HasConversion(DecimalToLongConverter)
+                .HasColumnType(IntegerType);
+        });
         
         modelBuilder.Entity<Category>(entity =>
         {
