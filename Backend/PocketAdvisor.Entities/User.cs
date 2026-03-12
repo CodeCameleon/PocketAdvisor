@@ -39,6 +39,11 @@ public class User
     public required EUserRole Role { get; set; }
     
     /// <summary>
+    /// The navigational property of the categories, which belong to the user.
+    /// </summary>
+    public virtual List<Category>? Categories { get; set; }
+    
+    /// <summary>
     /// The navigational property of the tokens, which belong to the user.
     /// </summary>
     public virtual List<Token>? Tokens { get; set; }

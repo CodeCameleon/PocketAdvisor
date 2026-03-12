@@ -23,6 +23,11 @@ public sealed class PocketAdvisorDbContext
     #region DbSets
     
     /// <summary>
+    /// The database table for the category entities.
+    /// </summary>
+    public DbSet<Category> Categories { get; set; }
+    
+    /// <summary>
     /// The database table for the token entities.
     /// </summary>
     public DbSet<Token> Tokens { get; set; }
@@ -44,6 +49,15 @@ public sealed class PocketAdvisorDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        
+        modelBuilder.Entity<Category>(entity =>
+        {
+            entity.HasIndex(c => new { c.Name, c.UserId }).IsUnique();
+            entity.HasOne(c => c.User)
+                .WithMany(u => u.Categories)
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
         
         modelBuilder.Entity<Token>(entity =>
         {
