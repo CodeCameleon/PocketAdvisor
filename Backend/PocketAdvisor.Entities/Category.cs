@@ -30,4 +30,9 @@ public class Category
     /// The navigational property of the user, to whom the category belongs.
     /// </summary>
     public virtual User? User { get; set; }
+    
+    /// <summary>
+    /// The navigational property of the transactions, which belong to the category.
+    /// </summary>
+    public virtual List<Transaction>? Transactions { get; set; }
 }

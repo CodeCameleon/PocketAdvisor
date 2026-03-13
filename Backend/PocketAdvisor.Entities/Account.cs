@@ -40,4 +40,14 @@ public class Account
     /// The navigational property of the user, to whom the account belongs.
     /// </summary>
     public virtual User? User { get; set; }
+    
+    /// <summary>
+    /// The navigational property of the transactions, which are incoming to the account.
+    /// </summary>
+    public virtual List<Transaction>? IncomingTransactions { get; set; }
+    
+    /// <summary>
+    /// The navigational property of the transactions, which are outgoing from the account.
+    /// </summary>
+    public virtual List<Transaction>? OutgoingTransactions { get; set; }
 }

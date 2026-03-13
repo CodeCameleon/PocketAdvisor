@@ -56,6 +56,11 @@ public sealed class PocketAdvisorDbContext
     public DbSet<Token> Tokens { get; set; }
     
     /// <summary>
+    /// The database table for the transaction entities.
+    /// </summary>
+    public DbSet<Transaction> Transactions { get; set; }
+    
+    /// <summary>
     /// The database table for the user entities.
     /// </summary>
     public DbSet<User> Users { get; set; }
@@ -101,6 +106,22 @@ public sealed class PocketAdvisorDbContext
                 .WithMany(u => u.Tokens)
                 .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+        
+        modelBuilder.Entity<Transaction>(entity =>
+        {
+            entity.HasOne(t => t.Category)
+                .WithMany(c => c.Transactions)
+                .HasForeignKey(t => t.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(t => t.FromAccount)
+                .WithMany(a => a.OutgoingTransactions)
+                .HasForeignKey(t => t.FromAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(t => t.ToAccount)
+                .WithMany(a => a.IncomingTransactions)
+                .HasForeignKey(t => t.ToAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
         
         modelBuilder.Entity<User>(entity =>
