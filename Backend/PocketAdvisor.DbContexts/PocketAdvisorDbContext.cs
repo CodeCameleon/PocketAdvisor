@@ -51,6 +51,11 @@ public sealed class PocketAdvisorDbContext
     public DbSet<Category> Categories { get; set; }
     
     /// <summary>
+    /// The database table for the item entities.
+    /// </summary>
+    public DbSet<Item> Items { get; set; }
+    
+    /// <summary>
     /// The database table for the token entities.
     /// </summary>
     public DbSet<Token> Tokens { get; set; }
@@ -96,6 +101,15 @@ public sealed class PocketAdvisorDbContext
             entity.HasOne(c => c.User)
                 .WithMany(u => u.Categories)
                 .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+        
+        modelBuilder.Entity<Item>(entity =>
+        {
+            entity.HasIndex(i => new { i.Name, i.UserId }).IsUnique();
+            entity.HasOne(i => i.User)
+                .WithMany(u => u.Items)
+                .HasForeignKey(i => i.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
         

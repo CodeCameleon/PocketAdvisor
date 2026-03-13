@@ -49,6 +49,11 @@ public class User
     public virtual List<Category>? Categories { get; set; }
     
     /// <summary>
+    /// The navigational property of the items, which belong to the user.
+    /// </summary>
+    public virtual List<Item>? Items { get; set; }
+    
+    /// <summary>
     /// The navigational property of the tokens, which belong to the user.
     /// </summary>
     public virtual List<Token>? Tokens { get; set; }
