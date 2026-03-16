@@ -36,26 +36,6 @@ public enum EUnit
     /// </summary>
     Kilometer = 104,
     
-    /// <summary>
-    /// The inch length unit.
-    /// </summary>
-    Inch = 105,
-    
-    /// <summary>
-    /// The foot length unit.
-    /// </summary>
-    Foot = 106,
-    
-    /// <summary>
-    /// The yard length unit.
-    /// </summary>
-    Yard = 107,
-    
-    /// <summary>
-    /// The mile length unit.
-    /// </summary>
-    Mile = 108,
-    
     #endregion
     
     #region Mass
@@ -80,16 +60,6 @@ public enum EUnit
     /// </summary>
     Tonne = 204,
     
-    /// <summary>
-    /// The ounce mass unit.
-    /// </summary>
-    Ounce = 205,
-    
-    /// <summary>
-    /// The pound mass unit.
-    /// </summary>
-    Pound = 206,
-    
     #endregion
     
     #region Area
@@ -103,21 +73,6 @@ public enum EUnit
     /// The square kilometer area unit.
     /// </summary>
     SquareKilometer = 302,
-    
-    /// <summary>
-    /// The square foot area unit.
-    /// </summary>
-    SquareFoot = 303,
-    
-    /// <summary>
-    /// The square yard area unit.
-    /// </summary>
-    SquareYard = 304,
-    
-    /// <summary>
-    /// The square mile area unit.
-    /// </summary>
-    SquareMile = 305,
     
     /// <summary>
     /// The acre area unit.
@@ -147,16 +102,6 @@ public enum EUnit
     /// The cubic meter volume unit.
     /// </summary>
     CubicMeter = 403,
-    
-    /// <summary>
-    /// The gallon volume unit.
-    /// </summary>
-    Gallon = 404,
-    
-    /// <summary>
-    /// The pint volume unit.
-    /// </summary>
-    Pint  = 405,
     
     #endregion
     
