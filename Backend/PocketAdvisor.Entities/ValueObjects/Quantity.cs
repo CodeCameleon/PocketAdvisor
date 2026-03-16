@@ -1,4 +1,6 @@
-﻿using PocketAdvisor.Enums;
+﻿using System.Diagnostics.CodeAnalysis;
+using PocketAdvisor.Enums;
+using PocketAdvisor.Enums.Extensions;
 
 namespace PocketAdvisor.Entities.ValueObjects;
 
@@ -6,6 +8,7 @@ namespace PocketAdvisor.Entities.ValueObjects;
 /// A value object representing a quantity, which consists of a value and a unit.
 /// </summary>
 public readonly struct Quantity
+    : IEquatable<Quantity>
 {
     #region Constants
     
@@ -43,6 +46,62 @@ public readonly struct Quantity
     /// The unit of the quantity.
     /// </summary>
     public EUnit Unit { get; }
+    
+    #endregion
+    
+    #region Operators
+    
+    /// <summary>
+    /// Checks if two quantities are equal.
+    /// </summary>
+    /// <param name="left">The first quantity.</param>
+    /// <param name="right">The second quantity.</param>
+    /// <returns><see langword="true" />, if they are equal, <see langword="false" /> otherwise.</returns>
+    public static bool operator ==(Quantity left, Quantity right) => left.Equals(right);
+    
+    /// <summary>
+    /// Checks if two quantities are not equal.
+    /// </summary>
+    /// <param name="left">The first quantity.</param>
+    /// <param name="right">The second quantity.</param>
+    /// <returns><see langword="true" />, if they are not equal, <see langword="false" /> otherwise.</returns>
+    public static bool operator !=(Quantity left, Quantity right) => !left.Equals(right);
+    
+    #endregion
+    
+    #region Equals
+    
+    /// <inheritdoc />
+    public bool Equals(Quantity other)
+    {
+        if (Unit == other.Unit)
+        {
+            return Value == other.Value;
+        }
+        
+        EUnitCategory category = Unit.GetUnitCategory();
+        EUnitCategory otherCategory = other.Unit.GetUnitCategory();
+        
+        if (category == EUnitCategory.Uncategorized || otherCategory == EUnitCategory.Uncategorized)
+        {
+            return false;
+        }
+        
+        if (category != otherCategory)
+        {
+            return false;
+        }
+        
+        decimal factor = Unit.GetUnitFactor(other.Unit);
+        
+        return Value * factor == other.Value;
+    }
+    
+    /// <inheritdoc />
+    public override bool Equals([NotNullWhen(true)] object? obj)
+    {
+        return obj is Quantity other && Equals(other);
+    }
     
     #endregion
     
