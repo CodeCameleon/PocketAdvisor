@@ -12,7 +12,7 @@ public static class EUnitCategoryExtensions
     /// <summary>
     /// When the conversion is not possible because the units belong to different categories.
     /// </summary>
-    private const string CategoryMissMatchMessage = "Units must belong to the same category.";
+    private const string CategoryMismatchMessage = "Units must belong to the same category.";
     
     /// <summary>
     /// When the unit category does not have a base unit.
@@ -196,7 +196,7 @@ public static class EUnitCategoryExtensions
         
         if (baseCategory != targetCategory)
         {
-            throw new ArgumentException(CategoryMissMatchMessage);
+            throw new ArgumentException(CategoryMismatchMessage);
         }
         
         return Factors[baseUnit] / Factors[targetUnit];
