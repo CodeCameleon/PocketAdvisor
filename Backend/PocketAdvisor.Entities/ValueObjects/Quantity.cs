@@ -110,7 +110,22 @@ public readonly struct Quantity
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return HashCode.Combine(Value, Unit);
+        EUnitCategory category = Unit.GetUnitCategory();
+        
+        if (category == EUnitCategory.Uncategorized)
+        {
+            return HashCode.Combine(Value, Unit);
+        }
+        
+        EUnit baseUnit = category.GetBaseUnit();
+        
+        if (Unit == baseUnit)
+        {
+            return HashCode.Combine(Value, Unit);
+        }
+        
+        decimal factor = Unit.GetUnitFactor(baseUnit);
+        return HashCode.Combine(Value * factor, baseUnit);
     }
     
     #endregion
