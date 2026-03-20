@@ -15,9 +15,19 @@ public static class EUnitCategoryExtensions
     private const string CategoryMissMatchMessage = "Units must belong to the same category.";
     
     /// <summary>
+    /// When the unit category does not have a base unit.
+    /// </summary>
+    private const string NoBaseUnitMessage = "The category does not have a base unit.";
+    
+    /// <summary>
     /// When the conversion is not possible because one of the units belongs to the uncategorized category.
     /// </summary>
     private const string UncategorizedMessage = "Uncategorized units cannot be converted.";
+    
+    /// <summary>
+    /// The dictionary containing the base unit of each category.
+    /// </summary>
+    private static readonly FrozenDictionary<EUnitCategory, EUnit> BaseUnits;
     
     /// <summary>
     /// The dictionary containing the units of each category.
@@ -89,14 +99,14 @@ public static class EUnitCategoryExtensions
             { EUnit.Minute, 60m },
             { EUnit.Hour, 3600m },
             { EUnit.Day, 86400m },
-            { EUnit.Month, 2630016m }, // Average month (30.44 days)
+            { EUnit.Month, 2629800m }, // Average month (30.4375 days)
             { EUnit.Year, 31557600m }, // Average year (365.25 days)
             
             { EUnit.Joule, 1m },
             { EUnit.Kilojoule, 1000m },
             { EUnit.KilowattHour, 3600000m },
             
-            { EUnit.Byte, 9.536743164E-7m },
+            { EUnit.Byte, 9.536743164e-7m },
             { EUnit.Kilobyte, 9.765625e-4m },
             { EUnit.Megabyte, 1m },
             { EUnit.Gigabyte, 1024m },
@@ -104,6 +114,32 @@ public static class EUnitCategoryExtensions
         };
         
         Factors = factors.ToFrozenDictionary();
+        
+        BaseUnits = factors.Where(pair =>
+            pair.Value == 1m
+        ).ToFrozenDictionary(pair => pair.Key.GetUnitCategory(), pair => pair.Key);
+    }
+    
+    #endregion
+    
+    #region GetBaseUnit
+    
+    /// <summary>
+    /// Gets the base unit of the category.
+    /// </summary>
+    /// <param name="unitCategory">The unit category.</param>
+    /// <returns>The base unit of the category.</returns>
+    /// <exception cref="ArgumentException">
+    /// If the unit category does not have a base unit.
+    /// </exception>
+    public static EUnit GetBaseUnit(this EUnitCategory unitCategory)
+    {
+        if (BaseUnits.TryGetValue(unitCategory, out EUnit unit))
+        {
+            return unit;
+        }
+        
+        throw new ArgumentException(NoBaseUnitMessage);
     }
     
     #endregion
