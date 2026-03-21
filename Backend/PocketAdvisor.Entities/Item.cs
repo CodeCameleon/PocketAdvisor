@@ -35,4 +35,9 @@ public class Item
     /// The navigational property of the user, to whom the item belongs.
     /// </summary>
     public virtual User? User { get; set; }
+    
+    /// <summary>
+    /// The navigational property of the connection entities linking this item to its transactions.
+    /// </summary>
+    public virtual List<TransactionItem>? TransactionItems { get; set; }
 }

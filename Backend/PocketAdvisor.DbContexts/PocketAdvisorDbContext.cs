@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PocketAdvisor.Entities;
+using PocketAdvisor.Entities.ValueObjects;
 
 namespace PocketAdvisor.DbContexts;
 
@@ -64,6 +65,11 @@ public sealed class PocketAdvisorDbContext
     /// The database table for the transaction entities.
     /// </summary>
     public DbSet<Transaction> Transactions { get; set; }
+    
+    /// <summary>
+    /// The database table for the transaction and item connection entities.
+    /// </summary>
+    public DbSet<TransactionItem> TransactionItems { get; set; }
     
     /// <summary>
     /// The database table for the user entities.
@@ -136,6 +142,33 @@ public sealed class PocketAdvisorDbContext
                 .WithMany(a => a.IncomingTransactions)
                 .HasForeignKey(t => t.ToAccountId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+        
+        modelBuilder.Entity<TransactionItem>(entity =>
+        {
+            entity.HasKey(ti => new { ti.TransactionId, ti.ItemId });
+            entity.HasOne(ti => ti.Transaction)
+                .WithMany(t => t.TransactionItems)
+                .HasForeignKey(ti => ti.TransactionId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(ti => ti.Item)
+                .WithMany(i => i.TransactionItems)
+                .HasForeignKey(ti => ti.ItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.Property(ti => ti.TotalPrice)
+                .HasConversion(DecimalToLongConverter)
+                .HasColumnType(IntegerType);
+            entity.OwnsOne(ti => ti.Amount, ti =>
+            {
+                ti.Property(a => a.Value)
+                    .HasColumnName(nameof(TransactionItem.Amount) + nameof(Quantity.Value))
+                    .HasConversion(DecimalToLongConverter)
+                    .HasColumnType(IntegerType);
+                
+                ti.Property(a => a.Unit).HasColumnName(
+                    nameof(TransactionItem.Amount) + nameof(Quantity.Unit)
+                );
+            });
         });
         
         modelBuilder.Entity<User>(entity =>

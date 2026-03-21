@@ -55,4 +55,9 @@ public class Transaction
     /// The navigational property of the account to which the transaction is directed.
     /// </summary>
     public virtual Account? ToAccount { get; set; }
+    
+    /// <summary>
+    /// The navigational property of the connection entities linking this transaction to its items.
+    /// </summary>
+    public virtual List<TransactionItem>? TransactionItems { get; set; }
 }
