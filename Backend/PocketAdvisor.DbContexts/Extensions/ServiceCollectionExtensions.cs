@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace PocketAdvisor.DbContexts.Extensions;
 
 /// <summary>
-/// The extensions methods for the <see cref="IServiceCollection" /> interface.
+/// The extension methods for the <see cref="IServiceCollection" /> interface.
 /// </summary>
 public static class ServiceCollectionExtensions
 {
