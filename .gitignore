@@ -58,3 +58,8 @@ nunit-*.xml
 
 # User Specific
 *.user
+
+# SQLite Database
+*.db
+*.db-shm
+*.db-wal
