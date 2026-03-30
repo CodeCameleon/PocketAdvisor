@@ -1,5 +1,6 @@
 using PocketAdvisor.DbContexts;
 using PocketAdvisor.DbContexts.Extensions;
+using PocketAdvisor.Repositories.Extensions;
 using PocketAdvisor.WebApplication.Extensions;
 
 // Creates a new web application builder instance.
@@ -9,6 +10,9 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddPocketAdvisorDbContext(
     builder.Configuration.GetDefaultConnectionString()
 );
+
+// Adds the repositories to the container.
+builder.Services.AddRepositories();
 
 // Adds the API controllers to the container.
 builder.Services.AddControllers();
