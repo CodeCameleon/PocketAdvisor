@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PocketAdvisor.DbContexts;
 using PocketAdvisor.Repositories.Interfaces;
@@ -75,6 +76,49 @@ public abstract class BaseRepository<TEntity, TRepository>
         {
             Logger.LogInformation("Created the {EntityName} entity.", EntityName);
         }
+    }
+    
+    #endregion
+    
+    #region GetSingleOrDefaultAsync
+    
+    /// <inheritdoc />
+    public async Task<TEntity?> GetSingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate,
+        bool asTracking = false, IEnumerable<Expression<Func<TEntity, object>>>? includes = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(predicate);
+        
+        IQueryable<TEntity> query = Entities.AsQueryable();
+        
+        if (asTracking)
+        {
+            query = query.AsTracking();
+        }
+        
+        if (includes is not null)
+        {
+            query = includes.Aggregate(
+                query,
+                (current, include) => current.Include(include)
+            );
+        }
+        
+        TEntity? entity = await query.SingleOrDefaultAsync(predicate, cancellationToken);
+        
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            if (entity is not null)
+            {
+                Logger.LogInformation("Found the {EntityName} entity.", EntityName);
+            }
+            else
+            {
+                Logger.LogInformation("The {EntityName} entity was not found.", EntityName);
+            }
+        }
+        
+        return entity;
     }
     
     #endregion

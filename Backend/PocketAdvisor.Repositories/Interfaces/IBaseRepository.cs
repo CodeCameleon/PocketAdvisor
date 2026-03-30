@@ -1,4 +1,6 @@
-﻿namespace PocketAdvisor.Repositories.Interfaces;
+﻿using System.Linq.Expressions;
+
+namespace PocketAdvisor.Repositories.Interfaces;
 
 /// <summary>
 /// Defines the base repository interface for performing basic CRUD operations on entities.
@@ -16,6 +18,27 @@ public interface IBaseRepository<TEntity>
     /// If the entity parameter is <see langword="null" />.
     /// </exception>
     Task CreateAsync(TEntity entity, CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// Retrieves a single entity that matches the specified predicate,
+    /// or <see langword="null" /> if no match is found.
+    /// </summary>
+    /// <param name="predicate">The expression used to filter entities.</param>
+    /// <param name="asTracking">
+    /// A value indicating whether the returned entity should be tracked by the context.
+    /// </param>
+    /// <param name="includes">The related navigation properties to include in the query.</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains the matching entity,
+    /// or <see langword="null" /> if no match is found.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// If the predicate parameter is <see langword="null" />.
+    /// </exception>
+    Task<TEntity?> GetSingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate,
+        bool asTracking = false, IEnumerable<Expression<Func<TEntity, object>>>? includes = null,
+        CancellationToken cancellationToken = default);
     
     /// <summary>
     /// Updates an existing entity in the database.
