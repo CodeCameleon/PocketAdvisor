@@ -14,7 +14,7 @@ namespace PocketAdvisor.Repositories.Implementations;
 public abstract class BaseRepository<TEntity, TRepository>
     : IBaseRepository<TEntity>
     where TEntity : class
-    where TRepository : IBaseRepository<TEntity>
+    where TRepository : class, IBaseRepository<TEntity>
 {
     #region Constants
     
