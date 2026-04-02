@@ -21,8 +21,22 @@ public interface IBaseRepository<TEntity>
     Task CreateAsync(TEntity entity, CancellationToken cancellationToken = default);
     
     /// <summary>
-    /// Retrieves a single entity that matches the specified predicate,
-    /// or <see langword="null" /> if no match is found.
+    /// Determines whether any entity matches the specified predicate asynchronously.
+    /// </summary>
+    /// <param name="predicate">The expression used to filter entities.</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains <see langword="true" />,
+    /// if an entity is found that matches the specified predicate, <see langword="false" /> otherwise.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// If the predicate parameter is <see langword="null" />.
+    /// </exception>
+    Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// Retrieves a single entity that matches the specified predicate asynchronously.
     /// </summary>
     /// <param name="predicate">The expression used to filter entities.</param>
     /// <param name="asTracking">

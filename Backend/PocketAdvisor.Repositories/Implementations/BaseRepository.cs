@@ -80,6 +80,33 @@ public abstract class BaseRepository<TEntity, TRepository>
     
     #endregion
     
+    #region ExistsAsync
+    
+    /// <inheritdoc />
+    public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(predicate);
+        
+        bool exists = await Entities.AnyAsync(predicate, cancellationToken);
+        
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            if (exists)
+            {
+                Logger.LogInformation("The {EntityName} entity exists.", EntityName);
+            }
+            else
+            {
+                Logger.LogInformation("The {EntityName} entity does not exist.", EntityName);
+            }
+        }
+        
+        return exists;
+    }
+    
+    #endregion
+    
     #region GetSingleOrDefaultAsync
     
     /// <inheritdoc />
