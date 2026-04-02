@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PocketAdvisor.DbContexts.Implementations;
+using PocketAdvisor.DbContexts.Interfaces;
 
 namespace PocketAdvisor.DbContexts.Extensions;
 
@@ -8,6 +10,8 @@ namespace PocketAdvisor.DbContexts.Extensions;
 /// </summary>
 public static class ServiceCollectionExtensions
 {
+    #region AddPocketAdvisorDbContext
+    
     /// <summary>
     /// Adds the <see cref="PocketAdvisorDbContext" /> to the service collection.
     /// </summary>
@@ -21,4 +25,19 @@ public static class ServiceCollectionExtensions
             options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         });
     }
+    
+    #endregion
+    
+    #region AddTransactionManager
+    
+    /// <summary>
+    /// Adds the transaction manager to the service collection.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    public static void AddTransactionManager(this IServiceCollection services)
+    {
+        services.AddScoped<ITransactionManager, TransactionManager>();
+    }
+    
+    #endregion
 }

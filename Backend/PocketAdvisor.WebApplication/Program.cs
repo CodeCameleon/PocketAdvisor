@@ -11,6 +11,9 @@ builder.Services.AddPocketAdvisorDbContext(
     builder.Configuration.GetDefaultConnectionString()
 );
 
+// Adds the transaction manager to the container.
+builder.Services.AddTransactionManager();
+
 // Adds the repositories to the container.
 builder.Services.AddRepositories();
 
