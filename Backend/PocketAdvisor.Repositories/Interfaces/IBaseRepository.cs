@@ -14,6 +14,7 @@ public interface IBaseRepository<TEntity>
     /// </summary>
     /// <param name="entity">The entity to be created in the database.</param>
     /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     /// <exception cref="ArgumentNullException">
     /// If the entity parameter is <see langword="null" />.
     /// </exception>
