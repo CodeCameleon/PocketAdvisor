@@ -27,6 +27,20 @@ public static class SwaggerExtensions
     /// </summary>
     private const string SwaggerVersion = "v1";
     
+    /// <summary>
+    /// The template used for the generated XML documentation files.
+    /// </summary>
+    private const string XmlFileTemplate = "PocketAdvisor.{0}.xml";
+    
+    /// <summary>
+    /// The list of XML documentation files to include in the Swagger documentation.
+    /// </summary>
+    private static readonly List<string> XmlDocumentationFiles = InitXmlDocumentationFiles(
+        "Requests",
+        "Responses",
+        "WebApplication"
+    );
+    
     #endregion
     
     #region AddPocketAdvisorSwagger
@@ -49,6 +63,8 @@ public static class SwaggerExtensions
                     Version = SwaggerVersion
                 }
             );
+            
+            XmlDocumentationFiles.ForEach(file => options.IncludeXmlComments(file));
         });
     }
     
@@ -72,6 +88,35 @@ public static class SwaggerExtensions
                 options.SwaggerEndpoint(SwaggerUrl, SwaggerName);
             });
         }
+    }
+    
+    #endregion
+    
+    #region InitXmlDocumentationFiles
+    
+    /// <summary>
+    /// Initializes the list of XML documentation files to include in the Swagger documentation.
+    /// </summary>
+    /// <param name="assemblies">The name of the assemblies to get the documentation from.</param>
+    /// <returns>The list of XML documentation files.</returns>
+    private static List<string> InitXmlDocumentationFiles(params string[] assemblies)
+    {
+        List<string> xmlFiles = [];
+        
+        foreach (string file in assemblies)
+        {
+            string path = Path.Combine(
+                AppContext.BaseDirectory,
+                string.Format(XmlFileTemplate, file)
+            );
+            
+            if (File.Exists(path))
+            {
+                xmlFiles.Add(path);
+            }
+        }
+        
+        return xmlFiles;
     }
     
     #endregion
