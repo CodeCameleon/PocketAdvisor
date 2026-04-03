@@ -20,8 +20,8 @@ builder.Services.AddRepositories();
 // Adds the API controllers to the container.
 builder.Services.AddControllers();
 
-// Adds the OpenAPI services to the container.
-builder.Services.AddOpenApi();
+// Adds the Swagger services to the container.
+builder.Services.AddPocketAdvisorSwagger();
 
 // Builds the web application.
 WebApplication app = builder.Build();
@@ -34,12 +34,8 @@ using (IServiceScope scope = app.Services.CreateScope())
     context.Database.EnsureCreated();
 }
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    // Exposes the OpenAPI documentation endpoint.
-    app.MapOpenApi();
-}
+// Adds the middleware for Swagger generation.
+app.UsePocketAdvisorSwagger();
 
 // Adds the middleware for redirecting HTTP requests.
 app.UseHttpsRedirection();
