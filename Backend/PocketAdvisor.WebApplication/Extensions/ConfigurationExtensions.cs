@@ -23,9 +23,24 @@ public static class ConfigurationExtensions
     private const string Default = "Default";
     
     /// <summary>
+    /// The name of the key file path for the secure store in the configuration.
+    /// </summary>
+    private const string KeyFilePath = "KeyFilePath";
+    
+    /// <summary>
     /// The message template used for missing configuration keys.
     /// </summary>
     private const string KeyNotFoundMessageTemplate = "The required configuration key '{0}' is missing or empty.";
+    
+    /// <summary>
+    /// The name of the section that contains secure store settings in the configuration.
+    /// </summary>
+    private const string SecureStore = "SecureStore";
+    
+    /// <summary>
+    /// The name of the secure store path in the configuration.
+    /// </summary>
+    private const string StorePath = "StorePath";
     
     #endregion
     
@@ -49,6 +64,54 @@ public static class ConfigurationExtensions
         }
         
         return connectionString;
+    }
+    
+    #endregion
+    
+    #region GetSecureStoreKeyFilePath
+    
+    /// <summary>
+    /// Gets the path of the key file for the secure store from the configuration.
+    /// </summary>
+    /// <param name="configuration">The configuration instance.</param>
+    /// <returns>The key file path for the secure store.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// If the key file path for the secure store is not found in the configuration.
+    /// </exception>
+    public static string GetSecureStoreKeyFilePath(this IConfiguration configuration)
+    {
+        string? keyFilePath = configuration.GetSection(SecureStore).GetValue<string>(KeyFilePath);
+        
+        if (string.IsNullOrWhiteSpace(keyFilePath))
+        {
+            throw CreateInvalidOperationException(KeyFilePath, Default);
+        }
+        
+        return keyFilePath;
+    }
+    
+    #endregion
+    
+    #region GetSecureStorePath
+    
+    /// <summary>
+    /// Gets the path of the secure store from the configuration.
+    /// </summary>
+    /// <param name="configuration">The configuration instance.</param>
+    /// <returns>The secure store file path.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// If the secure store path is not found in the configuration.
+    /// </exception>
+    public static string GetSecureStorePath(this IConfiguration configuration)
+    {
+        string? secureStorePath = configuration.GetSection(SecureStore).GetValue<string>(StorePath);
+        
+        if (string.IsNullOrWhiteSpace(secureStorePath))
+        {
+            throw CreateInvalidOperationException(SecureStore, StorePath);
+        }
+        
+        return secureStorePath;
     }
     
     #endregion
