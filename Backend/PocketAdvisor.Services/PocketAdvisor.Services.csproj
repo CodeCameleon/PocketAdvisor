@@ -6,4 +6,8 @@
     <ProjectReference Include="..\PocketAdvisor.Responses\PocketAdvisor.Responses.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="FluentResults" />
+  </ItemGroup>
+
 </Project>
