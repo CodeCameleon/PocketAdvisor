@@ -1,6 +1,8 @@
+using FluentValidation;
 using PocketAdvisor.DbContexts;
 using PocketAdvisor.DbContexts.Extensions;
 using PocketAdvisor.Repositories.Extensions;
+using PocketAdvisor.Requests.Users;
 using PocketAdvisor.WebApplication.Extensions;
 
 // Creates a new web application builder instance.
@@ -16,6 +18,9 @@ builder.Services.AddTransactionManager();
 
 // Adds the repositories to the container.
 builder.Services.AddRepositories();
+
+// Adds the validators to the container.
+builder.Services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
 
 // Adds the API controllers to the container.
 builder.Services.AddControllers();
