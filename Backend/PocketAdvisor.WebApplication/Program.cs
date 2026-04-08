@@ -1,6 +1,8 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using PocketAdvisor.DbContexts;
 using PocketAdvisor.DbContexts.Extensions;
+using PocketAdvisor.Entities;
 using PocketAdvisor.Repositories.Extensions;
 using PocketAdvisor.Requests.Users;
 using PocketAdvisor.Services.Extensions;
@@ -19,6 +21,9 @@ builder.Services.AddTransactionManager();
 
 // Adds the repositories to the container.
 builder.Services.AddRepositories();
+
+// Adds the password hasher to the container.
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 // Adds the validators to the container.
 builder.Services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
