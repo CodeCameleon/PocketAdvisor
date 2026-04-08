@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using PocketAdvisor.DbContexts.Interfaces;
 using PocketAdvisor.Services.Interfaces;
 
@@ -17,17 +19,18 @@ public abstract class BaseService<TService>
     /// Initializes a new instance of the <see cref="BaseService{TService}" /> class.
     /// </summary>
     /// <param name="logger">The logger for the class.</param>
-    /// <param name="transactionManager">The transaction manager of the database.</param>
+    /// <param name="serviceProvider">The service provider for resolving dependencies.</param>
     /// <exception cref="ArgumentNullException">
     /// If any of the given parameters is <see langword="null" />.
     /// </exception>
-    protected BaseService(ILogger<TService> logger, ITransactionManager transactionManager)
+    protected BaseService(ILogger<TService> logger, IServiceProvider serviceProvider)
     {
         ArgumentNullException.ThrowIfNull(logger);
-        ArgumentNullException.ThrowIfNull(transactionManager);
+        ArgumentNullException.ThrowIfNull(serviceProvider);
         
         Logger = logger;
-        TransactionManager = transactionManager;
+        TransactionManager = new(serviceProvider.GetRequiredService<ITransactionManager>);
+        ServiceProvider = serviceProvider;
     }
     
     #endregion
@@ -42,7 +45,27 @@ public abstract class BaseService<TService>
     /// <summary>
     /// The transaction manager of the database.
     /// </summary>
-    protected ITransactionManager TransactionManager { get; }
+    protected Lazy<ITransactionManager> TransactionManager { get; }
+    
+    /// <summary>
+    /// The service provider for resolving dependencies.
+    /// </summary>
+    private IServiceProvider ServiceProvider { get; }
+    
+    #endregion
+    
+    #region GetValidator
+    
+    /// <summary>
+    /// Resolves the validator for the given request model type.
+    /// </summary>
+    /// <typeparam name="TRequest">The request model type.</typeparam>
+    /// <returns>The validator registered for the given request model type.</returns>
+    protected IValidator<TRequest> GetValidator<TRequest>()
+        where TRequest : class
+    {
+        return ServiceProvider.GetRequiredService<IValidator<TRequest>>();
+    }
     
     #endregion
 }
