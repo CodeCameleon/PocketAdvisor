@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PocketAdvisor.WebApplication.Configurations;
+namespace PocketAdvisor.Services.Configurations;
 
 /// <summary>
 /// Represents the token-related secrets bound from configuration.

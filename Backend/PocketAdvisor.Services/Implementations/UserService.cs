@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using PocketAdvisor.Entities;
 using PocketAdvisor.Repositories.Interfaces;
+using PocketAdvisor.Services.Configurations;
 using PocketAdvisor.Services.Interfaces;
 
 namespace PocketAdvisor.Services.Implementations;
@@ -19,6 +21,9 @@ public sealed class UserService
     /// </summary>
     /// <param name="logger">The logger for the class.</param>
     /// <param name="serviceProvider">The service provider for resolving dependencies.</param>
+    /// <param name="tokenSecretsOptions">
+    /// The token secrets options for accessing the token secrets configuration values.
+    /// </param>
     /// <param name="passwordHasher">The password hasher for hashing user passwords.</param>
     /// <param name="tokenRepository">The token repository instance.</param>
     /// <param name="userRepository">The user repository instance.</param>
@@ -26,14 +31,16 @@ public sealed class UserService
     /// If any of the given parameters is <see langword="null" />.
     /// </exception>
     public UserService(ILogger<UserService> logger, IServiceProvider serviceProvider,
-        IPasswordHasher<User> passwordHasher, ITokenRepository tokenRepository,
-        IUserRepository userRepository)
+        IOptions<TokenSecretsOptions> tokenSecretsOptions, IPasswordHasher<User> passwordHasher,
+        ITokenRepository tokenRepository, IUserRepository userRepository)
         : base(logger, serviceProvider)
     {
+        ArgumentNullException.ThrowIfNull(tokenSecretsOptions);
         ArgumentNullException.ThrowIfNull(passwordHasher);
         ArgumentNullException.ThrowIfNull(tokenRepository);
         ArgumentNullException.ThrowIfNull(userRepository);
         
+        TokenSecretsOptions = tokenSecretsOptions;
         PasswordHasher = passwordHasher;
         TokenRepository = tokenRepository;
         UserRepository = userRepository;
@@ -42,6 +49,11 @@ public sealed class UserService
     #endregion
     
     #region Properties
+    
+    /// <summary>
+    /// The token secrets options for accessing the token secrets configuration values.
+    /// </summary>
+    private IOptions<TokenSecretsOptions> TokenSecretsOptions { get; }
     
     /// <summary>
     /// The password hasher for hashing user passwords.

@@ -1,5 +1,5 @@
 ﻿using NeoSmart.SecureStore;
-using PocketAdvisor.WebApplication.Configurations;
+using PocketAdvisor.Services.Configurations;
 
 namespace PocketAdvisor.WebApplication.Extensions;
 
