@@ -49,6 +49,9 @@ public sealed class UserService
     /// </summary>
     /// <param name="logger">The logger for the class.</param>
     /// <param name="serviceProvider">The service provider for resolving dependencies.</param>
+    /// <param name="tokenExpirationsOptions">
+    /// The token expirations options for accessing the token expirations configuration values.
+    /// </param>
     /// <param name="tokenSecretsOptions">
     /// The token secrets options for accessing the token secrets configuration values.
     /// </param>
@@ -59,15 +62,17 @@ public sealed class UserService
     /// If any of the given parameters is <see langword="null" />.
     /// </exception>
     public UserService(ILogger<UserService> logger, IServiceProvider serviceProvider,
-        IOptions<TokenSecretsOptions> tokenSecretsOptions, IPasswordHasher<User> passwordHasher,
-        ITokenRepository tokenRepository, IUserRepository userRepository)
+        IOptions<TokenExpirationsOptions> tokenExpirationsOptions, IOptions<TokenSecretsOptions> tokenSecretsOptions,
+        IPasswordHasher<User> passwordHasher, ITokenRepository tokenRepository, IUserRepository userRepository)
         : base(logger, serviceProvider)
     {
+        ArgumentNullException.ThrowIfNull(tokenExpirationsOptions);
         ArgumentNullException.ThrowIfNull(tokenSecretsOptions);
         ArgumentNullException.ThrowIfNull(passwordHasher);
         ArgumentNullException.ThrowIfNull(tokenRepository);
         ArgumentNullException.ThrowIfNull(userRepository);
         
+        TokenExpirationsOptions = tokenExpirationsOptions;
         TokenSecretsOptions = tokenSecretsOptions;
         PasswordHasher = passwordHasher;
         TokenRepository = tokenRepository;
@@ -77,6 +82,11 @@ public sealed class UserService
     #endregion
     
     #region Properties
+    
+    /// <summary>
+    /// The token expirations options for accessing the token expirations configuration values.
+    /// </summary>
+    private IOptions<TokenExpirationsOptions> TokenExpirationsOptions { get; }
     
     /// <summary>
     /// The token secrets options for accessing the token secrets configuration values.
@@ -161,7 +171,7 @@ public sealed class UserService
         Token token = new()
         {
             Hash = generatedToken.Hash,
-            ExpiryAt = DateTime.UtcNow.AddHours(1),
+            ExpiryAt = DateTime.UtcNow.AddHours(TokenExpirationsOptions.Value.EmailVerificationHours),
             Type = ETokenType.EmailVerification,
             UserId = user.Id
         };

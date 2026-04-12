@@ -8,6 +8,8 @@ namespace PocketAdvisor.WebApplication.Extensions;
 /// </summary>
 public static class WebApplicationBuilderExtensions
 {
+    #region AddPocketAdvisorSecrets
+    
     /// <summary>
     /// Adds the secrets from the secure store to the configuration.
     /// </summary>
@@ -33,4 +35,22 @@ public static class WebApplicationBuilderExtensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
     }
+    
+    #endregion
+    
+    #region AddTokenExpirationsOptions
+    
+    /// <summary>
+    /// Adds the token expirations options to the service collection.
+    /// </summary>
+    /// <param name="builder">The web application builder instance.</param>
+    public static void AddTokenExpirationsOptions(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddOptions<TokenExpirationsOptions>()
+            .Bind(builder.Configuration.GetSection(TokenExpirationsOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+    }
+    
+    #endregion
 }
