@@ -10,8 +10,4 @@
     <ProjectReference Include="..\PocketAdvisor.Services\PocketAdvisor.Services.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
 </Project>
