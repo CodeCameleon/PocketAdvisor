@@ -1,5 +1,4 @@
 ﻿using NeoSmart.SecureStore;
-using PocketAdvisor.Services.Configurations;
 
 namespace PocketAdvisor.WebApplication.Extensions;
 
@@ -29,27 +28,6 @@ public static class WebApplicationBuilderExtensions
         ).ToDictionary();
         
         builder.Configuration.AddInMemoryCollection(secrets);
-        
-        builder.Services.AddOptions<TokenSecretsOptions>()
-            .Bind(builder.Configuration.GetSection(TokenSecretsOptions.SectionName))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-    }
-    
-    #endregion
-    
-    #region AddTokenExpirationsOptions
-    
-    /// <summary>
-    /// Adds the token expirations options to the service collection.
-    /// </summary>
-    /// <param name="builder">The web application builder instance.</param>
-    public static void AddTokenExpirationsOptions(this WebApplicationBuilder builder)
-    {
-        builder.Services.AddOptions<TokenExpirationsOptions>()
-            .Bind(builder.Configuration.GetSection(TokenExpirationsOptions.SectionName))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
     }
     
     #endregion

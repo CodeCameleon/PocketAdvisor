@@ -14,9 +14,6 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 // Loads the application secrets from the secure store.
 builder.AddPocketAdvisorSecrets();
 
-// Adds the token expirations options to the container.
-builder.AddTokenExpirationsOptions();
-
 // Adds the database context to the container.
 builder.Services.AddPocketAdvisorDbContext(
     builder.Configuration.GetDefaultConnectionString()
@@ -35,7 +32,7 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
 
 // Adds the services to the container.
-builder.Services.AddServices();
+builder.Services.AddServices(builder.Configuration);
 
 // Adds the API controllers to the container.
 builder.Services.AddControllers();
