@@ -6,11 +6,12 @@ namespace PocketAdvisor.Services.Configurations;
 /// Represents the token-related expirations bound from configuration.
 /// </summary>
 public sealed class TokenExpirationsOptions
+    : IBaseOptions
 {
     /// <summary>
     /// The name of the configuration section that contains token expirations.
     /// </summary>
-    public const string SectionName = "TokenExpirations";
+    public static string SectionName => "TokenExpirations";
     
     /// <summary>
     /// The expiration in hours for email verification tokens.

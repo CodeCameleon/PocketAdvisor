@@ -6,11 +6,12 @@ namespace PocketAdvisor.Services.Configurations;
 /// Represents the token-related secrets bound from configuration.
 /// </summary>
 public sealed class TokenSecretsOptions
+    : IBaseOptions
 {
     /// <summary>
     /// The name of the configuration section that contains token secrets.
     /// </summary>
-    public const string SectionName = "TokenSecrets";
+    public static string SectionName => "TokenSecrets";
     
     /// <summary>
     /// The secret used for email verification tokens.
