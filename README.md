@@ -9,8 +9,9 @@ It uses SecureStore to manage sensitive configuration values, such as token secr
 
 ### Required secret keys
 
+- `Resend:ApiKey`
 - `TokenSecrets:EmailVerification`
-- `TokenSecrets:Jwt`
+- `TokenSecrets:JsonWeb`
 - `TokenSecrets:PasswordReset`
 - `TokenSecrets:Refresh`
 
@@ -25,14 +26,15 @@ dotnet tool install --global SecureStore.Client
 Create the encrypted store and a key file:
 
 ```powershell
-SecureStore create ./secrets/token-secrets.bin --keyfile ./secrets/token-secrets.key
+SecureStore create ./secrets.bin --keyfile ./secrets.key
 ```
 
 Set token secrets:
 
 ```powershell
-SecureStore --store ./secrets/token-secrets.bin --keyfile ./secrets/token-secrets.key set "TokenSecrets:EmailVerification" "replace-with-email-verification-secret"
-SecureStore --store ./secrets/token-secrets.bin --keyfile ./secrets/token-secrets.key set "TokenSecrets:Jwt" "replace-with-jwt-secret"
-SecureStore --store ./secrets/token-secrets.bin --keyfile ./secrets/token-secrets.key set "TokenSecrets:PasswordReset" "replace-with-password-reset-secret"
-SecureStore --store ./secrets/token-secrets.bin --keyfile ./secrets/token-secrets.key set "TokenSecrets:Refresh" "replace-with-refresh-secret"
+SecureStore --store ./secrets.bin --keyfile ./secrets.key set "Resend:ApiKey" "replace-with-api-key"
+SecureStore --store ./secrets.bin --keyfile ./secrets.key set "TokenSecrets:EmailVerification" "replace-with-email-verification-secret"
+SecureStore --store ./secrets.bin --keyfile ./secrets.key set "TokenSecrets:JsonWeb" "replace-with-jwt-secret"
+SecureStore --store ./secrets.bin --keyfile ./secrets.key set "TokenSecrets:PasswordReset" "replace-with-password-reset-secret"
+SecureStore --store ./secrets.bin --keyfile ./secrets.key set "TokenSecrets:Refresh" "replace-with-refresh-secret"
 ```
