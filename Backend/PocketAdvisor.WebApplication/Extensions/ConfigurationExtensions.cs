@@ -8,6 +8,11 @@ public static class ConfigurationExtensions
     #region Constants
     
     /// <summary>
+    /// The name of the api key for the Resend service in the configuration.
+    /// </summary>
+    private const string ApiKey = "ApiKey";
+    
+    /// <summary>
     /// The character used to separate configuration keys.
     /// </summary>
     private const char Colon = ':';
@@ -31,6 +36,11 @@ public static class ConfigurationExtensions
     /// The message template used for missing configuration keys.
     /// </summary>
     private const string KeyNotFoundMessageTemplate = "The required configuration key '{0}' is missing or empty.";
+    
+    /// <summary>
+    /// The name of the section that contains the Resend settings in the configuration.
+    /// </summary>
+    private const string Resend = "Resend";
     
     /// <summary>
     /// The name of the section that contains secure store settings in the configuration.
@@ -64,6 +74,30 @@ public static class ConfigurationExtensions
         }
         
         return connectionString;
+    }
+    
+    #endregion
+    
+    #region GetResendApiKey
+    
+    /// <summary>
+    /// Gets the api key for the Resend service from the configuration.
+    /// </summary>
+    /// <param name="configuration">The configuration instance.</param>
+    /// <returns>The api key for the Resend service.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// If the api key for the Resend service is not found in the configuration.
+    /// </exception>
+    public static string GetResendApiKey(this IConfiguration configuration)
+    {
+        string? apiKey = configuration.GetSection(Resend).GetValue<string>(ApiKey);
+        
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            throw CreateInvalidOperationException(Resend, ApiKey);
+        }
+        
+        return apiKey;
     }
     
     #endregion

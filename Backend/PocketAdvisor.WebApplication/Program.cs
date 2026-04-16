@@ -31,6 +31,11 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 // Adds the validators to the container.
 builder.Services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
 
+// Adds the Resend client to the container.
+builder.Services.AddResendClient(
+    builder.Configuration.GetResendApiKey()
+);
+
 // Adds the services to the container.
 builder.Services.AddServices(builder.Configuration);
 
