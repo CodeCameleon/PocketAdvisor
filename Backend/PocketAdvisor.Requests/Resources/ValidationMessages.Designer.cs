@@ -96,15 +96,6 @@ namespace PocketAdvisor.Requests.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The email address is already in use..
-        /// </summary>
-        internal static string EmailAlreadyExists {
-            get {
-                return ResourceManager.GetString("EmailAlreadyExists", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The email address format is invalid..
         /// </summary>
         internal static string EmailInvalid {

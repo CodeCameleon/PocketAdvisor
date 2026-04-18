@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using PocketAdvisor.Repositories.Interfaces;
 using PocketAdvisor.Requests.Resources;
 
 namespace PocketAdvisor.Requests.Users;
@@ -10,34 +9,17 @@ namespace PocketAdvisor.Requests.Users;
 public sealed class CreateUserRequestValidator
     : AbstractValidator<CreateUserRequest>
 {
-    #region Fields
-    
-    /// <summary>
-    /// The user repository instance used for validation purposes.
-    /// </summary>
-    private readonly IUserRepository _userRepository;
-    
-    #endregion
-    
     #region Constructors
     
     /// <summary>
     /// Initializes a new instance of the <see cref="CreateUserRequestValidator" /> class.
     /// </summary>
-    /// <param name="userRepository">The user repository instance.</param>
-    /// <exception cref="ArgumentNullException">
-    /// If the user repository instance is <see langword="null" />.
-    /// </exception>
-    public CreateUserRequestValidator(IUserRepository userRepository)
+    public CreateUserRequestValidator()
     {
-        ArgumentNullException.ThrowIfNull(userRepository);
-        _userRepository = userRepository;
-        
         RuleFor(cur => cur.Email).Cascade(CascadeMode.Stop)
             .NotEmpty().WithMessage(ValidationMessages.EmailRequired)
             .MaximumLength(100).WithMessage(ValidationMessages.EmailTooLong)
-            .EmailAddress().WithMessage(ValidationMessages.EmailInvalid)
-            .MustAsync(BeUniqueEmail).WithMessage(ValidationMessages.EmailAlreadyExists);
+            .EmailAddress().WithMessage(ValidationMessages.EmailInvalid);
         
         RuleFor(cur => cur.Password).Cascade(CascadeMode.Stop)
             .NotEmpty().WithMessage(ValidationMessages.PasswordRequired)
@@ -75,29 +57,6 @@ public sealed class CreateUserRequestValidator
         bool hasSpecial = password.Any(ch => !char.IsLetterOrDigit(ch));
         
         return hasUpper && hasLower && hasDigit && hasSpecial;
-    }
-    
-    #endregion
-    
-    #region BeUniqueEmail
-    
-    /// <summary>
-    /// Validates the uniqueness of the given email address asynchronously.
-    /// </summary>
-    /// <param name="email">The email address to validate for uniqueness.</param>
-    /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
-    /// <returns>
-    /// A task that represents the asynchronous operation. The task result contains <see langword="true" />,
-    /// if the email address is not found, <see langword="false" /> otherwise.
-    /// </returns>
-    private async Task<bool> BeUniqueEmail(string? email, CancellationToken cancellationToken)
-    {
-        string normalizedEmail = (email ?? string.Empty).Trim().ToUpperInvariant();
-        
-        return !await _userRepository.ExistsAsync(
-            u => u.Email.ToUpper() == normalizedEmail,
-            cancellationToken
-        );
     }
     
     #endregion

@@ -13,6 +13,7 @@ using PocketAdvisor.Requests.Users;
 using PocketAdvisor.Services.Configurations;
 using PocketAdvisor.Services.Extensions;
 using PocketAdvisor.Services.Interfaces;
+using PocketAdvisor.Services.Resources;
 
 namespace PocketAdvisor.Services.Implementations;
 
@@ -154,9 +155,17 @@ public sealed class UserService
         
         await TransactionManager.Value.BeginTransactionAsync();
         
+        string normalizedEmail = request.Email!.Trim().ToLowerInvariant();
+        bool emailExists = await UserRepository.ExistsAsync(u => u.Email == normalizedEmail);
+        
+        if (emailExists)
+        {
+            return Result.Fail(ValidationMessages.EmailAlreadyExists);
+        }
+        
         User user = new()
         {
-            Email = request.Email!,
+            Email = normalizedEmail,
             PasswordHash = string.Empty,
             Role = EUserRole.User
         };
