@@ -21,4 +21,7 @@
     <data name="EmailAlreadyExists" xml:space="preserve">
         <value>The email address is already in use.</value>
     </data>
+    <data name="InvalidCredentials" xml:space="preserve">
+        <value>The provided credentials are invalid.</value>
+    </data>
 </root>

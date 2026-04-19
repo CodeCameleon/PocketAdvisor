@@ -67,5 +67,14 @@ namespace PocketAdvisor.Services.Resources {
                 return ResourceManager.GetString("EmailAlreadyExists", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The provided credentials are invalid..
+        /// </summary>
+        internal static string InvalidCredentials {
+            get {
+                return ResourceManager.GetString("InvalidCredentials", resourceCulture);
+            }
+        }
     }
 }

@@ -10,6 +10,7 @@ using PocketAdvisor.Entities;
 using PocketAdvisor.Enums;
 using PocketAdvisor.Repositories.Interfaces;
 using PocketAdvisor.Requests.Users;
+using PocketAdvisor.Responses.Users;
 using PocketAdvisor.Services.Configurations;
 using PocketAdvisor.Services.Extensions;
 using PocketAdvisor.Services.Interfaces;
@@ -190,6 +191,92 @@ public sealed class UserService
         
         Logger.LogInformation("New user created successfully.");
         return Result.Ok(generatedToken.Plain);
+    }
+    
+    #endregion
+    
+    #region LoginAsync
+    
+    /// <inheritdoc />
+    public async Task<Result<LoginResponse>> LoginAsync(LoginRequest request)
+    {
+        Logger.LogInformation("Authenticating user...");
+        
+        IValidator<LoginRequest> validator = GetValidator<LoginRequest>();
+        ValidationResult validationResult = await validator.ValidateAsync(request);
+        
+        if (!validationResult.IsValid)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Validation failed for LoginRequest: {Errors}",
+                    validationResult.Errors
+                );
+            }
+            
+            return Result.Fail(validationResult.Errors.ToErrorList());
+        }
+        
+        string normalizedEmail = request.Email!.Trim().ToLowerInvariant();
+        
+        User? user = await UserRepository.GetSingleOrDefaultAsync(
+            u => u.Email == normalizedEmail,
+            asTracking: true
+        );
+        
+        if (user is null)
+        {
+            return Result.Fail(ValidationMessages.InvalidCredentials);
+        }
+        
+        PasswordVerificationResult passwordResult = PasswordHasher.VerifyHashedPassword(
+            user, user.PasswordHash, request.Password!
+        );
+        
+        if (passwordResult == PasswordVerificationResult.Failed)
+        {
+            return Result.Fail(ValidationMessages.InvalidCredentials);
+        }
+        
+        await TransactionManager.Value.BeginTransactionAsync();
+        
+        if (passwordResult == PasswordVerificationResult.SuccessRehashNeeded)
+        {
+            user.PasswordHash = PasswordHasher.HashPassword(user, request.Password!);
+            UserRepository.Update(user);
+            
+            await TransactionManager.Value.SaveChangesAsync();
+            
+            if (Logger.IsEnabled(LogLevel.Information))
+            {
+                Logger.LogInformation(
+                    "Password hash for user '{UserId}' was upgraded successfully.",
+                    user.Id
+                );
+            }
+        }
+        
+        GeneratedToken generatedRefreshToken = GenerateToken(TokenSecretsOptions.Value.Refresh);
+        
+        Token refreshToken = new()
+        {
+            Hash = generatedRefreshToken.Hash,
+            ExpiryAt = DateTime.UtcNow.AddDays(TokenExpirationsOptions.Value.RefreshDays),
+            Type = ETokenType.Refresh,
+            UserId = user.Id
+        };
+        await TokenRepository.CreateAsync(refreshToken);
+        
+        await TransactionManager.Value.CommitTransactionAsync();
+        
+        Logger.LogInformation("User authenticated successfully.");
+        
+        return Result.Ok(new LoginResponse
+        {
+            JsonWebToken = string.Empty, // TODO: Generate and return a signed JWT here.
+            RefreshToken = generatedRefreshToken.Plain
+        });
     }
     
     #endregion
