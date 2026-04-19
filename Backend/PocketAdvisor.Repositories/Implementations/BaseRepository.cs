@@ -52,7 +52,7 @@ public abstract class BaseRepository<TEntity, TRepository>
     #region Properties
     
     /// <summary>
-    /// The database table for the <see cref="TEntity" /> entities.
+    /// The database table for the entities.
     /// </summary>
     private DbSet<TEntity> Entities { get; }
     
