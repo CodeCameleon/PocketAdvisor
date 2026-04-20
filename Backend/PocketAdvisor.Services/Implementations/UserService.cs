@@ -1,4 +1,6 @@
-﻿using System.Security.Cryptography;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using FluentResults;
 using FluentValidation;
@@ -6,6 +8,7 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using PocketAdvisor.Entities;
 using PocketAdvisor.Enums;
 using PocketAdvisor.Repositories.Interfaces;
@@ -51,6 +54,9 @@ public sealed class UserService
     /// </summary>
     /// <param name="logger">The logger for the class.</param>
     /// <param name="serviceProvider">The service provider for resolving dependencies.</param>
+    /// <param name="jsonWebTokenOptions">
+    /// The JSON web token options for accessing the JSON web token configuration values.
+    /// </param>
     /// <param name="tokenExpirationsOptions">
     /// The token expirations options for accessing the token expirations configuration values.
     /// </param>
@@ -64,16 +70,19 @@ public sealed class UserService
     /// If any of the given parameters is <see langword="null" />.
     /// </exception>
     public UserService(ILogger<UserService> logger, IServiceProvider serviceProvider,
-        IOptions<TokenExpirationsOptions> tokenExpirationsOptions, IOptions<TokenSecretsOptions> tokenSecretsOptions,
-        IPasswordHasher<User> passwordHasher, ITokenRepository tokenRepository, IUserRepository userRepository)
+        IOptions<JsonWebTokenOptions> jsonWebTokenOptions, IOptions<TokenExpirationsOptions> tokenExpirationsOptions,
+        IOptions<TokenSecretsOptions> tokenSecretsOptions, IPasswordHasher<User> passwordHasher,
+        ITokenRepository tokenRepository, IUserRepository userRepository)
         : base(logger, serviceProvider)
     {
+        ArgumentNullException.ThrowIfNull(jsonWebTokenOptions);
         ArgumentNullException.ThrowIfNull(tokenExpirationsOptions);
         ArgumentNullException.ThrowIfNull(tokenSecretsOptions);
         ArgumentNullException.ThrowIfNull(passwordHasher);
         ArgumentNullException.ThrowIfNull(tokenRepository);
         ArgumentNullException.ThrowIfNull(userRepository);
         
+        JsonWebTokenOptions = jsonWebTokenOptions;
         TokenExpirationsOptions = tokenExpirationsOptions;
         TokenSecretsOptions = tokenSecretsOptions;
         PasswordHasher = passwordHasher;
@@ -84,6 +93,11 @@ public sealed class UserService
     #endregion
     
     #region Properties
+    
+    /// <summary>
+    /// The JSON web token options for accessing the JSON web token configuration values.
+    /// </summary>
+    private IOptions<JsonWebTokenOptions> JsonWebTokenOptions { get; }
     
     /// <summary>
     /// The token expirations options for accessing the token expirations configuration values.
@@ -274,9 +288,43 @@ public sealed class UserService
         
         return Result.Ok(new LoginResponse
         {
-            JsonWebToken = string.Empty, // TODO: Generate and return a signed JWT here.
+            JsonWebToken = GenerateJsonWebToken(user),
             RefreshToken = generatedRefreshToken.Plain
         });
+    }
+    
+    #endregion
+    
+    #region GenerateJsonWebToken
+    
+    /// <summary>
+    /// Generates a signed JSON Web Token for the specified user.
+    /// </summary>
+    /// <param name="user">The authenticated user for whom the token is issued.</param>
+    /// <returns>The compact serialized JWT string.</returns>
+    private string GenerateJsonWebToken(User user)
+    {
+        SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(TokenSecretsOptions.Value.JsonWeb));
+        SigningCredentials signingCredentials = new(securityKey, SecurityAlgorithms.HmacSha256);
+        
+        Claim[] claims =
+        [
+            new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new(ClaimTypes.Role, user.Role.ToString())
+        ];
+        
+        DateTime now = DateTime.UtcNow;
+        
+        JwtSecurityToken token = new(
+            issuer: JsonWebTokenOptions.Value.Issuer,
+            audience: JsonWebTokenOptions.Value.Audience,
+            claims: claims,
+            notBefore: now,
+            expires: now.AddMinutes(TokenExpirationsOptions.Value.JsonWebMinutes),
+            signingCredentials: signingCredentials
+        );
+        
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
     
     #endregion
