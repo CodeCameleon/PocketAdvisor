@@ -1,4 +1,5 @@
-﻿using FluentResults;
+﻿using System.IdentityModel.Tokens.Jwt;
+using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -17,6 +18,16 @@ public abstract class BaseController<TService>
     : ControllerBase
     where TService : IBaseService
 {
+    #region Constants
+    
+    /// <summary>
+    /// When the subject claim is missing from the JWT token.
+    /// </summary>
+    private const string UnauthorizedMessage = "Unauthorized access. Ensure the endpoint is protected with " +
+        "the [Authorize] attribute and a valid JWT token is provided.";
+    
+    #endregion
+    
     #region Constructors
     
     /// <summary>
@@ -36,6 +47,27 @@ public abstract class BaseController<TService>
     #endregion
     
     #region Properties
+    
+    /// <summary>
+    /// The ID of the currently authenticated user, extracted from the JWT subject claim.
+    /// </summary>
+    /// <exception cref="UnauthorizedAccessException">
+    /// If the subject claim is missing.
+    /// </exception>
+    protected Guid CurrentUserId
+    {
+        get
+        {
+            string? subject = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+            
+            if (subject is null || !Guid.TryParse(subject, out Guid userId))
+            {
+                throw new UnauthorizedAccessException(UnauthorizedMessage);
+            }
+            
+            return userId;
+        }
+    }
     
     /// <summary>
     /// The service to be used by the controller.
