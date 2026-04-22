@@ -7,6 +7,7 @@ using PocketAdvisor.Repositories.Extensions;
 using PocketAdvisor.Requests.Users;
 using PocketAdvisor.Services.Extensions;
 using PocketAdvisor.WebApplication.Extensions;
+using PocketAdvisor.WebApplication.Middlewares;
 
 // Creates a new web application builder instance.
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -55,6 +56,9 @@ using (IServiceScope scope = app.Services.CreateScope())
     PocketAdvisorDbContext context = serviceProvider.GetRequiredService<PocketAdvisorDbContext>();
     context.Database.EnsureCreated();
 }
+
+// Adds the middleware for handling exceptions.
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Adds the middleware for Swagger generation.
 app.UsePocketAdvisorSwagger();
