@@ -23,9 +23,34 @@ public static class ConfigurationExtensions
     private const string ConnectionStrings = "ConnectionStrings";
     
     /// <summary>
-    /// The name of the default database connection string in the configuration.
+    /// The template for the database connection string.
     /// </summary>
-    private const string Default = "Default";
+    private const string ConnectionStringTemplate = "Host={0};Port={1};Database={2};Username={3};Password={4}";
+    
+    /// <summary>
+    /// The name of the default database name in the configuration.
+    /// </summary>
+    private const string DefaultDatabase = "DefaultDatabase";
+    
+    /// <summary>
+    /// The name of the default database host in the configuration.
+    /// </summary>
+    private const string DefaultHost = "DefaultHost";
+    
+    /// <summary>
+    /// The name of the default database password in the configuration.
+    /// </summary>
+    private const string DefaultPassword = "DefaultPassword";
+    
+    /// <summary>
+    /// The name of the default database port in the configuration.
+    /// </summary>
+    private const string DefaultPort = "DefaultPort";
+    
+    /// <summary>
+    /// The name of the default database username in the configuration.
+    /// </summary>
+    private const string DefaultUsername = "DefaultUsername";
     
     /// <summary>
     /// The name of the key file path for the secure store in the configuration.
@@ -62,18 +87,43 @@ public static class ConfigurationExtensions
     /// <param name="configuration">The configuration instance.</param>
     /// <returns>The default database connection string.</returns>
     /// <exception cref="InvalidOperationException">
-    /// If the default database connection string is not found in the configuration.
+    /// If any required part of the connection string is missing from the configuration.
     /// </exception>
     public static string GetDefaultConnectionString(this IConfiguration configuration)
     {
-        string? connectionString = configuration.GetConnectionString(Default);
+        IConfigurationSection section = configuration.GetSection(ConnectionStrings);
         
-        if (string.IsNullOrWhiteSpace(connectionString))
+        string? host = section.GetValue<string>(DefaultHost);
+        if (string.IsNullOrWhiteSpace(host))
         {
-            throw CreateInvalidOperationException(ConnectionStrings, Default);
+            throw CreateInvalidOperationException(ConnectionStrings, DefaultHost);
         }
         
-        return connectionString;
+        string? port = section.GetValue<string>(DefaultPort);
+        if (string.IsNullOrWhiteSpace(port))
+        {
+            throw CreateInvalidOperationException(ConnectionStrings, DefaultPort);
+        }
+        
+        string? database = section.GetValue<string>(DefaultDatabase);
+        if (string.IsNullOrWhiteSpace(database))
+        {
+            throw CreateInvalidOperationException(ConnectionStrings, DefaultDatabase);
+        }
+        
+        string? username = section.GetValue<string>(DefaultUsername);
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            throw CreateInvalidOperationException(ConnectionStrings, DefaultUsername);
+        }
+        
+        string? password = section.GetValue<string>(DefaultPassword);
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            throw CreateInvalidOperationException(ConnectionStrings, DefaultPassword);
+        }
+        
+        return string.Format(ConnectionStringTemplate, host, port, database, username, password);
     }
     
     #endregion
@@ -118,7 +168,7 @@ public static class ConfigurationExtensions
         
         if (string.IsNullOrWhiteSpace(keyFilePath))
         {
-            throw CreateInvalidOperationException(KeyFilePath, Default);
+            throw CreateInvalidOperationException(SecureStore, KeyFilePath);
         }
         
         return keyFilePath;
