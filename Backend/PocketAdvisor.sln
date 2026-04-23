@@ -4,6 +4,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Settings", "Settings", "{3E
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
+		..\docker-compose.yml = ..\docker-compose.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PocketAdvisor.Enums", "PocketAdvisor.Enums\PocketAdvisor.Enums.csproj", "{BB7AB731-315B-4D22-AD90-C1091DD68EDA}"
