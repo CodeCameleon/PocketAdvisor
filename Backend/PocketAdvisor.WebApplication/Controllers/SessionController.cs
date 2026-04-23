@@ -45,4 +45,27 @@ public sealed class SessionController
     }
     
     #endregion
+    
+    #region RefreshAsync
+    
+    /// <summary>
+    /// Validates a refresh token, rotates it, and issues a new JSON Web Token and refresh token asynchronously.
+    /// </summary>
+    /// <param name="request">The refresh token presented by the client.</param>
+    [HttpPost("refresh")]
+    [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> RefreshAsync([FromBody] RefreshRequest request)
+    {
+        Result<LoginResponse> result = await Service.RefreshAsync(request);
+        
+        if (result.IsFailed)
+        {
+            return BadRequest(result.Errors);
+        }
+        
+        return StatusCode(StatusCodes.Status201Created, result.Value);
+    }
+    
+    #endregion
 }
