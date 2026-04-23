@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using PocketAdvisor.DbContexts;
 using PocketAdvisor.DbContexts.Extensions;
 using PocketAdvisor.Entities;
@@ -49,12 +50,12 @@ builder.Services.AddPocketAdvisorSwagger();
 // Builds the web application.
 WebApplication app = builder.Build();
 
-// Ensures the database exists.
+// Applies any pending migrations to the database.
 using (IServiceScope scope = app.Services.CreateScope())
 {
     IServiceProvider serviceProvider = scope.ServiceProvider;
     PocketAdvisorDbContext context = serviceProvider.GetRequiredService<PocketAdvisorDbContext>();
-    context.Database.EnsureCreated();
+    await context.Database.MigrateAsync();
 }
 
 // Adds the middleware for handling exceptions.
