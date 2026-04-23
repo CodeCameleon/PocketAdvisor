@@ -69,6 +69,15 @@ namespace PocketAdvisor.Services.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The email address has not been verified yet..
+        /// </summary>
+        internal static string EmailNotVerified {
+            get {
+                return ResourceManager.GetString("EmailNotVerified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The provided credentials are invalid..
         /// </summary>
         internal static string InvalidCredentials {

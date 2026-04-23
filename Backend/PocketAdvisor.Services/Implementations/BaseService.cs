@@ -1,7 +1,9 @@
-﻿using FluentValidation;
+﻿using FluentResults;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PocketAdvisor.DbContexts.Interfaces;
+using PocketAdvisor.Services.Constants;
 using PocketAdvisor.Services.Interfaces;
 
 namespace PocketAdvisor.Services.Implementations;
@@ -51,6 +53,29 @@ public abstract class BaseService<TService>
     /// The service provider for resolving dependencies.
     /// </summary>
     private IServiceProvider ServiceProvider { get; }
+    
+    #endregion
+    
+    #region CreateError
+    
+    /// <summary>
+    /// Creates a new <see cref="Error" /> that can be returned in a <see cref="Result" /> object.
+    /// </summary>
+    /// <param name="message">The error message.</param>
+    /// <param name="propertyName">The name of the property the error message belongs to.</param>
+    /// <returns>The constructed <see cref="Error" /> ready to be returned.</returns>
+    protected static Error CreateError(string message, string propertyName)
+    {
+        Error error = new(message)
+        {
+            Metadata =
+            {
+                [ErrorMetadataKeys.PropertyName] = propertyName
+            }
+        };
+        
+        return error;
+    }
     
     #endregion
     

@@ -175,7 +175,9 @@ public sealed class UserService
         
         if (emailExists)
         {
-            return Result.Fail(ValidationMessages.EmailAlreadyExists);
+            return Result.Fail(
+                CreateError(ValidationMessages.EmailAlreadyExists, nameof(request.Email))
+            );
         }
         
         User user = new()
@@ -251,6 +253,13 @@ public sealed class UserService
         if (passwordResult == PasswordVerificationResult.Failed)
         {
             return Result.Fail(ValidationMessages.InvalidCredentials);
+        }
+        
+        if (!user.IsEmailVerified)
+        {
+            return Result.Fail(
+                CreateError(ValidationMessages.EmailNotVerified, nameof(request.Email))
+            );
         }
         
         await TransactionManager.Value.BeginTransactionAsync();
