@@ -48,4 +48,13 @@
     <data name="ConfirmPasswordTooWeak" xml:space="preserve">
         <value>The password confirmation must be at least 8 characters and include uppercase, lowercase, digit, and special character.</value>
     </data>
+    <data name="RefreshTokenRequired" xml:space="preserve">
+        <value>The refresh token is required.</value>
+    </data>
+    <data name="RefreshTokenTooShort" xml:space="preserve">
+        <value>The refresh token must be at least 44 characters.</value>
+    </data>
+    <data name="RefreshTokenTooLong" xml:space="preserve">
+        <value>The refresh token must not exceed 44 characters.</value>
+    </data>
 </root>

@@ -148,5 +148,32 @@ namespace PocketAdvisor.Requests.Resources {
                 return ResourceManager.GetString("PasswordTooWeak", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The refresh token is required..
+        /// </summary>
+        internal static string RefreshTokenRequired {
+            get {
+                return ResourceManager.GetString("RefreshTokenRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The refresh token must not exceed 44 characters..
+        /// </summary>
+        internal static string RefreshTokenTooLong {
+            get {
+                return ResourceManager.GetString("RefreshTokenTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The refresh token must be at least 44 characters..
+        /// </summary>
+        internal static string RefreshTokenTooShort {
+            get {
+                return ResourceManager.GetString("RefreshTokenTooShort", resourceCulture);
+            }
+        }
     }
 }
