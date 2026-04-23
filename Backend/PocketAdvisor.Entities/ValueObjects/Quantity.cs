@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using Microsoft.EntityFrameworkCore;
 using PocketAdvisor.Enums;
 using PocketAdvisor.Enums.Extensions;
 
@@ -31,7 +32,7 @@ public sealed class Quantity
     /// <summary>
     /// The number of decimal places used when normalizing values for comparison and hashing.
     /// </summary>
-    private const int Precision = 6;
+    private const int Scale = 6;
     
     #endregion
     
@@ -56,6 +57,7 @@ public sealed class Quantity
     /// <summary>
     /// The value of the quantity.
     /// </summary>
+    [Precision(18, Scale)]
     public decimal Value { get; }
     
     /// <summary>
@@ -217,8 +219,8 @@ public sealed class Quantity
         }
         
         decimal factor = Unit.GetUnitFactor(other.Unit);
-        decimal normalized = Math.Round(Value * factor, Precision);
-        decimal otherValue = Math.Round(other.Value, Precision);
+        decimal normalized = Math.Round(Value * factor, Scale);
+        decimal otherValue = Math.Round(other.Value, Scale);
         
         return normalized == otherValue;
     }
@@ -251,7 +253,7 @@ public sealed class Quantity
         }
         
         decimal factor = Unit.GetUnitFactor(baseUnit);
-        decimal normalized = Math.Round(Value * factor, Precision);
+        decimal normalized = Math.Round(Value * factor, Scale);
         return HashCode.Combine(normalized, baseUnit);
     }
     

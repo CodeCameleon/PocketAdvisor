@@ -4,4 +4,8 @@
     <ProjectReference Include="..\PocketAdvisor.Enums\PocketAdvisor.Enums.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" />
+  </ItemGroup>
+
 </Project>

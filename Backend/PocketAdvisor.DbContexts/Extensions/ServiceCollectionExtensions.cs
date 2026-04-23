@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddDbContext<PocketAdvisorDbContext>(options =>
         {
-            options.UseSqlite(connectionString);
+            options.UseNpgsql(connectionString);
             options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         });
     }

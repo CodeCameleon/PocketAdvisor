@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PocketAdvisor.Entities;
 using PocketAdvisor.Entities.ValueObjects;
 
@@ -11,23 +10,6 @@ namespace PocketAdvisor.DbContexts;
 public sealed class PocketAdvisorDbContext
     : DbContext
 {
-    #region Constants
-    
-    /// <summary>
-    /// The database column type used for whole number values.
-    /// </summary>
-    private const string IntegerType = "INTEGER";
-    
-    /// <summary>
-    /// The value converter used for converting decimal values to long values.
-    /// </summary>
-    private static readonly ValueConverter<decimal, long> DecimalToLongConverter = new(
-        d => (long)(Math.Round(d, 2, MidpointRounding.AwayFromZero) * 100),
-        l => l / 100m
-    );
-    
-    #endregion
-    
     #region Constructors
     
     /// <summary>
@@ -101,9 +83,6 @@ public sealed class PocketAdvisorDbContext
                 .WithMany(u => u.Accounts)
                 .HasForeignKey(a => a.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-            entity.Property(a => a.Balance)
-                .HasConversion(DecimalToLongConverter)
-                .HasColumnType(IntegerType);
         });
         
         modelBuilder.Entity<Category>(entity =>
@@ -165,15 +144,11 @@ public sealed class PocketAdvisorDbContext
                 .WithMany(i => i.TransactionItems)
                 .HasForeignKey(ti => ti.ItemId)
                 .OnDelete(DeleteBehavior.Restrict);
-            entity.Property(ti => ti.TotalPrice)
-                .HasConversion(DecimalToLongConverter)
-                .HasColumnType(IntegerType);
             entity.OwnsOne(ti => ti.Amount, ti =>
             {
-                ti.Property(a => a.Value)
-                    .HasColumnName(nameof(TransactionItem.Amount) + nameof(Quantity.Value))
-                    .HasConversion(DecimalToLongConverter)
-                    .HasColumnType(IntegerType);
+                ti.Property(a => a.Value).HasColumnName(
+                    nameof(TransactionItem.Amount) + nameof(Quantity.Value)
+                );
                 
                 ti.Property(a => a.Unit).HasColumnName(
                     nameof(TransactionItem.Amount) + nameof(Quantity.Unit)

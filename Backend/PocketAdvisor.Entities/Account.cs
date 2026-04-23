@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using PocketAdvisor.Enums;
 
 namespace PocketAdvisor.Entities;
@@ -24,6 +25,7 @@ public class Account
     /// <summary>
     /// The starting balance of the account.
     /// </summary>
+    [Precision(18, 2)]
     public required decimal Balance { get; set; }
     
     /// <summary>

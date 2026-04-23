@@ -1,4 +1,5 @@
-﻿using PocketAdvisor.Entities.ValueObjects;
+﻿using Microsoft.EntityFrameworkCore;
+using PocketAdvisor.Entities.ValueObjects;
 
 namespace PocketAdvisor.Entities;
 
@@ -20,6 +21,7 @@ public class TransactionItem
     /// <summary>
     /// The total price of the item at the time of the transaction.
     /// </summary>
+    [Precision(18, 2)]
     public required decimal TotalPrice { get; set; }
     
     /// <summary>

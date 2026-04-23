@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
     <PackageReference Include="Resend" />
     <PackageReference Include="SecureStore" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
