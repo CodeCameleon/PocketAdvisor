@@ -304,6 +304,74 @@ public sealed class UserService
     
     #endregion
     
+    #region RefreshAsync
+    
+    /// <inheritdoc />
+    public async Task<Result<LoginResponse>> RefreshAsync(RefreshRequest request)
+    {
+        Logger.LogInformation("Refreshing session...");
+        
+        IValidator<RefreshRequest> validator = GetValidator<RefreshRequest>();
+        ValidationResult validationResult = await validator.ValidateAsync(request);
+        
+        if (!validationResult.IsValid)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Validation failed for RefreshRequest: {Errors}",
+                    validationResult.Errors
+                );
+            }
+            
+            return Result.Fail(validationResult.Errors.ToErrorList());
+        }
+        
+        using HMACSHA256 hmacSha256 = new(Encoding.UTF8.GetBytes(TokenSecretsOptions.Value.Refresh));
+        byte[] hashBytes = hmacSha256.ComputeHash(Encoding.UTF8.GetBytes(request.RefreshToken!));
+        string incomingHash = Convert.ToBase64String(hashBytes);
+        
+        Token? existingToken = await TokenRepository.GetSingleOrDefaultAsync(
+            t => t.Hash == incomingHash && t.Type == ETokenType.Refresh,
+            asTracking: true,
+            includes: [t => t.User!]
+        );
+        
+        if (existingToken is null || existingToken.ExpiryAt <= DateTime.UtcNow)
+        {
+            return Result.Fail(
+                CreateError(ValidationMessages.InvalidRefreshToken, nameof(request.RefreshToken))
+            );
+        }
+        
+        await TransactionManager.Value.BeginTransactionAsync();
+        
+        TokenRepository.Delete(existingToken);
+        
+        GeneratedToken generatedRefreshToken = GenerateToken(TokenSecretsOptions.Value.Refresh);
+        
+        Token newRefreshToken = new()
+        {
+            Hash = generatedRefreshToken.Hash,
+            ExpiryAt = DateTime.UtcNow.AddDays(TokenExpirationsOptions.Value.RefreshDays),
+            Type = ETokenType.Refresh,
+            UserId = existingToken.UserId
+        };
+        await TokenRepository.CreateAsync(newRefreshToken);
+        
+        await TransactionManager.Value.CommitTransactionAsync();
+        
+        Logger.LogInformation("Session refreshed successfully.");
+        
+        return Result.Ok(new LoginResponse
+        {
+            JsonWebToken = GenerateJsonWebToken(existingToken.User!),
+            RefreshToken = generatedRefreshToken.Plain
+        });
+    }
+    
+    #endregion
+    
     #region GenerateJsonWebToken
     
     /// <summary>

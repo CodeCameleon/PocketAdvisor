@@ -27,4 +27,7 @@
     <data name="EmailNotVerified" xml:space="preserve">
         <value>The email address has not been verified yet.</value>
     </data>
+    <data name="InvalidRefreshToken" xml:space="preserve">
+        <value>The refresh token is invalid or has expired.</value>
+    </data>
 </root>

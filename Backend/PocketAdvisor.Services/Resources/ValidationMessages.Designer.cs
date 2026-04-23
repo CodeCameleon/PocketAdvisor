@@ -85,5 +85,14 @@ namespace PocketAdvisor.Services.Resources {
                 return ResourceManager.GetString("InvalidCredentials", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The refresh token is invalid or has expired..
+        /// </summary>
+        internal static string InvalidRefreshToken {
+            get {
+                return ResourceManager.GetString("InvalidRefreshToken", resourceCulture);
+            }
+        }
     }
 }

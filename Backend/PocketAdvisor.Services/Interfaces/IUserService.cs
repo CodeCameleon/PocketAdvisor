@@ -31,4 +31,15 @@ public interface IUserService
     /// If successful, the result contains a <see cref="LoginResponse" /> with the issued tokens.
     /// </returns>
     Task<Result<LoginResponse>> LoginAsync(LoginRequest request);
+    
+    /// <summary>
+    /// Validates a refresh token, rotates it, and issues a new JSON Web Token and refresh token asynchronously.
+    /// </summary>
+    /// <param name="request">The refresh token presented by the client.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a
+    /// <see cref="Result{TValue}" /> indicating the success or failure of the operation.
+    /// If successful, the result contains a <see cref="LoginResponse" /> with the newly issued tokens.
+    /// </returns>
+    Task<Result<LoginResponse>> RefreshAsync(RefreshRequest request);
 }
