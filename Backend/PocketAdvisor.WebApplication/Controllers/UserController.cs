@@ -28,6 +28,11 @@ public sealed class UserController
     private new const string Url = "Url";
     
     /// <summary>
+    /// The template used to build the email verification URL.
+    /// </summary>
+    private const string EmailVerificationUrlTemplate = "{0}{1}?token={2}";
+    
+    /// <summary>
     /// The unique identifier of the email template used for email verification.
     /// </summary>
     private static readonly Guid EmailVerificationTemplateId = Guid.Parse("399c5102-326d-4300-88c5-ca6cc194577b");
@@ -40,6 +45,9 @@ public sealed class UserController
     /// Initializes a new instance of the <see cref="UserController" /> class.
     /// </summary>
     /// <param name="userService">The user service instance.</param>
+    /// <param name="frontendOptions">
+    /// The frontend options for accessing the frontend configuration values.
+    /// </param>
     /// <param name="tokenExpirationsOptions">
     /// The token expirations options for accessing the token expirations configuration values.
     /// </param>
@@ -47,13 +55,15 @@ public sealed class UserController
     /// <exception cref="ArgumentNullException">
     /// If any of the given parameters is <see langword="null" />.
     /// </exception>
-    public UserController(IUserService userService, IOptions<TokenExpirationsOptions> tokenExpirationsOptions,
-        IResend resend)
+    public UserController(IUserService userService, IOptions<FrontendOptions> frontendOptions,
+        IOptions<TokenExpirationsOptions> tokenExpirationsOptions, IResend resend)
         : base(userService)
     {
+        ArgumentNullException.ThrowIfNull(frontendOptions);
         ArgumentNullException.ThrowIfNull(tokenExpirationsOptions);
         ArgumentNullException.ThrowIfNull(resend);
         
+        FrontendOptions = frontendOptions;
         TokenExpirationsOptions = tokenExpirationsOptions;
         Resend = resend;
     }
@@ -61,6 +71,11 @@ public sealed class UserController
     #endregion
     
     #region Properties
+    
+    /// <summary>
+    /// The frontend options for accessing the frontend configuration values.
+    /// </summary>
+    private IOptions<FrontendOptions> FrontendOptions { get; }
     
     /// <summary>
     /// The token expirations options for accessing the token expirations configuration values.
@@ -102,8 +117,17 @@ public sealed class UserController
                 TemplateId = EmailVerificationTemplateId,
                 Variables = new()
                 {
-                    { Hours, TokenExpirationsOptions.Value.EmailVerificationHours },
-                    { Url, "" } // TODO: Add the email verification URL here.
+                    {
+                        Hours, TokenExpirationsOptions.Value.EmailVerificationHours
+                    },
+                    {
+                        Url, string.Format(
+                            EmailVerificationUrlTemplate,
+                            FrontendOptions.Value.BaseUrl,
+                            FrontendOptions.Value.EmailVerificationPath,
+                            result.Value
+                        )
+                    }
                 }
             }
         };
