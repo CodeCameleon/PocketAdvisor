@@ -34,11 +34,6 @@ public sealed class PocketAdvisorDbContext
     public DbSet<Category> Categories { get; set; }
     
     /// <summary>
-    /// The database table for the exchange entities.
-    /// </summary>
-    public DbSet<Exchange> Exchanges { get; set; }
-    
-    /// <summary>
     /// The database table for the item entities.
     /// </summary>
     public DbSet<Item> Items { get; set; }
@@ -92,11 +87,6 @@ public sealed class PocketAdvisorDbContext
                 .WithMany(u => u.Categories)
                 .HasForeignKey(c => c.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-        });
-        
-        modelBuilder.Entity<Exchange>(entity =>
-        {
-            entity.HasKey(e => new { e.Base, e.Target, e.Date });
         });
         
         modelBuilder.Entity<Item>(entity =>

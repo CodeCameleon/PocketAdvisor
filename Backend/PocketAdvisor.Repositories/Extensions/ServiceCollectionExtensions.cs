@@ -17,7 +17,6 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
-        services.AddScoped<IExchangeRepository, ExchangeRepository>();
         services.AddScoped<IItemRepository, ItemRepository>();
         services.AddScoped<ITokenRepository, TokenRepository>();
         services.AddScoped<ITransactionItemRepository, TransactionItemRepository>();
