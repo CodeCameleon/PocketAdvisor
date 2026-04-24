@@ -372,6 +372,61 @@ public sealed class UserService
     
     #endregion
     
+    #region VerifyEmailAsync
+    
+    /// <inheritdoc />
+    public async Task<Result> VerifyEmailAsync(VerifyEmailRequest request)
+    {
+        Logger.LogInformation("Verifying email address...");
+        
+        IValidator<VerifyEmailRequest> validator = GetValidator<VerifyEmailRequest>();
+        ValidationResult validationResult = await validator.ValidateAsync(request);
+        
+        if (!validationResult.IsValid)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Validation failed for VerifyEmailRequest: {Errors}",
+                    validationResult.Errors
+                );
+            }
+            
+            return Result.Fail(validationResult.Errors.ToErrorList());
+        }
+        
+        using HMACSHA256 hmacSha256 = new(Encoding.UTF8.GetBytes(TokenSecretsOptions.Value.EmailVerification));
+        byte[] hashBytes = hmacSha256.ComputeHash(Encoding.UTF8.GetBytes(request.Token!));
+        string incomingHash = Convert.ToBase64String(hashBytes);
+        
+        Token? existingToken = await TokenRepository.GetSingleOrDefaultAsync(
+            t => t.Hash == incomingHash && t.Type == ETokenType.EmailVerification,
+            asTracking: true,
+            includes: [t => t.User!]
+        );
+        
+        if (existingToken is null || existingToken.ExpiryAt <= DateTime.UtcNow)
+        {
+            return Result.Fail(
+                CreateError(ValidationMessages.InvalidEmailVerificationToken, nameof(request.Token))
+            );
+        }
+        
+        await TransactionManager.Value.BeginTransactionAsync();
+        
+        existingToken.User!.IsEmailVerified = true;
+        UserRepository.Update(existingToken.User);
+        
+        TokenRepository.Delete(existingToken);
+        
+        await TransactionManager.Value.CommitTransactionAsync();
+        
+        Logger.LogInformation("Email address verified successfully.");
+        return Result.Ok();
+    }
+    
+    #endregion
+    
     #region GenerateJsonWebToken
     
     /// <summary>

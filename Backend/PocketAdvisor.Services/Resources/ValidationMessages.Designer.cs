@@ -94,5 +94,14 @@ namespace PocketAdvisor.Services.Resources {
                 return ResourceManager.GetString("InvalidRefreshToken", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The email verification token is invalid or has expired..
+        /// </summary>
+        internal static string InvalidEmailVerificationToken {
+            get {
+                return ResourceManager.GetString("InvalidEmailVerificationToken", resourceCulture);
+            }
+        }
     }
 }

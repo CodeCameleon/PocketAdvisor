@@ -42,4 +42,14 @@ public interface IUserService
     /// If successful, the result contains a <see cref="LoginResponse" /> with the newly issued tokens.
     /// </returns>
     Task<Result<LoginResponse>> RefreshAsync(RefreshRequest request);
+    
+    /// <summary>
+    /// Verifies the email address of a user using the supplied verification token asynchronously.
+    /// </summary>
+    /// <param name="request">The email verification token presented by the client.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a
+    /// <see cref="Result" /> indicating the success or failure of the operation.
+    /// </returns>
+    Task<Result> VerifyEmailAsync(VerifyEmailRequest request);
 }

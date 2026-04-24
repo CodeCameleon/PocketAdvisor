@@ -30,4 +30,7 @@
     <data name="InvalidRefreshToken" xml:space="preserve">
         <value>The refresh token is invalid or has expired.</value>
     </data>
+    <data name="InvalidEmailVerificationToken" xml:space="preserve">
+        <value>The email verification token is invalid or has expired.</value>
+    </data>
 </root>
