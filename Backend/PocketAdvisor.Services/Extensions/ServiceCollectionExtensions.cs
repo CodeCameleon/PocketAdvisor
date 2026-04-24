@@ -20,6 +20,7 @@ public static class ServiceCollectionExtensions
     /// <param name="configuration">The configuration instance.</param>
     public static void AddServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddOptions<FrontendOptions>(configuration);
         services.AddOptions<JsonWebTokenOptions>(configuration);
         services.AddOptions<TokenExpirationsOptions>(configuration);
         services.AddOptions<TokenSecretsOptions>(configuration);
