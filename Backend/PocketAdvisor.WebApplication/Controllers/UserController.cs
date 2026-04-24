@@ -113,4 +113,27 @@ public sealed class UserController
     }
     
     #endregion
+    
+    #region VerifyEmailAsync
+    
+    /// <summary>
+    /// Verifies the email address of a user using the supplied verification token asynchronously.
+    /// </summary>
+    /// <param name="request">The email verification token presented by the client.</param>
+    [HttpPost("verify-email")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> VerifyEmailAsync([FromBody] VerifyEmailRequest request)
+    {
+        Result result = await Service.VerifyEmailAsync(request);
+        
+        if (result.IsFailed)
+        {
+            return BadRequest(result.Errors);
+        }
+        
+        return NoContent();
+    }
+    
+    #endregion
 }
