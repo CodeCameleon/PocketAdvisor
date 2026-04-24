@@ -57,4 +57,13 @@
     <data name="RefreshTokenTooLong" xml:space="preserve">
         <value>The refresh token must not exceed 44 characters.</value>
     </data>
+    <data name="EmailVerificationTokenRequired" xml:space="preserve">
+        <value>The email verification token is required.</value>
+    </data>
+    <data name="EmailVerificationTokenTooShort" xml:space="preserve">
+        <value>The email verification token must be at least 44 characters.</value>
+    </data>
+    <data name="EmailVerificationTokenTooLong" xml:space="preserve">
+        <value>The email verification token must not exceed 44 characters.</value>
+    </data>
 </root>

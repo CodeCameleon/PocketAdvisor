@@ -175,5 +175,32 @@ namespace PocketAdvisor.Requests.Resources {
                 return ResourceManager.GetString("RefreshTokenTooShort", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The email verification token is required..
+        /// </summary>
+        internal static string EmailVerificationTokenRequired {
+            get {
+                return ResourceManager.GetString("EmailVerificationTokenRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The email verification token must be at least 44 characters..
+        /// </summary>
+        internal static string EmailVerificationTokenTooShort {
+            get {
+                return ResourceManager.GetString("EmailVerificationTokenTooShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The email verification token must not exceed 44 characters..
+        /// </summary>
+        internal static string EmailVerificationTokenTooLong {
+            get {
+                return ResourceManager.GetString("EmailVerificationTokenTooLong", resourceCulture);
+            }
+        }
     }
 }
