@@ -18,9 +18,14 @@ public sealed class UserController
     #region Constants
     
     /// <summary>
-    /// The name of the variable used to store the time value in the email templates.
+    /// The name of the variable used to store the hour value in the email templates.
     /// </summary>
     private const string Hours = "Hours";
+    
+    /// <summary>
+    /// The name of the variable used to store the minute value in the email templates.
+    /// </summary>
+    private const string Minutes = "Minutes";
     
     /// <summary>
     /// The name of the variable used to store the URL value in the email templates.
@@ -28,14 +33,19 @@ public sealed class UserController
     private new const string Url = "Url";
     
     /// <summary>
-    /// The template used to build the email verification URL.
+    /// The template used to build the URL of emails.
     /// </summary>
-    private const string EmailVerificationUrlTemplate = "{0}{1}?token={2}";
+    private const string UrlTemplate = "{0}{1}?token={2}";
     
     /// <summary>
     /// The unique identifier of the email template used for email verification.
     /// </summary>
     private static readonly Guid EmailVerificationTemplateId = Guid.Parse("399c5102-326d-4300-88c5-ca6cc194577b");
+    
+    /// <summary>
+    /// The unique identifier of the email template used for password reset.
+    /// </summary>
+    private static readonly Guid PasswordResetTemplateId = Guid.Parse("4f196197-f7e1-4724-bdf4-7540c27bdaab");
     
     #endregion
     
@@ -122,7 +132,7 @@ public sealed class UserController
                     },
                     {
                         Url, string.Format(
-                            EmailVerificationUrlTemplate,
+                            UrlTemplate,
                             FrontendOptions.Value.BaseUrl,
                             FrontendOptions.Value.EmailVerificationPath,
                             result.Value
@@ -134,6 +144,55 @@ public sealed class UserController
         await Resend.EmailSendAsync(emailMessage);
         
         return StatusCode(StatusCodes.Status201Created);
+    }
+    
+    #endregion
+    
+    #region ForgotPasswordAsync
+    
+    /// <summary>
+    /// Sends a password reset email to the user with the given email address asynchronously.
+    /// </summary>
+    /// <param name="request">The email address of the user requesting a password reset.</param>
+    [HttpPost("forgot-password")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ForgotPasswordAsync([FromBody] ForgotPasswordRequest request)
+    {
+        Result<string> result = await Service.ForgotPasswordAsync(request);
+        
+        if (result.IsFailed)
+        {
+            return BadRequest(result.Errors);
+        }
+        
+        EmailMessage emailMessage = new()
+        {
+            From = string.Empty, // This is defined in the template.
+            To = request.Email!,
+            Subject = string.Empty, // This is defined in the template too.
+            Template = new()
+            {
+                TemplateId = PasswordResetTemplateId,
+                Variables = new()
+                {
+                    {
+                        Minutes, TokenExpirationsOptions.Value.PasswordResetMinutes
+                    },
+                    {
+                        Url, string.Format(
+                            UrlTemplate,
+                            FrontendOptions.Value.BaseUrl,
+                            FrontendOptions.Value.PasswordResetPath,
+                            result.Value
+                        )
+                    }
+                }
+            }
+        };
+        await Resend.EmailSendAsync(emailMessage);
+        
+        return NoContent();
     }
     
     #endregion
