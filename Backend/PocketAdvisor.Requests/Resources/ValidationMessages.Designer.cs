@@ -202,5 +202,32 @@ namespace PocketAdvisor.Requests.Resources {
                 return ResourceManager.GetString("EmailVerificationTokenTooLong", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The password reset token is required..
+        /// </summary>
+        internal static string PasswordResetTokenRequired {
+            get {
+                return ResourceManager.GetString("PasswordResetTokenRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The password reset token must be at least 44 characters..
+        /// </summary>
+        internal static string PasswordResetTokenTooShort {
+            get {
+                return ResourceManager.GetString("PasswordResetTokenTooShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The password reset token must not exceed 44 characters..
+        /// </summary>
+        internal static string PasswordResetTokenTooLong {
+            get {
+                return ResourceManager.GetString("PasswordResetTokenTooLong", resourceCulture);
+            }
+        }
     }
 }

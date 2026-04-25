@@ -66,4 +66,13 @@
     <data name="EmailVerificationTokenTooLong" xml:space="preserve">
         <value>The email verification token must not exceed 44 characters.</value>
     </data>
+    <data name="PasswordResetTokenRequired" xml:space="preserve">
+        <value>The password reset token is required.</value>
+    </data>
+    <data name="PasswordResetTokenTooShort" xml:space="preserve">
+        <value>The password reset token must be at least 44 characters.</value>
+    </data>
+    <data name="PasswordResetTokenTooLong" xml:space="preserve">
+        <value>The password reset token must not exceed 44 characters.</value>
+    </data>
 </root>
