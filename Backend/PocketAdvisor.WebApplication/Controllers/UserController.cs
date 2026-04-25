@@ -197,6 +197,29 @@ public sealed class UserController
     
     #endregion
     
+    #region ResetPasswordAsync
+    
+    /// <summary>
+    /// Resets the password of a user using the supplied password reset token asynchronously.
+    /// </summary>
+    /// <param name="request">The password reset token and the new password presented by the client.</param>
+    [HttpPost("reset-password")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ResetPasswordAsync([FromBody] ResetPasswordRequest request)
+    {
+        Result result = await Service.ResetPasswordAsync(request);
+        
+        if (result.IsFailed)
+        {
+            return BadRequest(result.Errors);
+        }
+        
+        return NoContent();
+    }
+    
+    #endregion
+    
     #region VerifyEmailAsync
     
     /// <summary>
