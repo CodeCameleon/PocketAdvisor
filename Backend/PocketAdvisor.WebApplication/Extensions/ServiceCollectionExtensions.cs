@@ -1,4 +1,7 @@
-﻿using Resend;
+﻿using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Resend;
 
 namespace PocketAdvisor.WebApplication.Extensions;
 
@@ -7,6 +10,35 @@ namespace PocketAdvisor.WebApplication.Extensions;
 /// </summary>
 public static class ServiceCollectionExtensions
 {
+    #region AddPocketAdvisorAuthentication
+    
+    /// <summary>
+    /// Adds JWT Bearer authentication to the service collection.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="issuer">The valid issuer of the JSON Web Token.</param>
+    /// <param name="audience">The valid audience of the JSON Web Token.</param>
+    /// <param name="signingSecret">The secret used to validate the JSON Web Token signature.</param>
+    public static void AddPocketAdvisorAuthentication(this IServiceCollection services,
+        string issuer, string audience, string signingSecret)
+    {
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new()
+            {
+                ValidateIssuer = true,
+                ValidIssuer = issuer,
+                ValidateAudience = true,
+                ValidAudience = audience,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingSecret))
+            };
+        });
+    }
+    
+    #endregion
+    
     #region AddResendClient
     
     /// <summary>

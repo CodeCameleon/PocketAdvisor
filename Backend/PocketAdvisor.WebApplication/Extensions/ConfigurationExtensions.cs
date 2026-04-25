@@ -8,6 +8,11 @@ public static class ConfigurationExtensions
     #region Constants
     
     /// <summary>
+    /// The name of the JWT audience in the configuration.
+    /// </summary>
+    private const string Audience = "Audience";
+    
+    /// <summary>
     /// The name of the api key for the Resend service in the configuration.
     /// </summary>
     private const string ApiKey = "ApiKey";
@@ -53,6 +58,21 @@ public static class ConfigurationExtensions
     private const string DefaultUsername = "DefaultUsername";
     
     /// <summary>
+    /// The name of the JWT issuer in the configuration.
+    /// </summary>
+    private const string Issuer = "Issuer";
+    
+    /// <summary>
+    /// The name of the JWT secret in the configuration.
+    /// </summary>
+    private const string JsonWeb = "JsonWeb";
+    
+    /// <summary>
+    /// The name of the section that contains JWT settings in the configuration.
+    /// </summary>
+    private const string JsonWebToken = "JsonWebToken";
+    
+    /// <summary>
     /// The name of the key file path for the secure store in the configuration.
     /// </summary>
     private const string KeyFilePath = "KeyFilePath";
@@ -76,6 +96,11 @@ public static class ConfigurationExtensions
     /// The name of the secure store path in the configuration.
     /// </summary>
     private const string StorePath = "StorePath";
+    
+    /// <summary>
+    /// The name of the section that contains token secrets in the configuration.
+    /// </summary>
+    private const string TokenSecrets = "TokenSecrets";
     
     #endregion
     
@@ -124,6 +149,78 @@ public static class ConfigurationExtensions
         }
         
         return string.Format(ConnectionStringTemplate, host, port, database, username, password);
+    }
+    
+    #endregion
+    
+    #region GetJwtAudience
+    
+    /// <summary>
+    /// Gets the JWT audience from the configuration.
+    /// </summary>
+    /// <param name="configuration">The configuration instance.</param>
+    /// <returns>The JWT audience.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// If the JWT audience is not found in the configuration.
+    /// </exception>
+    public static string GetJwtAudience(this IConfiguration configuration)
+    {
+        string? audience = configuration.GetSection(JsonWebToken).GetValue<string>(Audience);
+        
+        if (string.IsNullOrWhiteSpace(audience))
+        {
+            throw CreateInvalidOperationException(JsonWebToken, Audience);
+        }
+        
+        return audience;
+    }
+    
+    #endregion
+    
+    #region GetJwtIssuer
+    
+    /// <summary>
+    /// Gets the JWT issuer from the configuration.
+    /// </summary>
+    /// <param name="configuration">The configuration instance.</param>
+    /// <returns>The JWT issuer.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// If the JWT issuer is not found in the configuration.
+    /// </exception>
+    public static string GetJwtIssuer(this IConfiguration configuration)
+    {
+        string? issuer = configuration.GetSection(JsonWebToken).GetValue<string>(Issuer);
+        
+        if (string.IsNullOrWhiteSpace(issuer))
+        {
+            throw CreateInvalidOperationException(JsonWebToken, Issuer);
+        }
+        
+        return issuer;
+    }
+    
+    #endregion
+    
+    #region GetJwtSigningSecret
+    
+    /// <summary>
+    /// Gets the JWT signing secret from the configuration.
+    /// </summary>
+    /// <param name="configuration">The configuration instance.</param>
+    /// <returns>The JWT signing secret.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// If the JWT signing secret is not found in the configuration.
+    /// </exception>
+    public static string GetJwtSigningSecret(this IConfiguration configuration)
+    {
+        string? secret = configuration.GetSection(TokenSecrets).GetValue<string>(JsonWeb);
+        
+        if (string.IsNullOrWhiteSpace(secret))
+        {
+            throw CreateInvalidOperationException(TokenSecrets, JsonWeb);
+        }
+        
+        return secret;
     }
     
     #endregion

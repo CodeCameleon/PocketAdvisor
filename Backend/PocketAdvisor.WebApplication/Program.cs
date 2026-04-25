@@ -41,6 +41,13 @@ builder.Services.AddResendClient(
 // Adds the services to the container.
 builder.Services.AddServices(builder.Configuration);
 
+// Adds JWT Bearer authentication to the container.
+builder.Services.AddPocketAdvisorAuthentication(
+    builder.Configuration.GetJwtIssuer(),
+    builder.Configuration.GetJwtAudience(),
+    builder.Configuration.GetJwtSigningSecret()
+);
+
 // Adds the API controllers to the container.
 builder.Services.AddControllers();
 
@@ -66,6 +73,9 @@ app.UsePocketAdvisorSwagger();
 
 // Adds the middleware for redirecting HTTP requests.
 app.UseHttpsRedirection();
+
+// Adds the middleware for authentication.
+app.UseAuthentication();
 
 // Adds the middleware for authorization.
 app.UseAuthorization();
