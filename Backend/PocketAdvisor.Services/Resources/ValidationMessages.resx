@@ -19,24 +19,27 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
     <data name="EmailAlreadyExists" xml:space="preserve">
-        <value>The email address is already in use.</value>
+        <value>The email address is already in use</value>
     </data>
     <data name="InvalidCredentials" xml:space="preserve">
-        <value>The provided credentials are invalid.</value>
+        <value>The provided credentials are invalid</value>
     </data>
     <data name="EmailNotVerified" xml:space="preserve">
-        <value>The email address has not been verified yet.</value>
+        <value>The email address has not been verified yet</value>
     </data>
     <data name="InvalidRefreshToken" xml:space="preserve">
-        <value>The refresh token is invalid or has expired.</value>
+        <value>The refresh token is invalid or has expired</value>
     </data>
     <data name="InvalidEmailVerificationToken" xml:space="preserve">
-        <value>The email verification token is invalid or has expired.</value>
+        <value>The email verification token is invalid or has expired</value>
     </data>
     <data name="UserNotFound" xml:space="preserve">
-        <value>No account associated with the provided email address was found.</value>
+        <value>No account associated with the provided email address was found</value>
     </data>
     <data name="InvalidPasswordResetToken" xml:space="preserve">
-        <value>The password reset token is invalid or has expired.</value>
+        <value>The password reset token is invalid or has expired</value>
+    </data>
+    <data name="AccountNameAlreadyExists" xml:space="preserve">
+        <value>An account with the given name already exists</value>
     </data>
 </root>

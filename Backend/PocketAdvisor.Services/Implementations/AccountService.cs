@@ -1,0 +1,105 @@
+using FluentResults;
+using FluentValidation;
+using FluentValidation.Results;
+using Microsoft.Extensions.Logging;
+using PocketAdvisor.Entities;
+using PocketAdvisor.Repositories.Interfaces;
+using PocketAdvisor.Requests.Accounts;
+using PocketAdvisor.Services.Extensions;
+using PocketAdvisor.Services.Interfaces;
+using PocketAdvisor.Services.Resources;
+
+namespace PocketAdvisor.Services.Implementations;
+
+/// <summary>
+/// Represents the service implementation for performing operations related to accounts.
+/// </summary>
+public sealed class AccountService
+    : BaseService<AccountService>, IAccountService
+{
+    #region Constructors
+    
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AccountService" /> class.
+    /// </summary>
+    /// <param name="logger">The logger for the class.</param>
+    /// <param name="serviceProvider">The service provider for resolving dependencies.</param>
+    /// <param name="accountRepository">The account repository instance.</param>
+    /// <exception cref="ArgumentNullException">
+    /// If any of the given parameters is <see langword="null" />.
+    /// </exception>
+    public AccountService(ILogger<AccountService> logger, IServiceProvider serviceProvider,
+        IAccountRepository accountRepository)
+        : base(logger, serviceProvider)
+    {
+        ArgumentNullException.ThrowIfNull(accountRepository);
+        
+        AccountRepository = accountRepository;
+    }
+    
+    #endregion
+    
+    #region Properties
+    
+    /// <summary>
+    /// The account repository instance.
+    /// </summary>
+    private IAccountRepository AccountRepository { get; }
+    
+    #endregion
+    
+    #region CreateAccountAsync
+    
+    /// <inheritdoc />
+    public async Task<Result> CreateAccountAsync(CreateAccountRequest request, Guid userId)
+    {
+        Logger.LogInformation("Creating new account...");
+        
+        IValidator<CreateAccountRequest> validator = GetValidator<CreateAccountRequest>();
+        ValidationResult validationResult = await validator.ValidateAsync(request);
+        
+        if (!validationResult.IsValid)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Validation failed for CreateAccountRequest: {Errors}",
+                    validationResult.Errors
+                );
+            }
+            
+            return Result.Fail(validationResult.Errors.ToErrorList());
+        }
+        
+        string normalizedName = request.Name!.Trim();
+        
+        bool nameExists = await AccountRepository.ExistsAsync(
+            a => a.UserId == userId && a.Name == normalizedName
+        );
+        
+        if (nameExists)
+        {
+            return Result.Fail(
+                CreateError(ValidationMessages.AccountNameAlreadyExists, nameof(request.Name))
+            );
+        }
+        
+        await TransactionManager.Value.BeginTransactionAsync();
+        
+        Account account = new()
+        {
+            Name = normalizedName,
+            Balance = request.Balance!.Value,
+            CurrencyCode = request.CurrencyCode!.Value,
+            UserId = userId
+        };
+        await AccountRepository.CreateAsync(account);
+        
+        await TransactionManager.Value.CommitTransactionAsync();
+        
+        Logger.LogInformation("New account created successfully.");
+        return Result.Ok();
+    }
+    
+    #endregion
+}

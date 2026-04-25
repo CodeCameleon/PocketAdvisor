@@ -25,6 +25,7 @@ public static class ServiceCollectionExtensions
         services.AddOptions<TokenExpirationsOptions>(configuration);
         services.AddOptions<TokenSecretsOptions>(configuration);
         
+        services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IUserService, UserService>();
     }
     

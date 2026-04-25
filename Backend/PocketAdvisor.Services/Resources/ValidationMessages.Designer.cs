@@ -60,7 +60,16 @@ namespace PocketAdvisor.Services.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The email address is already in use..
+        ///   Looks up a localized string similar to An account with the given name already exists.
+        /// </summary>
+        internal static string AccountNameAlreadyExists {
+            get {
+                return ResourceManager.GetString("AccountNameAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The email address is already in use.
         /// </summary>
         internal static string EmailAlreadyExists {
             get {
@@ -69,7 +78,7 @@ namespace PocketAdvisor.Services.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The email address has not been verified yet..
+        ///   Looks up a localized string similar to The email address has not been verified yet.
         /// </summary>
         internal static string EmailNotVerified {
             get {
@@ -78,7 +87,7 @@ namespace PocketAdvisor.Services.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The provided credentials are invalid..
+        ///   Looks up a localized string similar to The provided credentials are invalid.
         /// </summary>
         internal static string InvalidCredentials {
             get {
@@ -87,7 +96,7 @@ namespace PocketAdvisor.Services.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The email verification token is invalid or has expired..
+        ///   Looks up a localized string similar to The email verification token is invalid or has expired.
         /// </summary>
         internal static string InvalidEmailVerificationToken {
             get {
@@ -96,7 +105,16 @@ namespace PocketAdvisor.Services.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The refresh token is invalid or has expired..
+        ///   Looks up a localized string similar to The password reset token is invalid or has expired.
+        /// </summary>
+        internal static string InvalidPasswordResetToken {
+            get {
+                return ResourceManager.GetString("InvalidPasswordResetToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The refresh token is invalid or has expired.
         /// </summary>
         internal static string InvalidRefreshToken {
             get {
@@ -105,20 +123,11 @@ namespace PocketAdvisor.Services.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No account associated with the provided email address was found..
+        ///   Looks up a localized string similar to No account associated with the provided email address was found.
         /// </summary>
         internal static string UserNotFound {
             get {
                 return ResourceManager.GetString("UserNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The password reset token is invalid or has expired..
-        /// </summary>
-        internal static string InvalidPasswordResetToken {
-            get {
-                return ResourceManager.GetString("InvalidPasswordResetToken", resourceCulture);
             }
         }
     }
