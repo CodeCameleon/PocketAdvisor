@@ -60,6 +60,15 @@ namespace PocketAdvisor.Requests.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The starting balance must not be negative.
+        /// </summary>
+        internal static string AccountBalanceNegative {
+            get {
+                return ResourceManager.GetString("AccountBalanceNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The starting balance is required.
         /// </summary>
         internal static string AccountBalanceRequired {

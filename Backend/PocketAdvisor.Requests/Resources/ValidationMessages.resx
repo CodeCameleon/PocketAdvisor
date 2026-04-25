@@ -84,6 +84,9 @@
     <data name="AccountBalanceRequired" xml:space="preserve">
         <value>The starting balance is required</value>
     </data>
+    <data name="AccountBalanceNegative" xml:space="preserve">
+        <value>The starting balance must not be negative</value>
+    </data>
     <data name="AccountCurrencyCodeRequired" xml:space="preserve">
         <value>The currency code is required</value>
     </data>

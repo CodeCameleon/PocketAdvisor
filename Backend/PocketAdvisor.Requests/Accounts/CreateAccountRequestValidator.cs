@@ -21,7 +21,8 @@ public sealed class CreateAccountRequestValidator
             .MaximumLength(100).WithMessage(ValidationMessages.AccountNameTooLong);
         
         RuleFor(car => car.Balance).Cascade(CascadeMode.Stop)
-            .NotNull().WithMessage(ValidationMessages.AccountBalanceRequired);
+            .NotNull().WithMessage(ValidationMessages.AccountBalanceRequired)
+            .GreaterThanOrEqualTo(0).WithMessage(ValidationMessages.AccountBalanceNegative);
         
         RuleFor(car => car.CurrencyCode).Cascade(CascadeMode.Stop)
             .NotNull().WithMessage(ValidationMessages.AccountCurrencyCodeRequired)
