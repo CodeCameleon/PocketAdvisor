@@ -33,4 +33,7 @@
     <data name="InvalidEmailVerificationToken" xml:space="preserve">
         <value>The email verification token is invalid or has expired.</value>
     </data>
+    <data name="UserNotFound" xml:space="preserve">
+        <value>No account associated with the provided email address was found.</value>
+    </data>
 </root>

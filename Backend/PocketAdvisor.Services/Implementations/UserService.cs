@@ -211,6 +211,63 @@ public sealed class UserService
     
     #endregion
     
+    #region ForgotPasswordAsync
+    
+    /// <inheritdoc />
+    public async Task<Result<string>> ForgotPasswordAsync(ForgotPasswordRequest request)
+    {
+        Logger.LogInformation("Processing forgot password request...");
+        
+        IValidator<ForgotPasswordRequest> validator = GetValidator<ForgotPasswordRequest>();
+        ValidationResult validationResult = await validator.ValidateAsync(request);
+        
+        if (!validationResult.IsValid)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Validation failed for ForgotPasswordRequest: {Errors}",
+                    validationResult.Errors
+                );
+            }
+            
+            return Result.Fail(validationResult.Errors.ToErrorList());
+        }
+        
+        string normalizedEmail = request.Email!.Trim().ToLowerInvariant();
+        
+        User? user = await UserRepository.GetSingleOrDefaultAsync(
+            u => u.Email == normalizedEmail
+        );
+        
+        if (user is null)
+        {
+            return Result.Fail(
+                CreateError(ValidationMessages.UserNotFound, nameof(request.Email))
+            );
+        }
+        
+        await TransactionManager.Value.BeginTransactionAsync();
+        
+        GeneratedToken generatedToken = GenerateToken(TokenSecretsOptions.Value.PasswordReset);
+        
+        Token token = new()
+        {
+            Hash = generatedToken.Hash,
+            ExpiryAt = DateTime.UtcNow.AddMinutes(TokenExpirationsOptions.Value.PasswordResetMinutes),
+            Type = ETokenType.PasswordReset,
+            UserId = user.Id
+        };
+        await TokenRepository.CreateAsync(token);
+        
+        await TransactionManager.Value.CommitTransactionAsync();
+        
+        Logger.LogInformation("Password reset token generated successfully.");
+        return Result.Ok(generatedToken.Plain);
+    }
+    
+    #endregion
+    
     #region LoginAsync
     
     /// <inheritdoc />
