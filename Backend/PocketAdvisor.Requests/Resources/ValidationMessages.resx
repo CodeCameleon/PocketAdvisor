@@ -19,60 +19,75 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
     <data name="EmailRequired" xml:space="preserve">
-        <value>The email address is required.</value>
+        <value>The email address is required</value>
     </data>
     <data name="EmailTooLong" xml:space="preserve">
-        <value>The email address must not exceed 100 characters.</value>
+        <value>The email address must not exceed 100 characters</value>
     </data>
     <data name="EmailInvalid" xml:space="preserve">
-        <value>The email address format is invalid.</value>
+        <value>The email address format is invalid</value>
     </data>
     <data name="PasswordRequired" xml:space="preserve">
-        <value>The password is required.</value>
+        <value>The password is required</value>
     </data>
     <data name="PasswordTooLong" xml:space="preserve">
-        <value>The password must not exceed 100 characters.</value>
+        <value>The password must not exceed 100 characters</value>
     </data>
     <data name="PasswordTooWeak" xml:space="preserve">
-        <value>The password must be at least 8 characters and include uppercase, lowercase, digit, and special character.</value>
+        <value>The password must be at least 8 characters and include uppercase, lowercase, digit, and special character</value>
     </data>
     <data name="ConfirmPasswordRequired" xml:space="preserve">
-        <value>The password confirmation is required.</value>
+        <value>The password confirmation is required</value>
     </data>
     <data name="ConfirmPasswordTooLong" xml:space="preserve">
-        <value>The password confirmation must not exceed 100 characters.</value>
+        <value>The password confirmation must not exceed 100 characters</value>
     </data>
     <data name="ConfirmPasswordMismatch" xml:space="preserve">
-        <value>The password confirmation must match the password.</value>
+        <value>The password confirmation must match the password</value>
     </data>
     <data name="ConfirmPasswordTooWeak" xml:space="preserve">
-        <value>The password confirmation must be at least 8 characters and include uppercase, lowercase, digit, and special character.</value>
+        <value>The password confirmation must be at least 8 characters and include uppercase, lowercase, digit, and special character</value>
     </data>
     <data name="RefreshTokenRequired" xml:space="preserve">
-        <value>The refresh token is required.</value>
+        <value>The refresh token is required</value>
     </data>
     <data name="RefreshTokenTooShort" xml:space="preserve">
-        <value>The refresh token must be at least 44 characters.</value>
+        <value>The refresh token must be at least 44 characters</value>
     </data>
     <data name="RefreshTokenTooLong" xml:space="preserve">
-        <value>The refresh token must not exceed 44 characters.</value>
+        <value>The refresh token must not exceed 44 characters</value>
     </data>
     <data name="EmailVerificationTokenRequired" xml:space="preserve">
-        <value>The email verification token is required.</value>
+        <value>The email verification token is required</value>
     </data>
     <data name="EmailVerificationTokenTooShort" xml:space="preserve">
-        <value>The email verification token must be at least 44 characters.</value>
+        <value>The email verification token must be at least 44 characters</value>
     </data>
     <data name="EmailVerificationTokenTooLong" xml:space="preserve">
-        <value>The email verification token must not exceed 44 characters.</value>
+        <value>The email verification token must not exceed 44 characters</value>
     </data>
     <data name="PasswordResetTokenRequired" xml:space="preserve">
-        <value>The password reset token is required.</value>
+        <value>The password reset token is required</value>
     </data>
     <data name="PasswordResetTokenTooShort" xml:space="preserve">
-        <value>The password reset token must be at least 44 characters.</value>
+        <value>The password reset token must be at least 44 characters</value>
     </data>
     <data name="PasswordResetTokenTooLong" xml:space="preserve">
-        <value>The password reset token must not exceed 44 characters.</value>
+        <value>The password reset token must not exceed 44 characters</value>
+    </data>
+    <data name="AccountNameRequired" xml:space="preserve">
+        <value>The account name is required</value>
+    </data>
+    <data name="AccountNameTooLong" xml:space="preserve">
+        <value>The account name must not exceed 100 characters</value>
+    </data>
+    <data name="AccountBalanceRequired" xml:space="preserve">
+        <value>The starting balance is required</value>
+    </data>
+    <data name="AccountCurrencyCodeRequired" xml:space="preserve">
+        <value>The currency code is required</value>
+    </data>
+    <data name="AccountCurrencyCodeInvalid" xml:space="preserve">
+        <value>The currency code is invalid</value>
     </data>
 </root>

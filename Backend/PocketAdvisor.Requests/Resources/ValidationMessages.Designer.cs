@@ -60,7 +60,52 @@ namespace PocketAdvisor.Requests.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The password confirmation must match the password..
+        ///   Looks up a localized string similar to The starting balance is required.
+        /// </summary>
+        internal static string AccountBalanceRequired {
+            get {
+                return ResourceManager.GetString("AccountBalanceRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The currency code is invalid.
+        /// </summary>
+        internal static string AccountCurrencyCodeInvalid {
+            get {
+                return ResourceManager.GetString("AccountCurrencyCodeInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The currency code is required.
+        /// </summary>
+        internal static string AccountCurrencyCodeRequired {
+            get {
+                return ResourceManager.GetString("AccountCurrencyCodeRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The account name is required.
+        /// </summary>
+        internal static string AccountNameRequired {
+            get {
+                return ResourceManager.GetString("AccountNameRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The account name must not exceed 100 characters.
+        /// </summary>
+        internal static string AccountNameTooLong {
+            get {
+                return ResourceManager.GetString("AccountNameTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The password confirmation must match the password.
         /// </summary>
         internal static string ConfirmPasswordMismatch {
             get {
@@ -69,7 +114,7 @@ namespace PocketAdvisor.Requests.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The password confirmation is required..
+        ///   Looks up a localized string similar to The password confirmation is required.
         /// </summary>
         internal static string ConfirmPasswordRequired {
             get {
@@ -78,7 +123,7 @@ namespace PocketAdvisor.Requests.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The password confirmation must not exceed 100 characters..
+        ///   Looks up a localized string similar to The password confirmation must not exceed 100 characters.
         /// </summary>
         internal static string ConfirmPasswordTooLong {
             get {
@@ -87,7 +132,7 @@ namespace PocketAdvisor.Requests.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The password confirmation must be at least 8 characters and include uppercase, lowercase, digit, and special character..
+        ///   Looks up a localized string similar to The password confirmation must be at least 8 characters and include uppercase, lowercase, digit, and special character.
         /// </summary>
         internal static string ConfirmPasswordTooWeak {
             get {
@@ -96,7 +141,7 @@ namespace PocketAdvisor.Requests.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The email address format is invalid..
+        ///   Looks up a localized string similar to The email address format is invalid.
         /// </summary>
         internal static string EmailInvalid {
             get {
@@ -105,7 +150,7 @@ namespace PocketAdvisor.Requests.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The email address is required..
+        ///   Looks up a localized string similar to The email address is required.
         /// </summary>
         internal static string EmailRequired {
             get {
@@ -114,7 +159,7 @@ namespace PocketAdvisor.Requests.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The email address must not exceed 100 characters..
+        ///   Looks up a localized string similar to The email address must not exceed 100 characters.
         /// </summary>
         internal static string EmailTooLong {
             get {
@@ -123,61 +168,7 @@ namespace PocketAdvisor.Requests.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The password is required..
-        /// </summary>
-        internal static string PasswordRequired {
-            get {
-                return ResourceManager.GetString("PasswordRequired", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The password must not exceed 100 characters..
-        /// </summary>
-        internal static string PasswordTooLong {
-            get {
-                return ResourceManager.GetString("PasswordTooLong", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The password must be at least 8 characters and include uppercase, lowercase, digit, and special character..
-        /// </summary>
-        internal static string PasswordTooWeak {
-            get {
-                return ResourceManager.GetString("PasswordTooWeak", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The refresh token is required..
-        /// </summary>
-        internal static string RefreshTokenRequired {
-            get {
-                return ResourceManager.GetString("RefreshTokenRequired", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The refresh token must not exceed 44 characters..
-        /// </summary>
-        internal static string RefreshTokenTooLong {
-            get {
-                return ResourceManager.GetString("RefreshTokenTooLong", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The refresh token must be at least 44 characters..
-        /// </summary>
-        internal static string RefreshTokenTooShort {
-            get {
-                return ResourceManager.GetString("RefreshTokenTooShort", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The email verification token is required..
+        ///   Looks up a localized string similar to The email verification token is required.
         /// </summary>
         internal static string EmailVerificationTokenRequired {
             get {
@@ -186,16 +177,7 @@ namespace PocketAdvisor.Requests.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The email verification token must be at least 44 characters..
-        /// </summary>
-        internal static string EmailVerificationTokenTooShort {
-            get {
-                return ResourceManager.GetString("EmailVerificationTokenTooShort", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The email verification token must not exceed 44 characters..
+        ///   Looks up a localized string similar to The email verification token must not exceed 44 characters.
         /// </summary>
         internal static string EmailVerificationTokenTooLong {
             get {
@@ -204,7 +186,25 @@ namespace PocketAdvisor.Requests.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The password reset token is required..
+        ///   Looks up a localized string similar to The email verification token must be at least 44 characters.
+        /// </summary>
+        internal static string EmailVerificationTokenTooShort {
+            get {
+                return ResourceManager.GetString("EmailVerificationTokenTooShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The password is required.
+        /// </summary>
+        internal static string PasswordRequired {
+            get {
+                return ResourceManager.GetString("PasswordRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The password reset token is required.
         /// </summary>
         internal static string PasswordResetTokenRequired {
             get {
@@ -213,7 +213,16 @@ namespace PocketAdvisor.Requests.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The password reset token must be at least 44 characters..
+        ///   Looks up a localized string similar to The password reset token must not exceed 44 characters.
+        /// </summary>
+        internal static string PasswordResetTokenTooLong {
+            get {
+                return ResourceManager.GetString("PasswordResetTokenTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The password reset token must be at least 44 characters.
         /// </summary>
         internal static string PasswordResetTokenTooShort {
             get {
@@ -222,11 +231,47 @@ namespace PocketAdvisor.Requests.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The password reset token must not exceed 44 characters..
+        ///   Looks up a localized string similar to The password must not exceed 100 characters.
         /// </summary>
-        internal static string PasswordResetTokenTooLong {
+        internal static string PasswordTooLong {
             get {
-                return ResourceManager.GetString("PasswordResetTokenTooLong", resourceCulture);
+                return ResourceManager.GetString("PasswordTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The password must be at least 8 characters and include uppercase, lowercase, digit, and special character.
+        /// </summary>
+        internal static string PasswordTooWeak {
+            get {
+                return ResourceManager.GetString("PasswordTooWeak", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The refresh token is required.
+        /// </summary>
+        internal static string RefreshTokenRequired {
+            get {
+                return ResourceManager.GetString("RefreshTokenRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The refresh token must not exceed 44 characters.
+        /// </summary>
+        internal static string RefreshTokenTooLong {
+            get {
+                return ResourceManager.GetString("RefreshTokenTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The refresh token must be at least 44 characters.
+        /// </summary>
+        internal static string RefreshTokenTooShort {
+            get {
+                return ResourceManager.GetString("RefreshTokenTooShort", resourceCulture);
             }
         }
     }
