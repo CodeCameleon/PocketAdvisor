@@ -1,4 +1,6 @@
-﻿namespace PocketAdvisor.WebApplication.Extensions;
+﻿using Microsoft.OpenApi;
+
+namespace PocketAdvisor.WebApplication.Extensions;
 
 /// <summary>
 /// The extension methods for the Swagger documentation.
@@ -6,6 +8,26 @@
 public static class SwaggerExtensions
 {
     #region Constants
+    
+    /// <summary>
+    /// The format of the JWT Bearer token used in the Swagger documentation.
+    /// </summary>
+    private const string JwtBearerFormat = "JWT";
+    
+    /// <summary>
+    /// The name of the JWT Bearer security scheme used in the Swagger documentation.
+    /// </summary>
+    private const string JwtBearerScheme = "Bearer";
+    
+    /// <summary>
+    /// The description of the security scheme used in the Swagger documentation.
+    /// </summary>
+    private const string SchemeDescription = "Please enter a JWT Bearer token.";
+    
+    /// <summary>
+    /// The name of the security scheme used in the Swagger documentation.
+    /// </summary>
+    private const string SchemeName = "Authorization";
     
     /// <summary>
     /// The name of the Swagger documentation.
@@ -65,6 +87,22 @@ public static class SwaggerExtensions
             );
             
             XmlDocumentationFiles.ForEach(file => options.IncludeXmlComments(file));
+            
+            OpenApiSecurityScheme securityScheme = new()
+            {
+                Name = SchemeName,
+                Description = SchemeDescription,
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = JwtBearerScheme,
+                BearerFormat = JwtBearerFormat
+            };
+            options.AddSecurityDefinition(JwtBearerScheme, securityScheme);
+            
+            options.AddSecurityRequirement(document => new()
+            {
+                [new(JwtBearerScheme, document)] = []
+            });
         });
     }
     

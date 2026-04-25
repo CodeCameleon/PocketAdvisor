@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System.Security.Claims;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -58,7 +58,7 @@ public abstract class BaseController<TService>
     {
         get
         {
-            string? subject = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+            string? subject = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             
             if (subject is null || !Guid.TryParse(subject, out Guid userId))
             {
