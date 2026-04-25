@@ -55,6 +55,16 @@ public interface IUserService
     Task<Result<LoginResponse>> RefreshAsync(RefreshRequest request);
     
     /// <summary>
+    /// Resets the password of a user using the supplied password reset token asynchronously.
+    /// </summary>
+    /// <param name="request">The password reset token and the new password presented by the client.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a
+    /// <see cref="Result" /> indicating the success or failure of the operation.
+    /// </returns>
+    Task<Result> ResetPasswordAsync(ResetPasswordRequest request);
+    
+    /// <summary>
     /// Verifies the email address of a user using the supplied verification token asynchronously.
     /// </summary>
     /// <param name="request">The email verification token presented by the client.</param>

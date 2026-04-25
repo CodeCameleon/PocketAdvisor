@@ -429,6 +429,61 @@ public sealed class UserService
     
     #endregion
     
+    #region ResetPasswordAsync
+    
+    /// <inheritdoc />
+    public async Task<Result> ResetPasswordAsync(ResetPasswordRequest request)
+    {
+        Logger.LogInformation("Resetting user password...");
+        
+        IValidator<ResetPasswordRequest> validator = GetValidator<ResetPasswordRequest>();
+        ValidationResult validationResult = await validator.ValidateAsync(request);
+        
+        if (!validationResult.IsValid)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Validation failed for ResetPasswordRequest: {Errors}",
+                    validationResult.Errors
+                );
+            }
+            
+            return Result.Fail(validationResult.Errors.ToErrorList());
+        }
+        
+        using HMACSHA256 hmacSha256 = new(Encoding.UTF8.GetBytes(TokenSecretsOptions.Value.PasswordReset));
+        byte[] hashBytes = hmacSha256.ComputeHash(Encoding.UTF8.GetBytes(request.Token!));
+        string incomingHash = Convert.ToBase64String(hashBytes);
+        
+        Token? existingToken = await TokenRepository.GetSingleOrDefaultAsync(
+            t => t.Hash == incomingHash && t.Type == ETokenType.PasswordReset,
+            asTracking: true,
+            includes: [t => t.User!]
+        );
+        
+        if (existingToken is null || existingToken.ExpiryAt <= DateTime.UtcNow)
+        {
+            return Result.Fail(
+                CreateError(ValidationMessages.InvalidPasswordResetToken, nameof(request.Token))
+            );
+        }
+        
+        await TransactionManager.Value.BeginTransactionAsync();
+        
+        existingToken.User!.PasswordHash = PasswordHasher.HashPassword(existingToken.User, request.Password!);
+        UserRepository.Update(existingToken.User);
+        
+        TokenRepository.Delete(existingToken);
+        
+        await TransactionManager.Value.CommitTransactionAsync();
+        
+        Logger.LogInformation("User password reset successfully.");
+        return Result.Ok();
+    }
+    
+    #endregion
+    
     #region VerifyEmailAsync
     
     /// <inheritdoc />

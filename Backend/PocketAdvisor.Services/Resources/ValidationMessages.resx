@@ -36,4 +36,7 @@
     <data name="UserNotFound" xml:space="preserve">
         <value>No account associated with the provided email address was found.</value>
     </data>
+    <data name="InvalidPasswordResetToken" xml:space="preserve">
+        <value>The password reset token is invalid or has expired.</value>
+    </data>
 </root>

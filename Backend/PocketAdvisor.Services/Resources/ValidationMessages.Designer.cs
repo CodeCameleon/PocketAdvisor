@@ -112,5 +112,14 @@ namespace PocketAdvisor.Services.Resources {
                 return ResourceManager.GetString("UserNotFound", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The password reset token is invalid or has expired..
+        /// </summary>
+        internal static string InvalidPasswordResetToken {
+            get {
+                return ResourceManager.GetString("InvalidPasswordResetToken", resourceCulture);
+            }
+        }
     }
 }
