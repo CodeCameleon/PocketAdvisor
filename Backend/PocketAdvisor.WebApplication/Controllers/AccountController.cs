@@ -2,6 +2,7 @@ using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PocketAdvisor.Requests.Accounts;
+using PocketAdvisor.Responses.Accounts;
 using PocketAdvisor.Services.Interfaces;
 
 namespace PocketAdvisor.WebApplication.Controllers;
@@ -44,6 +45,21 @@ public sealed class AccountController
         }
         
         return StatusCode(StatusCodes.Status201Created);
+    }
+    
+    #endregion
+    
+    #region GetAccountsAsync
+    
+    /// <summary>
+    /// Retrieves all accounts belonging to the currently authenticated user asynchronously.
+    /// </summary>
+    [HttpGet]
+    [ProducesResponseType(typeof(IReadOnlyList<AccountResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAccountsAsync()
+    {
+        IReadOnlyList<AccountResponse> response = await Service.GetAccountsAsync(CurrentUserId);
+        return Ok(response);
     }
     
     #endregion
