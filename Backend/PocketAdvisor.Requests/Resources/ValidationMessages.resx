@@ -93,4 +93,10 @@
     <data name="AccountCurrencyCodeInvalid" xml:space="preserve">
         <value>The currency code is invalid</value>
     </data>
+    <data name="CategoryNameRequired" xml:space="preserve">
+        <value>The category name is required</value>
+    </data>
+    <data name="CategoryNameTooLong" xml:space="preserve">
+        <value>The category name must not exceed 100 characters</value>
+    </data>
 </root>

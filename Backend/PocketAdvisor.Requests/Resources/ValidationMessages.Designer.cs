@@ -114,6 +114,24 @@ namespace PocketAdvisor.Requests.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The category name is required.
+        /// </summary>
+        internal static string CategoryNameRequired {
+            get {
+                return ResourceManager.GetString("CategoryNameRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The category name must not exceed 100 characters.
+        /// </summary>
+        internal static string CategoryNameTooLong {
+            get {
+                return ResourceManager.GetString("CategoryNameTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The password confirmation must match the password.
         /// </summary>
         internal static string ConfirmPasswordMismatch {
