@@ -26,6 +26,9 @@ public static class ServiceCollectionExtensions
         services.AddOptions<TokenSecretsOptions>(configuration);
         
         services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IItemService, ItemService>();
+        services.AddScoped<ITransactionService, TransactionService>();
         services.AddScoped<IUserService, UserService>();
     }
     
