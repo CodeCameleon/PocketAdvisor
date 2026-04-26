@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using PocketAdvisor.Entities;
 using PocketAdvisor.Repositories.Interfaces;
 using PocketAdvisor.Requests.Accounts;
+using PocketAdvisor.Responses.Accounts;
 using PocketAdvisor.Services.Extensions;
 using PocketAdvisor.Services.Interfaces;
 using PocketAdvisor.Services.Resources;
@@ -99,6 +100,53 @@ public sealed class AccountService
         
         Logger.LogInformation("New account created successfully.");
         return Result.Ok();
+    }
+    
+    #endregion
+    
+    #region GetAccountsAsync
+    
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<AccountResponse>> GetAccountsAsync(Guid userId)
+    {
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Retrieving accounts for user '{UserId}'...", userId);
+        }
+        
+        IReadOnlyList<Account> accounts = await AccountRepository.GetAllAsync(
+            a => a.UserId == userId,
+            [
+                a => a.IncomingTransactions!,
+                a => a.OutgoingTransactions!
+            ]
+        );
+        
+        List<AccountResponse> response = accounts.Select(a =>
+        {
+            decimal incoming = a.IncomingTransactions?
+                .SelectMany(t => t.TransactionItems ?? [])
+                .Sum(ti => ti.TotalPrice) ?? 0m;
+            
+            decimal outgoing = a.OutgoingTransactions?
+                .SelectMany(t => t.TransactionItems ?? [])
+                .Sum(ti => ti.TotalPrice) ?? 0m;
+            
+            return new AccountResponse
+            {
+                Id = a.Id,
+                Name = a.Name,
+                CalculatedBalance = a.Balance + incoming - outgoing,
+                CurrencyCode = a.CurrencyCode
+            };
+        }).ToList();
+        
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Retrieved {Count} accounts for user '{UserId}'.", response.Count, userId);
+        }
+        
+        return response;
     }
     
     #endregion
