@@ -56,6 +56,23 @@ public interface IBaseRepository<TEntity>
         CancellationToken cancellationToken = default);
     
     /// <summary>
+    /// Retrieves all entities that match the specified predicate asynchronously.
+    /// </summary>
+    /// <param name="predicate">The expression used to filter entities.</param>
+    /// <param name="includes">The related navigation properties to include in the query.</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a read-only list
+    /// of all entities that match the predicate.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// If the predicate parameter is <see langword="null" />.
+    /// </exception>
+    Task<IReadOnlyList<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate,
+        IEnumerable<Expression<Func<TEntity, object>>>? includes = null,
+        CancellationToken cancellationToken = default);
+    
+    /// <summary>
     /// Updates an existing entity in the database.
     /// </summary>
     /// <param name="entity">The entity to be updated in the database.</param>

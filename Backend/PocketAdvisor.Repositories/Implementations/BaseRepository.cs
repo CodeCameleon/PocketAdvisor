@@ -150,6 +150,37 @@ public abstract class BaseRepository<TEntity, TRepository>
     
     #endregion
     
+    #region GetAllAsync
+    
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate,
+        IEnumerable<Expression<Func<TEntity, object>>>? includes = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(predicate);
+        
+        IQueryable<TEntity> query = Entities.AsQueryable();
+        
+        if (includes is not null)
+        {
+            query = includes.Aggregate(
+                query,
+                (current, include) => current.Include(include)
+            );
+        }
+        
+        List<TEntity> entities = await query.Where(predicate).ToListAsync(cancellationToken);
+        
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Retrieved {Count} {EntityName} entities.", entities.Count, EntityName);
+        }
+        
+        return entities.AsReadOnly();
+    }
+    
+    #endregion
+    
     #region Update
     
     /// <inheritdoc />
