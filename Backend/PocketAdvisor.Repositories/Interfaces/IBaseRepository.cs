@@ -59,6 +59,9 @@ public interface IBaseRepository<TEntity>
     /// Retrieves all entities that match the specified predicate asynchronously.
     /// </summary>
     /// <param name="predicate">The expression used to filter entities.</param>
+    /// <param name="asSplitQuery">
+    /// A value indicating whether the query should be split into multiple SQL queries.
+    /// </param>
     /// <param name="includes">The related navigation properties to include in the query.</param>
     /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
     /// <returns>
@@ -69,7 +72,7 @@ public interface IBaseRepository<TEntity>
     /// If the predicate parameter is <see langword="null" />.
     /// </exception>
     Task<IReadOnlyList<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate,
-        IEnumerable<Expression<Func<TEntity, object>>>? includes = null,
+        bool asSplitQuery = false, IEnumerable<Expression<Func<TEntity, object>>>? includes = null,
         CancellationToken cancellationToken = default);
     
     /// <summary>

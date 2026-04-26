@@ -154,7 +154,7 @@ public abstract class BaseRepository<TEntity, TRepository>
     
     /// <inheritdoc />
     public async Task<IReadOnlyList<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate,
-        IEnumerable<Expression<Func<TEntity, object>>>? includes = null,
+        bool asSplitQuery = false, IEnumerable<Expression<Func<TEntity, object>>>? includes = null,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(predicate);
@@ -167,6 +167,11 @@ public abstract class BaseRepository<TEntity, TRepository>
                 query,
                 (current, include) => current.Include(include)
             );
+        }
+        
+        if (asSplitQuery)
+        {
+            query = query.AsSplitQuery();
         }
         
         List<TEntity> entities = await query.Where(predicate).ToListAsync(cancellationToken);

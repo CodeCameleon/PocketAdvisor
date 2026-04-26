@@ -116,6 +116,7 @@ public sealed class AccountService
         
         IReadOnlyList<Account> accounts = await AccountRepository.GetAllAsync(
             a => a.UserId == userId,
+            asSplitQuery: true,
             [
                 a => a.IncomingTransactions!,
                 a => a.OutgoingTransactions!
