@@ -324,7 +324,6 @@ public sealed class UserService
         if (passwordResult == PasswordVerificationResult.SuccessRehashNeeded)
         {
             user.PasswordHash = PasswordHasher.HashPassword(user, request.Password!);
-            UserRepository.Update(user);
             
             await TransactionManager.Value.SaveChangesAsync();
             
@@ -390,7 +389,6 @@ public sealed class UserService
         
         Token? existingToken = await TokenRepository.GetSingleOrDefaultAsync(
             t => t.Hash == incomingHash && t.Type == ETokenType.Refresh,
-            asTracking: true,
             includes: [t => t.User!]
         );
         
@@ -472,7 +470,6 @@ public sealed class UserService
         await TransactionManager.Value.BeginTransactionAsync();
         
         existingToken.User!.PasswordHash = PasswordHasher.HashPassword(existingToken.User, request.Password!);
-        UserRepository.Update(existingToken.User);
         
         TokenRepository.Delete(existingToken);
         
@@ -527,7 +524,6 @@ public sealed class UserService
         await TransactionManager.Value.BeginTransactionAsync();
         
         existingToken.User!.IsEmailVerified = true;
-        UserRepository.Update(existingToken.User);
         
         TokenRepository.Delete(existingToken);
         

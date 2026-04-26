@@ -69,6 +69,15 @@ namespace PocketAdvisor.Services.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A category with the given name already exists.
+        /// </summary>
+        internal static string CategoryNameAlreadyExists {
+            get {
+                return ResourceManager.GetString("CategoryNameAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The email address is already in use.
         /// </summary>
         internal static string EmailAlreadyExists {

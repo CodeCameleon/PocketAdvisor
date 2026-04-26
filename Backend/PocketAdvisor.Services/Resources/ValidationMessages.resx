@@ -42,4 +42,7 @@
     <data name="AccountNameAlreadyExists" xml:space="preserve">
         <value>An account with the given name already exists</value>
     </data>
+    <data name="CategoryNameAlreadyExists" xml:space="preserve">
+        <value>A category with the given name already exists</value>
+    </data>
 </root>
