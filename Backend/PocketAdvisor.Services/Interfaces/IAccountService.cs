@@ -22,6 +22,17 @@ public interface IAccountService
     Task<Result> CreateAccountAsync(CreateAccountRequest request, Guid userId);
     
     /// <summary>
+    /// Deletes the specified account asynchronously.
+    /// </summary>
+    /// <param name="accountId">The identifier of the account to delete.</param>
+    /// <param name="userId">The identifier of the user who owns the account.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a
+    /// <see cref="Result" /> indicating the success or failure of the operation.
+    /// </returns>
+    Task<Result> DeleteAccountAsync(Guid accountId, Guid userId);
+    
+    /// <summary>
     /// Retrieves all accounts that belong to the specified user asynchronously.
     /// </summary>
     /// <param name="userId">The identifier of the user whose accounts to retrieve.</param>

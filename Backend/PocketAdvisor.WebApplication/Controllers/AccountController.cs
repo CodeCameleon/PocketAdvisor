@@ -50,6 +50,29 @@ public sealed class AccountController
     
     #endregion
     
+    #region DeleteAccountAsync
+    
+    /// <summary>
+    /// Deletes the specified account belonging to the currently authenticated user asynchronously.
+    /// </summary>
+    /// <param name="id">The identifier of the account to delete.</param>
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteAccountAsync([FromRoute] Guid id)
+    {
+        Result result = await Service.DeleteAccountAsync(id, CurrentUserId);
+        
+        if (result.IsFailed)
+        {
+            return NotFound();
+        }
+        
+        return NoContent();
+    }
+    
+    #endregion
+    
     #region GetAccountsAsync
     
     /// <summary>
