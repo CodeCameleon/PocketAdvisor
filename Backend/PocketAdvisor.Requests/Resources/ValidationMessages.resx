@@ -99,4 +99,16 @@
     <data name="CategoryNameTooLong" xml:space="preserve">
         <value>The category name must not exceed 100 characters</value>
     </data>
+    <data name="ItemNameRequired" xml:space="preserve">
+        <value>The item name is required</value>
+    </data>
+    <data name="ItemNameTooLong" xml:space="preserve">
+        <value>The item name must not exceed 100 characters</value>
+    </data>
+    <data name="ItemUnitCategoryRequired" xml:space="preserve">
+        <value>The unit category is required</value>
+    </data>
+    <data name="ItemUnitCategoryInvalid" xml:space="preserve">
+        <value>The unit category is invalid</value>
+    </data>
 </root>

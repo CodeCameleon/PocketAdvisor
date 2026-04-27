@@ -222,6 +222,42 @@ namespace PocketAdvisor.Requests.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The item name is required.
+        /// </summary>
+        internal static string ItemNameRequired {
+            get {
+                return ResourceManager.GetString("ItemNameRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The item name must not exceed 100 characters.
+        /// </summary>
+        internal static string ItemNameTooLong {
+            get {
+                return ResourceManager.GetString("ItemNameTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The unit category is invalid.
+        /// </summary>
+        internal static string ItemUnitCategoryInvalid {
+            get {
+                return ResourceManager.GetString("ItemUnitCategoryInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The unit category is required.
+        /// </summary>
+        internal static string ItemUnitCategoryRequired {
+            get {
+                return ResourceManager.GetString("ItemUnitCategoryRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The password is required.
         /// </summary>
         internal static string PasswordRequired {

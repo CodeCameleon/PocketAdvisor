@@ -132,6 +132,15 @@ namespace PocketAdvisor.Services.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An item with the given name already exists.
+        /// </summary>
+        internal static string ItemNameAlreadyExists {
+            get {
+                return ResourceManager.GetString("ItemNameAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No account associated with the provided email address was found.
         /// </summary>
         internal static string UserNotFound {

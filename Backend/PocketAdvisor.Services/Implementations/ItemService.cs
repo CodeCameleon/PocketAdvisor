@@ -1,6 +1,13 @@
+using FluentResults;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
+using PocketAdvisor.Entities;
 using PocketAdvisor.Repositories.Interfaces;
+using PocketAdvisor.Requests.Items;
+using PocketAdvisor.Services.Extensions;
 using PocketAdvisor.Services.Interfaces;
+using PocketAdvisor.Services.Resources;
 
 namespace PocketAdvisor.Services.Implementations;
 
@@ -38,6 +45,60 @@ public sealed class ItemService
     /// The item repository instance.
     /// </summary>
     private IItemRepository ItemRepository { get; }
+    
+    #endregion
+    
+    #region CreateItemAsync
+    
+    /// <inheritdoc />
+    public async Task<Result> CreateItemAsync(CreateItemRequest request, Guid userId)
+    {
+        Logger.LogInformation("Creating new item...");
+        
+        IValidator<CreateItemRequest> validator = GetValidator<CreateItemRequest>();
+        ValidationResult validationResult = await validator.ValidateAsync(request);
+        
+        if (!validationResult.IsValid)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Validation failed for CreateItemRequest: {Errors}",
+                    validationResult.Errors
+                );
+            }
+            
+            return Result.Fail(validationResult.Errors.ToErrorList());
+        }
+        
+        string normalizedName = request.Name!.Trim();
+        
+        bool nameExists = await ItemRepository.ExistsAsync(
+            i => i.UserId == userId && i.Name == normalizedName
+        );
+        
+        if (nameExists)
+        {
+            return Result.Fail(
+                CreateError(ValidationMessages.ItemNameAlreadyExists, nameof(request.Name))
+            );
+        }
+        
+        await TransactionManager.Value.BeginTransactionAsync();
+        
+        Item item = new()
+        {
+            Name = normalizedName,
+            UnitCategory = request.UnitCategory!.Value,
+            UserId = userId
+        };
+        await ItemRepository.CreateAsync(item);
+        
+        await TransactionManager.Value.CommitTransactionAsync();
+        
+        Logger.LogInformation("New item created successfully.");
+        return Result.Ok();
+    }
     
     #endregion
 }
