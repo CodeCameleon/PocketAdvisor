@@ -151,4 +151,78 @@ public sealed class AccountService
     }
     
     #endregion
+    
+    #region UpdateAccountNameAsync
+    
+    /// <inheritdoc />
+    public async Task<Result> UpdateAccountNameAsync(Guid accountId, UpdateAccountNameRequest request, Guid userId)
+    {
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Updating name of account '{AccountId}'...", accountId);
+        }
+        
+        IValidator<UpdateAccountNameRequest> validator = GetValidator<UpdateAccountNameRequest>();
+        ValidationResult validationResult = await validator.ValidateAsync(request);
+        
+        if (!validationResult.IsValid)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Validation failed for UpdateAccountNameRequest: {Errors}",
+                    validationResult.Errors
+                );
+            }
+            
+            return Result.Fail(validationResult.Errors.ToErrorList());
+        }
+        
+        string normalizedName = request.Name!.Trim();
+        
+        Account? account = await AccountRepository.GetSingleOrDefaultAsync(
+            a => a.Id == accountId && a.UserId == userId,
+            asTracking: true
+        );
+        
+        if (account is null)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Account '{AccountId}' was not found for user '{UserId}'.",
+                    accountId,
+                    userId
+                );
+            }
+            
+            return Result.Fail(string.Empty);
+        }
+        
+        bool nameExists = await AccountRepository.ExistsAsync(
+            a => a.UserId == userId && a.Name == normalizedName && a.Id != accountId
+        );
+        
+        if (nameExists)
+        {
+            return Result.Fail(
+                CreateError(ValidationMessages.AccountNameAlreadyExists, nameof(request.Name))
+            );
+        }
+        
+        await TransactionManager.Value.BeginTransactionAsync();
+        
+        account.Name = normalizedName;
+        
+        await TransactionManager.Value.CommitTransactionAsync();
+        
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Account '{AccountId}' name updated successfully.", accountId);
+        }
+        
+        return Result.Ok();
+    }
+    
+    #endregion
 }

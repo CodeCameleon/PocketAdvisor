@@ -30,4 +30,16 @@ public interface IAccountService
     /// read-only list of <see cref="AccountResponse" /> representing the user's accounts.
     /// </returns>
     Task<IReadOnlyList<AccountResponse>> GetAccountsAsync(Guid userId);
+    
+    /// <summary>
+    /// Updates the name of the specified account asynchronously.
+    /// </summary>
+    /// <param name="accountId">The identifier of the account to update.</param>
+    /// <param name="request">The new name for the account.</param>
+    /// <param name="userId">The identifier of the user who owns the account.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a
+    /// <see cref="Result" /> indicating the success or failure of the operation.
+    /// </returns>
+    Task<Result> UpdateAccountNameAsync(Guid accountId, UpdateAccountNameRequest request, Guid userId);
 }

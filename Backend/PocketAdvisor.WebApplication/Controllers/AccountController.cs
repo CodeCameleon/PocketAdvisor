@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PocketAdvisor.Requests.Accounts;
 using PocketAdvisor.Responses.Accounts;
+using PocketAdvisor.Services.Constants;
 using PocketAdvisor.Services.Interfaces;
 
 namespace PocketAdvisor.WebApplication.Controllers;
@@ -60,6 +61,38 @@ public sealed class AccountController
     {
         IReadOnlyList<AccountResponse> response = await Service.GetAccountsAsync(CurrentUserId);
         return Ok(response);
+    }
+    
+    #endregion
+    
+    #region UpdateAccountNameAsync
+    
+    /// <summary>
+    /// Updates the name of the specified account belonging to the currently authenticated user asynchronously.
+    /// </summary>
+    /// <param name="id">The identifier of the account to update.</param>
+    /// <param name="request">The new name for the account.</param>
+    [HttpPatch("{id:guid}/name")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateAccountNameAsync([FromRoute] Guid id,
+        [FromBody] UpdateAccountNameRequest request)
+    {
+        Result result = await Service.UpdateAccountNameAsync(id, request, CurrentUserId);
+        
+        if (result.IsFailed)
+        {
+            if (result.Errors.Any(e => string.IsNullOrEmpty(e.Message) &&
+                !e.Metadata.TryGetValue(ErrorMetadataKeys.PropertyName, out _)))
+            {
+                return NotFound();
+            }
+            
+            return BadRequest(result.Errors);
+        }
+        
+        return NoContent();
     }
     
     #endregion
