@@ -101,4 +101,78 @@ public sealed class ItemService
     }
     
     #endregion
+    
+    #region UpdateItemNameAsync
+    
+    /// <inheritdoc />
+    public async Task<Result> UpdateItemNameAsync(Guid itemId, UpdateItemNameRequest request, Guid userId)
+    {
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Updating name of item '{ItemId}'...", itemId);
+        }
+        
+        IValidator<UpdateItemNameRequest> validator = GetValidator<UpdateItemNameRequest>();
+        ValidationResult validationResult = await validator.ValidateAsync(request);
+        
+        if (!validationResult.IsValid)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Validation failed for UpdateItemNameRequest: {Errors}",
+                    validationResult.Errors
+                );
+            }
+            
+            return Result.Fail(validationResult.Errors.ToErrorList());
+        }
+        
+        string normalizedName = request.Name!.Trim();
+        
+        Item? item = await ItemRepository.GetSingleOrDefaultAsync(
+            i => i.Id == itemId && i.UserId == userId,
+            asTracking: true
+        );
+        
+        if (item is null)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Item '{ItemId}' was not found for user '{UserId}'.",
+                    itemId,
+                    userId
+                );
+            }
+            
+            return Result.Fail(string.Empty);
+        }
+        
+        bool nameExists = await ItemRepository.ExistsAsync(
+            i => i.UserId == userId && i.Name == normalizedName && i.Id != itemId
+        );
+        
+        if (nameExists)
+        {
+            return Result.Fail(
+                CreateError(ValidationMessages.ItemNameAlreadyExists, nameof(request.Name))
+            );
+        }
+        
+        await TransactionManager.Value.BeginTransactionAsync();
+        
+        item.Name = normalizedName;
+        
+        await TransactionManager.Value.CommitTransactionAsync();
+        
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Item '{ItemId}' name updated successfully.", itemId);
+        }
+        
+        return Result.Ok();
+    }
+    
+    #endregion
 }

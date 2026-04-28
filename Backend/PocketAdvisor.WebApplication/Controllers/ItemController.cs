@@ -2,6 +2,7 @@ using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PocketAdvisor.Requests.Items;
+using PocketAdvisor.Services.Constants;
 using PocketAdvisor.Services.Interfaces;
 
 namespace PocketAdvisor.WebApplication.Controllers;
@@ -44,6 +45,38 @@ public sealed class ItemController
         }
         
         return StatusCode(StatusCodes.Status201Created);
+    }
+    
+    #endregion
+    
+    #region UpdateItemNameAsync
+    
+    /// <summary>
+    /// Updates the name of the specified item belonging to the currently authenticated user asynchronously.
+    /// </summary>
+    /// <param name="id">The identifier of the item to update.</param>
+    /// <param name="request">The new name for the item.</param>
+    [HttpPatch("{id:guid}/name")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateItemNameAsync([FromRoute] Guid id,
+        [FromBody] UpdateItemNameRequest request)
+    {
+        Result result = await Service.UpdateItemNameAsync(id, request, CurrentUserId);
+        
+        if (result.IsFailed)
+        {
+            if (result.Errors.Any(e => string.IsNullOrEmpty(e.Message) &&
+                !e.Metadata.TryGetValue(ErrorMetadataKeys.PropertyName, out _)))
+            {
+                return NotFound();
+            }
+            
+            return BadRequest(result.Errors);
+        }
+        
+        return NoContent();
     }
     
     #endregion
