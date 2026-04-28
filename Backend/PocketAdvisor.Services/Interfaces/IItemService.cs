@@ -21,6 +21,17 @@ public interface IItemService
     Task<Result> CreateItemAsync(CreateItemRequest request, Guid userId);
     
     /// <summary>
+    /// Deletes the specified item asynchronously.
+    /// </summary>
+    /// <param name="itemId">The identifier of the item to delete.</param>
+    /// <param name="userId">The identifier of the user who owns the item.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a
+    /// <see cref="Result" /> indicating the success or failure of the operation.
+    /// </returns>
+    Task<Result> DeleteItemAsync(Guid itemId, Guid userId);
+    
+    /// <summary>
     /// Updates the name of the specified item asynchronously.
     /// </summary>
     /// <param name="itemId">The identifier of the item to update.</param>

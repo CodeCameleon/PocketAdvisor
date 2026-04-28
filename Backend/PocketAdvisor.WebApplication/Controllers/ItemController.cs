@@ -49,6 +49,29 @@ public sealed class ItemController
     
     #endregion
     
+    #region DeleteItemAsync
+    
+    /// <summary>
+    /// Deletes the specified item belonging to the currently authenticated user asynchronously.
+    /// </summary>
+    /// <param name="id">The identifier of the item to delete.</param>
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteItemAsync([FromRoute] Guid id)
+    {
+        Result result = await Service.DeleteItemAsync(id, CurrentUserId);
+        
+        if (result.IsFailed)
+        {
+            return NotFound();
+        }
+        
+        return NoContent();
+    }
+    
+    #endregion
+    
     #region UpdateItemNameAsync
     
     /// <summary>

@@ -102,6 +102,50 @@ public sealed class ItemService
     
     #endregion
     
+    #region DeleteItemAsync
+    
+    /// <inheritdoc />
+    public async Task<Result> DeleteItemAsync(Guid itemId, Guid userId)
+    {
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Deleting item '{ItemId}'...", itemId);
+        }
+        
+        Item? item = await ItemRepository.GetSingleOrDefaultAsync(
+            i => i.Id == itemId && i.UserId == userId
+        );
+        
+        if (item is null)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Item '{ItemId}' was not found for user '{UserId}'.",
+                    itemId,
+                    userId
+                );
+            }
+            
+            return Result.Fail(string.Empty);
+        }
+        
+        await TransactionManager.Value.BeginTransactionAsync();
+        
+        ItemRepository.Delete(item);
+        
+        await TransactionManager.Value.CommitTransactionAsync();
+        
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Item '{ItemId}' deleted successfully.", itemId);
+        }
+        
+        return Result.Ok();
+    }
+    
+    #endregion
+    
     #region UpdateItemNameAsync
     
     /// <inheritdoc />
