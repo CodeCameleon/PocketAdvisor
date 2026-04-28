@@ -201,7 +201,7 @@ public sealed class CategoryService
         List<CategoryResponse> response = categories.Select(c => new CategoryResponse
         {
             Id = c.Id,
-            Name = c.Name 
+            Name = c.Name
         }).ToList();
         
         if (Logger.IsEnabled(LogLevel.Information))
@@ -210,6 +210,172 @@ public sealed class CategoryService
         }
         
         return response;
+    }
+    
+    #endregion
+    
+    #region UpdateGlobalCategoryNameAsync
+    
+    /// <inheritdoc />
+    public async Task<Result> UpdateGlobalCategoryNameAsync(Guid categoryId, UpdateCategoryNameRequest request)
+    {
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Updating name of global category '{CategoryId}'...", categoryId);
+        }
+        
+        IValidator<UpdateCategoryNameRequest> validator = GetValidator<UpdateCategoryNameRequest>();
+        ValidationResult validationResult = await validator.ValidateAsync(request);
+        
+        if (!validationResult.IsValid)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Validation failed for UpdateCategoryNameRequest: {Errors}",
+                    validationResult.Errors
+                );
+            }
+            
+            return Result.Fail(validationResult.Errors.ToErrorList());
+        }
+        
+        string normalizedName = request.Name!.Trim();
+        
+        Category? globalCategory = await CategoryRepository.GetSingleOrDefaultAsync(
+            c => c.Id == categoryId && c.UserId == null,
+            asTracking: true
+        );
+        
+        if (globalCategory is null)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning("Global category '{CategoryId}' was not found.", categoryId);
+            }
+            
+            return Result.Fail(string.Empty);
+        }
+        
+        bool nameExists = await CategoryRepository.ExistsAsync(
+            c => c.UserId == null && c.Name == normalizedName && c.Id != categoryId
+        );
+        
+        if (nameExists)
+        {
+            return Result.Fail(
+                CreateError(ValidationMessages.CategoryNameAlreadyExists, nameof(request.Name))
+            );
+        }
+        
+        await TransactionManager.Value.BeginTransactionAsync();
+        
+        globalCategory.Name = normalizedName;
+        
+        await TransactionManager.Value.SaveChangesAsync();
+        
+        IReadOnlyList<Category> personalCategories = await CategoryRepository.GetAllAsync(
+            c => c.UserId != null && c.Name == normalizedName
+        );
+        
+        foreach (Category personalCategory in personalCategories)
+        {
+            IReadOnlyList<Transaction> transactions = await TransactionRepository.GetAllAsync(
+                t => t.CategoryId == personalCategory.Id
+            );
+            
+            foreach (Transaction transaction in transactions)
+            {
+                transaction.CategoryId = globalCategory.Id;
+                TransactionRepository.Update(transaction);
+            }
+            
+            CategoryRepository.Delete(personalCategory);
+        }
+        
+        await TransactionManager.Value.CommitTransactionAsync();
+        
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Global category '{CategoryId}' name updated successfully.", categoryId);
+        }
+        
+        return Result.Ok();
+    }
+    
+    #endregion
+    
+    #region UpdatePersonalCategoryNameAsync
+    
+    /// <inheritdoc />
+    public async Task<Result> UpdatePersonalCategoryNameAsync(Guid categoryId, UpdateCategoryNameRequest request,
+        Guid userId)
+    {
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Updating name of personal category '{CategoryId}'...", categoryId);
+        }
+        
+        IValidator<UpdateCategoryNameRequest> validator = GetValidator<UpdateCategoryNameRequest>();
+        ValidationResult validationResult = await validator.ValidateAsync(request);
+        
+        if (!validationResult.IsValid)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Validation failed for UpdateCategoryNameRequest: {Errors}",
+                    validationResult.Errors
+                );
+            }
+            
+            return Result.Fail(validationResult.Errors.ToErrorList());
+        }
+        
+        string normalizedName = request.Name!.Trim();
+        
+        Category? category = await CategoryRepository.GetSingleOrDefaultAsync(
+            c => c.Id == categoryId && c.UserId == userId,
+            asTracking: true
+        );
+        
+        if (category is null)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Personal category '{CategoryId}' was not found for user '{UserId}'.",
+                    categoryId,
+                    userId
+                );
+            }
+            
+            return Result.Fail(string.Empty);
+        }
+        
+        bool nameExists = await CategoryRepository.ExistsAsync(
+            c => c.Name == normalizedName && (c.UserId == null || c.UserId == userId) && c.Id != categoryId
+        );
+        
+        if (nameExists)
+        {
+            return Result.Fail(
+                CreateError(ValidationMessages.CategoryNameAlreadyExists, nameof(request.Name))
+            );
+        }
+        
+        await TransactionManager.Value.BeginTransactionAsync();
+        
+        category.Name = normalizedName;
+        
+        await TransactionManager.Value.CommitTransactionAsync();
+        
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Personal category '{CategoryId}' name updated successfully.", categoryId);
+        }
+        
+        return Result.Ok();
     }
     
     #endregion

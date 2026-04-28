@@ -48,4 +48,7 @@
     <data name="ItemNameAlreadyExists" xml:space="preserve">
         <value>An item with the given name already exists</value>
     </data>
+    <data name="CategoryNotFound" xml:space="preserve">
+        <value>The category was not found</value>
+    </data>
 </root>

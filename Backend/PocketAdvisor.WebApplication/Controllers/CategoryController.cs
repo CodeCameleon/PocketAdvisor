@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PocketAdvisor.Requests.Categories;
 using PocketAdvisor.Responses.Categories;
+using PocketAdvisor.Services.Constants;
 using PocketAdvisor.Services.Interfaces;
 
 namespace PocketAdvisor.WebApplication.Controllers;
@@ -86,6 +87,74 @@ public sealed class CategoryController
     {
         IReadOnlyList<CategoryResponse> response = await Service.GetCategoriesAsync(CurrentUserId);
         return Ok(response);
+    }
+    
+    #endregion
+    
+    #region UpdateGlobalCategoryNameAsync
+    
+    /// <summary>
+    /// Updates the name of the specified global category asynchronously.
+    /// Requires the <c>Administrator</c> role.
+    /// </summary>
+    /// <param name="id">The identifier of the global category to update.</param>
+    /// <param name="request">The new name for the category.</param>
+    [HttpPatch("global/{id:guid}/name")]
+    [Authorize(Roles = "Administrator")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateGlobalCategoryNameAsync([FromRoute] Guid id,
+        [FromBody] UpdateCategoryNameRequest request)
+    {
+        Result result = await Service.UpdateGlobalCategoryNameAsync(id, request);
+        
+        if (result.IsFailed)
+        {
+            if (result.Errors.Any(e => string.IsNullOrEmpty(e.Message) &&
+                !e.Metadata.TryGetValue(ErrorMetadataKeys.PropertyName, out _)))
+            {
+                return NotFound();
+            }
+            
+            return BadRequest(result.Errors);
+        }
+        
+        return NoContent();
+    }
+    
+    #endregion
+    
+    #region UpdatePersonalCategoryNameAsync
+    
+    /// <summary>
+    /// Updates the name of the specified personal category belonging to the currently authenticated user
+    /// asynchronously.
+    /// </summary>
+    /// <param name="id">The identifier of the personal category to update.</param>
+    /// <param name="request">The new name for the category.</param>
+    [HttpPatch("personal/{id:guid}/name")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdatePersonalCategoryNameAsync([FromRoute] Guid id,
+        [FromBody] UpdateCategoryNameRequest request)
+    {
+        Result result = await Service.UpdatePersonalCategoryNameAsync(id, request, CurrentUserId);
+        
+        if (result.IsFailed)
+        {
+            if (result.Errors.Any(e => string.IsNullOrEmpty(e.Message) &&
+                !e.Metadata.TryGetValue(ErrorMetadataKeys.PropertyName, out _)))
+            {
+                return NotFound();
+            }
+            
+            return BadRequest(result.Errors);
+        }
+        
+        return NoContent();
     }
     
     #endregion

@@ -40,4 +40,27 @@ public interface ICategoryService
     /// read-only list of <see cref="CategoryResponse" /> objects.
     /// </returns>
     Task<IReadOnlyList<CategoryResponse>> GetCategoriesAsync(Guid userId);
+    
+    /// <summary>
+    /// Updates the name of the specified global category asynchronously.
+    /// </summary>
+    /// <param name="categoryId">The identifier of the global category to update.</param>
+    /// <param name="request">The new name for the category.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a
+    /// <see cref="Result" /> indicating the success or failure of the operation.
+    /// </returns>
+    Task<Result> UpdateGlobalCategoryNameAsync(Guid categoryId, UpdateCategoryNameRequest request);
+    
+    /// <summary>
+    /// Updates the name of the specified personal category asynchronously.
+    /// </summary>
+    /// <param name="categoryId">The identifier of the personal category to update.</param>
+    /// <param name="request">The new name for the category.</param>
+    /// <param name="userId">The identifier of the user who owns the category.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a
+    /// <see cref="Result" /> indicating the success or failure of the operation.
+    /// </returns>
+    Task<Result> UpdatePersonalCategoryNameAsync(Guid categoryId, UpdateCategoryNameRequest request, Guid userId);
 }
