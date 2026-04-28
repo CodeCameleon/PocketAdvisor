@@ -2,6 +2,7 @@ using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PocketAdvisor.Requests.Categories;
+using PocketAdvisor.Responses.Categories;
 using PocketAdvisor.Services.Interfaces;
 
 namespace PocketAdvisor.WebApplication.Controllers;
@@ -70,6 +71,21 @@ public sealed class CategoryController
         }
         
         return StatusCode(StatusCodes.Status201Created);
+    }
+    
+    #endregion
+    
+    #region GetCategoriesAsync
+    
+    /// <summary>
+    /// Retrieves all categories visible to the currently authenticated user asynchronously.
+    /// </summary>
+    [HttpGet]
+    [ProducesResponseType(typeof(IReadOnlyList<CategoryResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCategoriesAsync()
+    {
+        IReadOnlyList<CategoryResponse> response = await Service.GetCategoriesAsync(CurrentUserId);
+        return Ok(response);
     }
     
     #endregion

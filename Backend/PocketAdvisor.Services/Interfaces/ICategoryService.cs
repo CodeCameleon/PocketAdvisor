@@ -1,5 +1,6 @@
 using FluentResults;
 using PocketAdvisor.Requests.Categories;
+using PocketAdvisor.Responses.Categories;
 
 namespace PocketAdvisor.Services.Interfaces;
 
@@ -29,4 +30,14 @@ public interface ICategoryService
     /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
     Task<Result> CreatePersonalCategoryAsync(CreateCategoryRequest request, Guid userId);
+    
+    /// <summary>
+    /// Retrieves all categories visible to the specified user asynchronously.
+    /// </summary>
+    /// <param name="userId">The identifier of the currently authenticated user.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a
+    /// read-only list of <see cref="CategoryResponse" /> objects.
+    /// </returns>
+    Task<IReadOnlyList<CategoryResponse>> GetCategoriesAsync(Guid userId);
 }

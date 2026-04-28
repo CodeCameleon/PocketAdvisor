@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using PocketAdvisor.Entities;
 using PocketAdvisor.Repositories.Interfaces;
 using PocketAdvisor.Requests.Categories;
+using PocketAdvisor.Responses.Categories;
 using PocketAdvisor.Services.Extensions;
 using PocketAdvisor.Services.Interfaces;
 using PocketAdvisor.Services.Resources;
@@ -179,6 +180,36 @@ public sealed class CategoryService
         
         Logger.LogInformation("New personal category created successfully.");
         return Result.Ok();
+    }
+    
+    #endregion
+    
+    #region GetCategoriesAsync
+    
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<CategoryResponse>> GetCategoriesAsync(Guid userId)
+    {
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Retrieving categories for user '{UserId}'...", userId);
+        }
+        
+        IReadOnlyList<Category> categories = await CategoryRepository.GetAllAsync(
+            c => c.UserId == null || c.UserId == userId
+        );
+        
+        List<CategoryResponse> response = categories.Select(c => new CategoryResponse
+        {
+            Id = c.Id,
+            Name = c.Name 
+        }).ToList();
+        
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Retrieved {Count} categories for user '{UserId}'.", response.Count, userId);
+        }
+        
+        return response;
     }
     
     #endregion
