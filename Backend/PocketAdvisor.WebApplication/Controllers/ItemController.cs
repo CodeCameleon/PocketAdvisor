@@ -2,6 +2,7 @@ using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PocketAdvisor.Requests.Items;
+using PocketAdvisor.Responses.Items;
 using PocketAdvisor.Services.Constants;
 using PocketAdvisor.Services.Interfaces;
 
@@ -68,6 +69,21 @@ public sealed class ItemController
         }
         
         return NoContent();
+    }
+    
+    #endregion
+    
+    #region GetItemsAsync
+    
+    /// <summary>
+    /// Retrieves all items belonging to the currently authenticated user asynchronously.
+    /// </summary>
+    [HttpGet]
+    [ProducesResponseType(typeof(IReadOnlyList<ItemResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetItemsAsync()
+    {
+        IReadOnlyList<ItemResponse> response = await Service.GetItemsAsync(CurrentUserId);
+        return Ok(response);
     }
     
     #endregion

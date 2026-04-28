@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using PocketAdvisor.Entities;
 using PocketAdvisor.Repositories.Interfaces;
 using PocketAdvisor.Requests.Items;
+using PocketAdvisor.Responses.Items;
 using PocketAdvisor.Services.Extensions;
 using PocketAdvisor.Services.Interfaces;
 using PocketAdvisor.Services.Resources;
@@ -142,6 +143,37 @@ public sealed class ItemService
         }
         
         return Result.Ok();
+    }
+    
+    #endregion
+    
+    #region GetItemsAsync
+    
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<ItemResponse>> GetItemsAsync(Guid userId)
+    {
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Retrieving items for user '{UserId}'...", userId);
+        }
+        
+        IReadOnlyList<Item> items = await ItemRepository.GetAllAsync(
+            i => i.UserId == userId
+        );
+        
+        List<ItemResponse> response = items.Select(i => new ItemResponse
+        {
+            Id = i.Id,
+            Name = i.Name,
+            UnitCategory = i.UnitCategory
+        }).ToList();
+        
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Retrieved {Count} items for user '{UserId}'.", response.Count, userId);
+        }
+        
+        return response;
     }
     
     #endregion
