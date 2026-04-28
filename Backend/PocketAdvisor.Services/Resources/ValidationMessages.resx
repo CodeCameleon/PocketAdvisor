@@ -51,4 +51,7 @@
     <data name="CategoryNotFound" xml:space="preserve">
         <value>The category was not found</value>
     </data>
+    <data name="CategoryHasTransactions" xml:space="preserve">
+        <value>The category cannot be deleted because it still has transactions associated with it</value>
+    </data>
 </root>

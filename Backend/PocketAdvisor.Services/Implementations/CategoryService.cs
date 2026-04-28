@@ -184,6 +184,108 @@ public sealed class CategoryService
     
     #endregion
     
+    #region DeleteGlobalCategoryAsync
+    
+    /// <inheritdoc />
+    public async Task<Result> DeleteGlobalCategoryAsync(Guid categoryId)
+    {
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Deleting global category '{CategoryId}'...", categoryId);
+        }
+        
+        Category? globalCategory = await CategoryRepository.GetSingleOrDefaultAsync(
+            c => c.Id == categoryId && c.UserId == null
+        );
+        
+        if (globalCategory is null)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning("Global category '{CategoryId}' was not found.", categoryId);
+            }
+            
+            return Result.Fail(string.Empty);
+        }
+        
+        bool hasTransactions = await TransactionRepository.ExistsAsync(
+            t => t.CategoryId == categoryId
+        );
+        
+        if (hasTransactions)
+        {
+            return Result.Fail(ValidationMessages.CategoryHasTransactions);
+        }
+        
+        await TransactionManager.Value.BeginTransactionAsync();
+        
+        CategoryRepository.Delete(globalCategory);
+        
+        await TransactionManager.Value.CommitTransactionAsync();
+        
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Global category '{CategoryId}' deleted successfully.", categoryId);
+        }
+        
+        return Result.Ok();
+    }
+    
+    #endregion
+    
+    #region DeletePersonalCategoryAsync
+    
+    /// <inheritdoc />
+    public async Task<Result> DeletePersonalCategoryAsync(Guid categoryId, Guid userId)
+    {
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Deleting personal category '{CategoryId}'...", categoryId);
+        }
+        
+        Category? category = await CategoryRepository.GetSingleOrDefaultAsync(
+            c => c.Id == categoryId && c.UserId == userId
+        );
+        
+        if (category is null)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Personal category '{CategoryId}' was not found for user '{UserId}'.",
+                    categoryId,
+                    userId
+                );
+            }
+            
+            return Result.Fail(string.Empty);
+        }
+        
+        bool hasTransactions = await TransactionRepository.ExistsAsync(
+            t => t.CategoryId == categoryId
+        );
+        
+        if (hasTransactions)
+        {
+            return Result.Fail(ValidationMessages.CategoryHasTransactions);
+        }
+        
+        await TransactionManager.Value.BeginTransactionAsync();
+        
+        CategoryRepository.Delete(category);
+        
+        await TransactionManager.Value.CommitTransactionAsync();
+        
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Personal category '{CategoryId}' deleted successfully.", categoryId);
+        }
+        
+        return Result.Ok();
+    }
+    
+    #endregion
+    
     #region GetCategoriesAsync
     
     /// <inheritdoc />

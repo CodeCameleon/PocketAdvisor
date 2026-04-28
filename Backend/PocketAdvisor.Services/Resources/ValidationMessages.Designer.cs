@@ -69,6 +69,15 @@ namespace PocketAdvisor.Services.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The category cannot be deleted because it still has transactions associated with it.
+        /// </summary>
+        internal static string CategoryHasTransactions {
+            get {
+                return ResourceManager.GetString("CategoryHasTransactions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A category with the given name already exists.
         /// </summary>
         internal static string CategoryNameAlreadyExists {

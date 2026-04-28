@@ -104,6 +104,50 @@ public sealed class AccountService
     
     #endregion
     
+    #region DeleteAccountAsync
+    
+    /// <inheritdoc />
+    public async Task<Result> DeleteAccountAsync(Guid accountId, Guid userId)
+    {
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Deleting account '{AccountId}'...", accountId);
+        }
+        
+        Account? account = await AccountRepository.GetSingleOrDefaultAsync(
+            a => a.Id == accountId && a.UserId == userId
+        );
+        
+        if (account is null)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Account '{AccountId}' was not found for user '{UserId}'.",
+                    accountId,
+                    userId
+                );
+            }
+            
+            return Result.Fail(string.Empty);
+        }
+        
+        await TransactionManager.Value.BeginTransactionAsync();
+        
+        AccountRepository.Delete(account);
+        
+        await TransactionManager.Value.CommitTransactionAsync();
+        
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Account '{AccountId}' deleted successfully.", accountId);
+        }
+        
+        return Result.Ok();
+    }
+    
+    #endregion
+    
     #region GetAccountsAsync
     
     /// <inheritdoc />
@@ -219,50 +263,6 @@ public sealed class AccountService
         if (Logger.IsEnabled(LogLevel.Information))
         {
             Logger.LogInformation("Account '{AccountId}' name updated successfully.", accountId);
-        }
-        
-        return Result.Ok();
-    }
-    
-    #endregion
-    
-    #region DeleteAccountAsync
-    
-    /// <inheritdoc />
-    public async Task<Result> DeleteAccountAsync(Guid accountId, Guid userId)
-    {
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation("Deleting account '{AccountId}'...", accountId);
-        }
-        
-        Account? account = await AccountRepository.GetSingleOrDefaultAsync(
-            a => a.Id == accountId && a.UserId == userId
-        );
-        
-        if (account is null)
-        {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Account '{AccountId}' was not found for user '{UserId}'.",
-                    accountId,
-                    userId
-                );
-            }
-            
-            return Result.Fail(string.Empty);
-        }
-        
-        await TransactionManager.Value.BeginTransactionAsync();
-        
-        AccountRepository.Delete(account);
-        
-        await TransactionManager.Value.CommitTransactionAsync();
-        
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation("Account '{AccountId}' deleted successfully.", accountId);
         }
         
         return Result.Ok();

@@ -76,6 +76,69 @@ public sealed class CategoryController
     
     #endregion
     
+    #region DeleteGlobalCategoryAsync
+    
+    /// <summary>
+    /// Deletes the specified global category asynchronously.
+    /// Requires the <c>Administrator</c> role.
+    /// </summary>
+    /// <param name="id">The identifier of the global category to delete.</param>
+    [HttpDelete("global/{id:guid}")]
+    [Authorize(Roles = "Administrator")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteGlobalCategoryAsync([FromRoute] Guid id)
+    {
+        Result result = await Service.DeleteGlobalCategoryAsync(id);
+        
+        if (result.IsFailed)
+        {
+            if (result.Errors.Any(e => string.IsNullOrEmpty(e.Message) &&
+                !e.Metadata.TryGetValue(ErrorMetadataKeys.PropertyName, out _)))
+            {
+                return NotFound();
+            }
+            
+            return BadRequest(result.Errors);
+        }
+        
+        return NoContent();
+    }
+    
+    #endregion
+    
+    #region DeletePersonalCategoryAsync
+    
+    /// <summary>
+    /// Deletes the specified personal category belonging to the currently authenticated user asynchronously.
+    /// </summary>
+    /// <param name="id">The identifier of the personal category to delete.</param>
+    [HttpDelete("personal/{id:guid}")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeletePersonalCategoryAsync([FromRoute] Guid id)
+    {
+        Result result = await Service.DeletePersonalCategoryAsync(id, CurrentUserId);
+        
+        if (result.IsFailed)
+        {
+            if (result.Errors.Any(e => string.IsNullOrEmpty(e.Message) &&
+                !e.Metadata.TryGetValue(ErrorMetadataKeys.PropertyName, out _)))
+            {
+                return NotFound();
+            }
+            
+            return BadRequest(result.Errors);
+        }
+        
+        return NoContent();
+    }
+    
+    #endregion
+    
     #region GetCategoriesAsync
     
     /// <summary>
