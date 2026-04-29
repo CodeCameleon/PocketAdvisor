@@ -23,9 +23,13 @@ public sealed class CreateTransactionRequestValidator
         RuleFor(r => r.CategoryId)
             .NotNull().WithMessage(ValidationMessages.TransactionCategoryIdRequired);
         
-        RuleFor(r => r)
-            .Must(r => r.FromAccountId.HasValue || r.ToAccountId.HasValue)
-            .WithMessage(ValidationMessages.TransactionEitherAccountRequired);
+        RuleFor(r => r).Cascade(CascadeMode.Stop)
+            .Must(r =>
+                r.FromAccountId.HasValue || r.ToAccountId.HasValue
+            ).WithMessage(ValidationMessages.TransactionEitherAccountRequired)
+            .Must(r =>
+                !(r.FromAccountId.HasValue && r.ToAccountId.HasValue) || r.FromAccountId != r.ToAccountId
+            ).WithMessage(ValidationMessages.TransactionAccountsSame);
         
         RuleFor(r => r.Items).Cascade(CascadeMode.Stop)
             .NotNull().WithMessage(ValidationMessages.TransactionItemsRequired)

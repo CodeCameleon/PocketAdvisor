@@ -6,6 +6,7 @@ using PocketAdvisor.Entities;
 using PocketAdvisor.Enums.Extensions;
 using PocketAdvisor.Repositories.Interfaces;
 using PocketAdvisor.Requests.Transactions;
+using PocketAdvisor.Responses.Transactions;
 using PocketAdvisor.Services.Extensions;
 using PocketAdvisor.Services.Interfaces;
 using PocketAdvisor.Services.Resources;
@@ -232,6 +233,58 @@ public sealed class TransactionService
         
         Logger.LogInformation("New transaction created successfully.");
         return Result.Ok();
+    }
+    
+    #endregion
+    
+    #region GetTransactionsAsync
+    
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<TransactionResponse>> GetTransactionsAsync(Guid accountId, Guid userId)
+    {
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation(
+                "Retrieving transactions for account '{AccountId}' and user '{UserId}'...",
+                accountId,
+                userId
+            );
+        }
+        
+        IReadOnlyList<Transaction> transactions = await TransactionRepository.GetAllAsync(
+            t => (t.FromAccountId == accountId || t.ToAccountId == accountId) && (
+                (t.FromAccountId.HasValue && t.FromAccount!.UserId == userId) ||
+                (t.ToAccountId.HasValue && t.ToAccount!.UserId == userId)
+            ),
+            includes: [t => t.TransactionItems!]
+        );
+        
+        List<TransactionResponse> response = transactions.Select(t => new TransactionResponse
+        {
+            Id = t.Id,
+            OccurredAt = t.OccurredAt,
+            CategoryId = t.CategoryId,
+            FromAccountId = t.FromAccountId,
+            ToAccountId = t.ToAccountId,
+            Items = t.TransactionItems!.Select(ti => new TransactionItemResponse
+            {
+                ItemId = ti.ItemId,
+                TotalPrice = ti.TotalPrice,
+                AmountValue = ti.Amount.Value,
+                AmountUnit = ti.Amount.Unit
+            }).ToList()
+        }).ToList();
+        
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation(
+                "Retrieved {Count} transactions for account '{AccountId}'.",
+                response.Count,
+                accountId
+            );
+        }
+        
+        return response;
     }
     
     #endregion

@@ -2,6 +2,7 @@ using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PocketAdvisor.Requests.Transactions;
+using PocketAdvisor.Responses.Transactions;
 using PocketAdvisor.Services.Constants;
 using PocketAdvisor.Services.Interfaces;
 
@@ -52,6 +53,23 @@ public sealed class TransactionController
         }
         
         return StatusCode(StatusCodes.Status201Created);
+    }
+    
+    #endregion
+    
+    #region GetTransactionsAsync
+    
+    /// <summary>
+    /// Retrieves all transactions associated with the specified account for the
+    /// currently authenticated user asynchronously.
+    /// </summary>
+    /// <param name="accountId">The identifier of the account to filter transactions by.</param>
+    [HttpGet]
+    [ProducesResponseType(typeof(IReadOnlyList<TransactionResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetTransactionsAsync([FromQuery] Guid accountId)
+    {
+        IReadOnlyList<TransactionResponse> response = await Service.GetTransactionsAsync(accountId, CurrentUserId);
+        return Ok(response);
     }
     
     #endregion

@@ -339,6 +339,15 @@ namespace PocketAdvisor.Requests.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The source and destination accounts must be different.
+        /// </summary>
+        internal static string TransactionAccountsSame {
+            get {
+                return ResourceManager.GetString("TransactionAccountsSame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The category is required.
         /// </summary>
         internal static string TransactionCategoryIdRequired {

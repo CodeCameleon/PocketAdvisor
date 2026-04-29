@@ -147,4 +147,7 @@
     <data name="TransactionItemUnitInvalid" xml:space="preserve">
         <value>The amount unit is invalid</value>
     </data>
+    <data name="TransactionAccountsSame" xml:space="preserve">
+        <value>The source and destination accounts must be different</value>
+    </data>
 </root>
