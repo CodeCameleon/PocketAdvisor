@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using PocketAdvisor.Enums;
 
 namespace PocketAdvisor.Entities;
 
@@ -18,11 +17,6 @@ public class Transaction
     /// The occurrence date and time of the transaction.
     /// </summary>
     public required DateTime OccurredAt { get; set; }
-    
-    /// <summary>
-    /// The currency code of the transaction.
-    /// </summary>
-    public required ECurrencyCode CurrencyCode { get; set; }
     
     /// <summary>
     /// The identifier of the category to which the transaction belongs.
