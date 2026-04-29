@@ -87,15 +87,6 @@ namespace PocketAdvisor.Services.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The category was not found.
-        /// </summary>
-        internal static string CategoryNotFound {
-            get {
-                return ResourceManager.GetString("CategoryNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The email address is already in use.
         /// </summary>
         internal static string EmailAlreadyExists {
@@ -155,6 +146,15 @@ namespace PocketAdvisor.Services.Resources {
         internal static string ItemNameAlreadyExists {
             get {
                 return ResourceManager.GetString("ItemNameAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The unit does not belong to the unit category of the item.
+        /// </summary>
+        internal static string TransactionItemUnitCategoryMismatch {
+            get {
+                return ResourceManager.GetString("TransactionItemUnitCategoryMismatch", resourceCulture);
             }
         }
         

@@ -48,10 +48,10 @@
     <data name="ItemNameAlreadyExists" xml:space="preserve">
         <value>An item with the given name already exists</value>
     </data>
-    <data name="CategoryNotFound" xml:space="preserve">
-        <value>The category was not found</value>
-    </data>
     <data name="CategoryHasTransactions" xml:space="preserve">
         <value>The category cannot be deleted because it still has transactions associated with it</value>
+    </data>
+    <data name="TransactionItemUnitCategoryMismatch" xml:space="preserve">
+        <value>The unit does not belong to the unit category of the item</value>
     </data>
 </root>

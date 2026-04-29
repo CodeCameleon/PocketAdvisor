@@ -337,5 +337,113 @@ namespace PocketAdvisor.Requests.Resources {
                 return ResourceManager.GetString("RefreshTokenTooShort", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The category is required.
+        /// </summary>
+        internal static string TransactionCategoryIdRequired {
+            get {
+                return ResourceManager.GetString("TransactionCategoryIdRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A transaction must have either a source account, a destination account, or both.
+        /// </summary>
+        internal static string TransactionEitherAccountRequired {
+            get {
+                return ResourceManager.GetString("TransactionEitherAccountRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The item amount must be greater than zero.
+        /// </summary>
+        internal static string TransactionItemAmountNegative {
+            get {
+                return ResourceManager.GetString("TransactionItemAmountNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The item amount is required.
+        /// </summary>
+        internal static string TransactionItemAmountRequired {
+            get {
+                return ResourceManager.GetString("TransactionItemAmountRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The item is required.
+        /// </summary>
+        internal static string TransactionItemIdRequired {
+            get {
+                return ResourceManager.GetString("TransactionItemIdRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to At least one transaction item is required.
+        /// </summary>
+        internal static string TransactionItemsRequired {
+            get {
+                return ResourceManager.GetString("TransactionItemsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The total price must not be negative.
+        /// </summary>
+        internal static string TransactionItemTotalPriceNegative {
+            get {
+                return ResourceManager.GetString("TransactionItemTotalPriceNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The total price is required.
+        /// </summary>
+        internal static string TransactionItemTotalPriceRequired {
+            get {
+                return ResourceManager.GetString("TransactionItemTotalPriceRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The amount unit is invalid.
+        /// </summary>
+        internal static string TransactionItemUnitInvalid {
+            get {
+                return ResourceManager.GetString("TransactionItemUnitInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The amount unit is required.
+        /// </summary>
+        internal static string TransactionItemUnitRequired {
+            get {
+                return ResourceManager.GetString("TransactionItemUnitRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The occurrence date must not be in the future.
+        /// </summary>
+        internal static string TransactionOccurredAtFuture {
+            get {
+                return ResourceManager.GetString("TransactionOccurredAtFuture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The occurrence date is required.
+        /// </summary>
+        internal static string TransactionOccurredAtRequired {
+            get {
+                return ResourceManager.GetString("TransactionOccurredAtRequired", resourceCulture);
+            }
+        }
     }
 }
