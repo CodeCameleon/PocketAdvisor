@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PocketAdvisor.DbContexts;
 using PocketAdvisor.DbContexts.Extensions;
+using PocketAdvisor.DbContexts.Interfaces;
 using PocketAdvisor.Entities;
 using PocketAdvisor.Repositories.Extensions;
 using PocketAdvisor.Requests.Users;
@@ -29,6 +30,9 @@ builder.Services.AddRepositories();
 
 // Adds the password hasher to the container.
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
+// Adds the data seeder to the container.
+builder.Services.AddDataSeeder();
 
 // Adds the validators to the container.
 builder.Services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
@@ -57,12 +61,18 @@ builder.Services.AddPocketAdvisorSwagger();
 // Builds the web application.
 WebApplication app = builder.Build();
 
-// Applies any pending migrations to the database.
+// Applies any pending migrations to the database, then seeds the test data in Development.
 using (IServiceScope scope = app.Services.CreateScope())
 {
     IServiceProvider serviceProvider = scope.ServiceProvider;
     PocketAdvisorDbContext context = serviceProvider.GetRequiredService<PocketAdvisorDbContext>();
     await context.Database.MigrateAsync();
+    
+    if (app.Environment.IsDevelopment())
+    {
+        IDataSeeder seeder = serviceProvider.GetRequiredService<IDataSeeder>();
+        await seeder.SeedAsync();
+    }
 }
 
 // Adds the middleware for handling exceptions.

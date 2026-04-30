@@ -10,6 +10,19 @@ namespace PocketAdvisor.DbContexts.Extensions;
 /// </summary>
 public static class ServiceCollectionExtensions
 {
+    #region AddDataSeeder
+    
+    /// <summary>
+    /// Adds the test data seeder to the service collection.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    public static void AddDataSeeder(this IServiceCollection services)
+    {
+        services.AddScoped<IDataSeeder, DataSeeder>();
+    }
+    
+    #endregion
+    
     #region AddPocketAdvisorDbContext
     
     /// <summary>
