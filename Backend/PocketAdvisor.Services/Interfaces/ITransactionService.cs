@@ -17,9 +17,32 @@ public interface ITransactionService
     /// <param name="userId">The identifier of the currently authenticated user.</param>
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains a
-    /// <see cref="Result" /> indicating the success or failure of the operation
+    /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
     Task<Result> CreateTransactionAsync(CreateTransactionRequest request, Guid userId);
+    
+    /// <summary>
+    /// Deletes the specified transaction and all of its items asynchronously.
+    /// </summary>
+    /// <param name="transactionId">The identifier of the transaction to delete.</param>
+    /// <param name="userId">The identifier of the currently authenticated user.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a
+    /// <see cref="Result" /> indicating the success or failure of the operation.
+    /// </returns>
+    Task<Result> DeleteTransactionAsync(Guid transactionId, Guid userId);
+    
+    /// <summary>
+    /// Deletes a single item from the specified transaction asynchronously.
+    /// </summary>
+    /// <param name="transactionId">The identifier of the transaction.</param>
+    /// <param name="itemId">The identifier of the item to remove from the transaction.</param>
+    /// <param name="userId">The identifier of the currently authenticated user.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a
+    /// <see cref="Result" /> indicating the success or failure of the operation.
+    /// </returns>
+    Task<Result> DeleteTransactionItemAsync(Guid transactionId, Guid itemId, Guid userId);
     
     /// <summary>
     /// Retrieves all transactions associated with the specified account asynchronously.

@@ -57,6 +57,61 @@ public sealed class TransactionController
     
     #endregion
     
+    #region DeleteTransactionAsync
+    
+    /// <summary>
+    /// Deletes the specified transaction and all of its items for the currently authenticated user asynchronously.
+    /// </summary>
+    /// <param name="id">The identifier of the transaction to delete.</param>
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteTransactionAsync([FromRoute] Guid id)
+    {
+        Result result = await Service.DeleteTransactionAsync(id, CurrentUserId);
+        
+        if (result.IsFailed)
+        {
+            return NotFound();
+        }
+        
+        return NoContent();
+    }
+    
+    #endregion
+    
+    #region DeleteTransactionItemAsync
+    
+    /// <summary>
+    /// Deletes a single item from the specified transaction for the currently authenticated user asynchronously.
+    /// </summary>
+    /// <param name="transactionId">The identifier of the transaction.</param>
+    /// <param name="itemId">The identifier of the item to remove from the transaction.</param>
+    [HttpDelete("{transactionId:guid}/items/{itemId:guid}")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> DeleteTransactionItemAsync([FromRoute] Guid transactionId,
+        [FromRoute] Guid itemId)
+    {
+        Result result = await Service.DeleteTransactionItemAsync(transactionId, itemId, CurrentUserId);
+        
+        if (result.IsFailed)
+        {
+            if (result.Errors.Any(e => string.IsNullOrEmpty(e.Message) &&
+                e.Metadata.TryGetValue(ErrorMetadataKeys.Conflict, out _)))
+            {
+                return Conflict();
+            }
+            
+            return NotFound();
+        }
+        
+        return NoContent();
+    }
+    
+    #endregion
+    
     #region GetTransactionsAsync
     
     /// <summary>

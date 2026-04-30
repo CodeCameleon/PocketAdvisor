@@ -7,6 +7,7 @@ using PocketAdvisor.Enums.Extensions;
 using PocketAdvisor.Repositories.Interfaces;
 using PocketAdvisor.Requests.Transactions;
 using PocketAdvisor.Responses.Transactions;
+using PocketAdvisor.Services.Constants;
 using PocketAdvisor.Services.Extensions;
 using PocketAdvisor.Services.Interfaces;
 using PocketAdvisor.Services.Resources;
@@ -232,6 +233,152 @@ public sealed class TransactionService
         await TransactionManager.Value.CommitTransactionAsync();
         
         Logger.LogInformation("New transaction created successfully.");
+        return Result.Ok();
+    }
+    
+    #endregion
+    
+    #region DeleteTransactionAsync
+    
+    /// <inheritdoc />
+    public async Task<Result> DeleteTransactionAsync(Guid transactionId, Guid userId)
+    {
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Deleting transaction '{TransactionId}'...", transactionId);
+        }
+        
+        Transaction? transaction = await TransactionRepository.GetSingleOrDefaultAsync(t =>
+            t.Id == transactionId && (
+                (t.FromAccountId.HasValue && t.FromAccount!.UserId == userId) ||
+                (t.ToAccountId.HasValue && t.ToAccount!.UserId == userId)
+            )
+        );
+        
+        if (transaction is null)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Transaction '{TransactionId}' was not found for user '{UserId}'.",
+                    transactionId,
+                    userId
+                );
+            }
+            
+            return Result.Fail(string.Empty);
+        }
+        
+        await TransactionManager.Value.BeginTransactionAsync();
+        
+        TransactionRepository.Delete(transaction);
+        
+        await TransactionManager.Value.CommitTransactionAsync();
+        
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation("Transaction '{TransactionId}' deleted successfully.", transactionId);
+        }
+        
+        return Result.Ok();
+    }
+    
+    #endregion
+    
+    #region DeleteTransactionItemAsync
+    
+    /// <inheritdoc />
+    public async Task<Result> DeleteTransactionItemAsync(Guid transactionId, Guid itemId, Guid userId)
+    {
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation(
+                "Deleting item '{ItemId}' from transaction '{TransactionId}'...",
+                itemId,
+                transactionId
+            );
+        }
+        
+        Transaction? transaction = await TransactionRepository.GetSingleOrDefaultAsync(t =>
+            t.Id == transactionId && (
+                (t.FromAccountId.HasValue && t.FromAccount!.UserId == userId) ||
+                (t.ToAccountId.HasValue && t.ToAccount!.UserId == userId)
+            )
+        );
+        
+        if (transaction is null)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Transaction '{TransactionId}' was not found for user '{UserId}'.",
+                    transactionId,
+                    userId
+                );
+            }
+            
+            return Result.Fail(string.Empty);
+        }
+        
+        TransactionItem? transactionItem = await TransactionItemRepository.GetSingleOrDefaultAsync(
+            ti => ti.TransactionId == transactionId && ti.ItemId == itemId
+        );
+        
+        if (transactionItem is null)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Item '{ItemId}' was not found on transaction '{TransactionId}'.",
+                    itemId,
+                    transactionId
+                );
+            }
+            
+            return Result.Fail(string.Empty);
+        }
+        
+        bool hasOtherItems = await TransactionItemRepository.ExistsAsync(
+            ti => ti.TransactionId == transactionId && ti.ItemId != itemId
+        );
+        
+        if (!hasOtherItems)
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(
+                    "Cannot delete item '{ItemId}' from transaction '{TransactionId}' as it is the last item.",
+                    itemId,
+                    transactionId
+                );
+            }
+            
+            Error error = new(string.Empty)
+            {
+                Metadata =
+                {
+                    [ErrorMetadataKeys.Conflict] = true
+                }
+            };
+            
+            return Result.Fail(error);
+        }
+        
+        await TransactionManager.Value.BeginTransactionAsync();
+        
+        TransactionItemRepository.Delete(transactionItem);
+        
+        await TransactionManager.Value.CommitTransactionAsync();
+        
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation(
+                "Item '{ItemId}' deleted from transaction '{TransactionId}' successfully.",
+                itemId,
+                transactionId
+            );
+        }
+        
         return Result.Ok();
     }
     

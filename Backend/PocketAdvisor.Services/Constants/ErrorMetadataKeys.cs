@@ -6,6 +6,11 @@
 public static class ErrorMetadataKeys
 {
     /// <summary>
+    /// The metadata key that marks an error as a conflict.
+    /// </summary>
+    public const string Conflict = "Conflict";
+    
+    /// <summary>
     /// The metadata key that stores the name of the property.
     /// </summary>
     public const string PropertyName = "PropertyName";
