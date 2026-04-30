@@ -6,6 +6,7 @@ using FluentResults;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -389,7 +390,7 @@ public sealed class UserService
         
         Token? existingToken = await TokenRepository.GetSingleOrDefaultAsync(
             t => t.Hash == incomingHash && t.Type == ETokenType.Refresh,
-            includes: [t => t.User!]
+            includes: q => q.Include(t => t.User!)
         );
         
         if (existingToken is null || existingToken.ExpiryAt <= DateTime.UtcNow)
@@ -457,7 +458,7 @@ public sealed class UserService
         Token? existingToken = await TokenRepository.GetSingleOrDefaultAsync(
             t => t.Hash == incomingHash && t.Type == ETokenType.PasswordReset,
             asTracking: true,
-            includes: [t => t.User!]
+            includes: q => q.Include(t => t.User!)
         );
         
         if (existingToken is null || existingToken.ExpiryAt <= DateTime.UtcNow)
@@ -511,7 +512,7 @@ public sealed class UserService
         Token? existingToken = await TokenRepository.GetSingleOrDefaultAsync(
             t => t.Hash == incomingHash && t.Type == ETokenType.EmailVerification,
             asTracking: true,
-            includes: [t => t.User!]
+            includes: q => q.Include(t => t.User!)
         );
         
         if (existingToken is null || existingToken.ExpiryAt <= DateTime.UtcNow)

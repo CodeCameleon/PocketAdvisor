@@ -42,7 +42,10 @@ public interface IBaseRepository<TEntity>
     /// <param name="asTracking">
     /// A value indicating whether the returned entity should be tracked by the context.
     /// </param>
-    /// <param name="includes">The related navigation properties to include in the query.</param>
+    /// <param name="includes">
+    /// An optional delegate for shaping the query's includes. Use <c>Include</c> and
+    /// <c>ThenInclude</c> to load related navigation properties.
+    /// </param>
     /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains the matching entity,
@@ -52,7 +55,7 @@ public interface IBaseRepository<TEntity>
     /// If the predicate parameter is <see langword="null" />.
     /// </exception>
     Task<TEntity?> GetSingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate,
-        bool asTracking = false, IEnumerable<Expression<Func<TEntity, object>>>? includes = null,
+        bool asTracking = false, Func<IQueryable<TEntity>, IQueryable<TEntity>>? includes = null,
         CancellationToken cancellationToken = default);
     
     /// <summary>
@@ -62,7 +65,10 @@ public interface IBaseRepository<TEntity>
     /// <param name="asSplitQuery">
     /// A value indicating whether the query should be split into multiple SQL queries.
     /// </param>
-    /// <param name="includes">The related navigation properties to include in the query.</param>
+    /// <param name="includes">
+    /// An optional delegate for shaping the query's includes. Use <c>Include</c> and
+    /// <c>ThenInclude</c> to load related navigation properties.
+    /// </param>
     /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains a read-only list
@@ -72,7 +78,7 @@ public interface IBaseRepository<TEntity>
     /// If the predicate parameter is <see langword="null" />.
     /// </exception>
     Task<IReadOnlyList<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate,
-        bool asSplitQuery = false, IEnumerable<Expression<Func<TEntity, object>>>? includes = null,
+        bool asSplitQuery = false, Func<IQueryable<TEntity>, IQueryable<TEntity>>? includes = null,
         CancellationToken cancellationToken = default);
     
     /// <summary>

@@ -1,6 +1,7 @@
 using FluentResults;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PocketAdvisor.Entities;
 using PocketAdvisor.Repositories.Interfaces;
@@ -161,10 +162,11 @@ public sealed class AccountService
         IReadOnlyList<Account> accounts = await AccountRepository.GetAllAsync(
             a => a.UserId == userId,
             asSplitQuery: true,
-            [
-                a => a.IncomingTransactions!,
-                a => a.OutgoingTransactions!
-            ]
+            includes: q => q
+                .Include(a =>a.IncomingTransactions!)
+                    .ThenInclude(t => t.TransactionItems!)
+                .Include(a => a.OutgoingTransactions!)
+                    .ThenInclude(t => t.TransactionItems!)
         );
         
         List<AccountResponse> response = accounts.Select(a =>

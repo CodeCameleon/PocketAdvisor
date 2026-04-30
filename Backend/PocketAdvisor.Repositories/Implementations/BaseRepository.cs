@@ -111,7 +111,7 @@ public abstract class BaseRepository<TEntity, TRepository>
     
     /// <inheritdoc />
     public async Task<TEntity?> GetSingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate,
-        bool asTracking = false, IEnumerable<Expression<Func<TEntity, object>>>? includes = null,
+        bool asTracking = false, Func<IQueryable<TEntity>, IQueryable<TEntity>>? includes = null,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(predicate);
@@ -125,10 +125,7 @@ public abstract class BaseRepository<TEntity, TRepository>
         
         if (includes is not null)
         {
-            query = includes.Aggregate(
-                query,
-                (current, include) => current.Include(include)
-            );
+            query = includes(query);
         }
         
         TEntity? entity = await query.SingleOrDefaultAsync(predicate, cancellationToken);
@@ -154,7 +151,7 @@ public abstract class BaseRepository<TEntity, TRepository>
     
     /// <inheritdoc />
     public async Task<IReadOnlyList<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate,
-        bool asSplitQuery = false, IEnumerable<Expression<Func<TEntity, object>>>? includes = null,
+        bool asSplitQuery = false, Func<IQueryable<TEntity>, IQueryable<TEntity>>? includes = null,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(predicate);
@@ -163,10 +160,7 @@ public abstract class BaseRepository<TEntity, TRepository>
         
         if (includes is not null)
         {
-            query = includes.Aggregate(
-                query,
-                (current, include) => current.Include(include)
-            );
+            query = includes(query);
         }
         
         if (asSplitQuery)

@@ -1,6 +1,7 @@
 using FluentResults;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PocketAdvisor.Entities;
 using PocketAdvisor.Enums.Extensions;
@@ -394,7 +395,7 @@ public sealed class TransactionService
                 (t.FromAccountId.HasValue && t.FromAccount!.UserId == userId) ||
                 (t.ToAccountId.HasValue && t.ToAccount!.UserId == userId)
             ),
-            includes: [t => t.TransactionItems!]
+            includes: q => q.Include(t => t.TransactionItems!)
         );
         
         List<TransactionResponse> response = transactions.Select(t => new TransactionResponse
