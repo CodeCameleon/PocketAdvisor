@@ -56,6 +56,48 @@ public abstract class BaseService<TService>
     
     #endregion
     
+    #region CreateConflictError
+    
+    /// <summary>
+    /// Creates a new conflict <see cref="Error" /> that can be returned in a <see cref="Result" /> object.
+    /// </summary>
+    /// <returns>The constructed conflict <see cref="Error" /> ready to be returned.</returns>
+    protected static Error CreateConflictError()
+    {
+        Error error = new(string.Empty)
+        {
+            Metadata =
+            {
+                [ErrorMetadataKeys.Conflict] = true
+            }
+        };
+        
+        return error;
+    }
+    
+    #endregion
+    
+    #region CreateNotFoundError
+    
+    /// <summary>
+    /// Creates a new not found <see cref="Error" /> that can be returned in a <see cref="Result" /> object.
+    /// </summary>
+    /// <returns>The constructed not found <see cref="Error" /> ready to be returned.</returns>
+    protected static Error CreateNotFoundError()
+    {
+        Error error = new(string.Empty)
+        {
+            Metadata =
+            {
+                [ErrorMetadataKeys.NotFound] = true
+            }
+        };
+        
+        return error;
+    }
+    
+    #endregion
+    
     #region CreateError
     
     /// <summary>

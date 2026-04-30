@@ -115,4 +115,32 @@ public abstract class BaseController<TService>
     }
     
     #endregion
+    
+    #region HandleFailure
+    
+    /// <summary>
+    /// Inspects the errors of a failed <see cref="Result" /> and returns
+    /// the appropriate <see cref="IActionResult" />:<br />
+    /// - <see cref="ConflictResult" />, if any error is marked as a conflict.<br />
+    /// - <see cref="BadRequestObjectResult" />, if the errors are from data validation.<br />
+    /// - <see cref="NotFoundResult" />, if any error is marked as not found.
+    /// </summary>
+    /// <param name="result">The failed result whose errors should be inspected.</param>
+    /// <returns>The appropriate <see cref="IActionResult" /> for the client.</returns>
+    protected IActionResult HandleFailure(Result result)
+    {
+        if (result.Errors.Any(e => e.Metadata.TryGetValue(ErrorMetadataKeys.Conflict, out _)))
+        {
+            return Conflict();
+        }
+        
+        if (result.Errors.Any(e => e.Metadata.TryGetValue(ErrorMetadataKeys.NotFound, out _)))
+        {
+            return NotFound();
+        }
+        
+        return BadRequest(result.Errors);
+    }
+    
+    #endregion
 }

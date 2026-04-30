@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PocketAdvisor.Requests.Transactions;
 using PocketAdvisor.Responses.Transactions;
-using PocketAdvisor.Services.Constants;
 using PocketAdvisor.Services.Interfaces;
 
 namespace PocketAdvisor.WebApplication.Controllers;
@@ -43,13 +42,7 @@ public sealed class TransactionController
         
         if (result.IsFailed)
         {
-            if (result.Errors.Any(e => string.IsNullOrEmpty(e.Message) &&
-                !e.Metadata.TryGetValue(ErrorMetadataKeys.PropertyName, out _)))
-            {
-                return NotFound();
-            }
-            
-            return BadRequest(result.Errors);
+            return HandleFailure(result);
         }
         
         return StatusCode(StatusCodes.Status201Created);
@@ -98,13 +91,7 @@ public sealed class TransactionController
         
         if (result.IsFailed)
         {
-            if (result.Errors.Any(e => string.IsNullOrEmpty(e.Message) &&
-                e.Metadata.TryGetValue(ErrorMetadataKeys.Conflict, out _)))
-            {
-                return Conflict();
-            }
-            
-            return NotFound();
+            return HandleFailure(result);
         }
         
         return NoContent();

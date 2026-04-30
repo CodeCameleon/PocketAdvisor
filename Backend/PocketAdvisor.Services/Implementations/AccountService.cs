@@ -129,7 +129,7 @@ public sealed class AccountService
                 );
             }
             
-            return Result.Fail(string.Empty);
+            return Result.Fail(CreateNotFoundError());
         }
         
         await TransactionManager.Value.BeginTransactionAsync();
@@ -240,7 +240,7 @@ public sealed class AccountService
                 );
             }
             
-            return Result.Fail(string.Empty);
+            return Result.Fail(CreateNotFoundError());
         }
         
         bool nameExists = await AccountRepository.ExistsAsync(

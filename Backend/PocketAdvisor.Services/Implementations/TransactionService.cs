@@ -7,7 +7,6 @@ using PocketAdvisor.Enums.Extensions;
 using PocketAdvisor.Repositories.Interfaces;
 using PocketAdvisor.Requests.Transactions;
 using PocketAdvisor.Responses.Transactions;
-using PocketAdvisor.Services.Constants;
 using PocketAdvisor.Services.Extensions;
 using PocketAdvisor.Services.Interfaces;
 using PocketAdvisor.Services.Resources;
@@ -123,7 +122,7 @@ public sealed class TransactionService
                 );
             }
             
-            return Result.Fail(string.Empty);
+            return Result.Fail(CreateNotFoundError());
         }
         
         if (request.FromAccountId.HasValue)
@@ -143,7 +142,7 @@ public sealed class TransactionService
                     );
                 }
                 
-                return Result.Fail(string.Empty);
+                return Result.Fail(CreateNotFoundError());
             }
         }
         
@@ -164,7 +163,7 @@ public sealed class TransactionService
                     );
                 }
                 
-                return Result.Fail(string.Empty);
+                return Result.Fail(CreateNotFoundError());
             }
         }
         
@@ -186,7 +185,7 @@ public sealed class TransactionService
                 );
             }
             
-            return Result.Fail(string.Empty);
+            return Result.Fail(CreateNotFoundError());
         }
         
         Dictionary<Guid, Item> itemsById = items.ToDictionary(i => i.Id);
@@ -266,7 +265,7 @@ public sealed class TransactionService
                 );
             }
             
-            return Result.Fail(string.Empty);
+            return Result.Fail(CreateNotFoundError());
         }
         
         await TransactionManager.Value.BeginTransactionAsync();
@@ -317,7 +316,7 @@ public sealed class TransactionService
                 );
             }
             
-            return Result.Fail(string.Empty);
+            return Result.Fail(CreateNotFoundError());
         }
         
         TransactionItem? transactionItem = await TransactionItemRepository.GetSingleOrDefaultAsync(
@@ -335,7 +334,7 @@ public sealed class TransactionService
                 );
             }
             
-            return Result.Fail(string.Empty);
+            return Result.Fail(CreateNotFoundError());
         }
         
         bool hasOtherItems = await TransactionItemRepository.ExistsAsync(
@@ -353,15 +352,7 @@ public sealed class TransactionService
                 );
             }
             
-            Error error = new(string.Empty)
-            {
-                Metadata =
-                {
-                    [ErrorMetadataKeys.Conflict] = true
-                }
-            };
-            
-            return Result.Fail(error);
+            return Result.Fail(CreateConflictError());
         }
         
         await TransactionManager.Value.BeginTransactionAsync();

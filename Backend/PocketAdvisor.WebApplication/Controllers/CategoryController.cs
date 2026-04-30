@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PocketAdvisor.Requests.Categories;
 using PocketAdvisor.Responses.Categories;
-using PocketAdvisor.Services.Constants;
 using PocketAdvisor.Services.Interfaces;
 
 namespace PocketAdvisor.WebApplication.Controllers;
@@ -95,13 +94,7 @@ public sealed class CategoryController
         
         if (result.IsFailed)
         {
-            if (result.Errors.Any(e => string.IsNullOrEmpty(e.Message) &&
-                !e.Metadata.TryGetValue(ErrorMetadataKeys.PropertyName, out _)))
-            {
-                return NotFound();
-            }
-            
-            return BadRequest(result.Errors);
+            return HandleFailure(result);
         }
         
         return NoContent();
@@ -125,13 +118,7 @@ public sealed class CategoryController
         
         if (result.IsFailed)
         {
-            if (result.Errors.Any(e => string.IsNullOrEmpty(e.Message) &&
-                !e.Metadata.TryGetValue(ErrorMetadataKeys.PropertyName, out _)))
-            {
-                return NotFound();
-            }
-            
-            return BadRequest(result.Errors);
+            return HandleFailure(result);
         }
         
         return NoContent();
@@ -175,13 +162,7 @@ public sealed class CategoryController
         
         if (result.IsFailed)
         {
-            if (result.Errors.Any(e => string.IsNullOrEmpty(e.Message) &&
-                !e.Metadata.TryGetValue(ErrorMetadataKeys.PropertyName, out _)))
-            {
-                return NotFound();
-            }
-            
-            return BadRequest(result.Errors);
+            return HandleFailure(result);
         }
         
         return NoContent();
@@ -208,13 +189,7 @@ public sealed class CategoryController
         
         if (result.IsFailed)
         {
-            if (result.Errors.Any(e => string.IsNullOrEmpty(e.Message) &&
-                !e.Metadata.TryGetValue(ErrorMetadataKeys.PropertyName, out _)))
-            {
-                return NotFound();
-            }
-            
-            return BadRequest(result.Errors);
+            return HandleFailure(result);
         }
         
         return NoContent();

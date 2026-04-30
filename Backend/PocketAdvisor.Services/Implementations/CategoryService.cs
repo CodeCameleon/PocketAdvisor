@@ -205,7 +205,7 @@ public sealed class CategoryService
                 Logger.LogWarning("Global category '{CategoryId}' was not found.", categoryId);
             }
             
-            return Result.Fail(string.Empty);
+            return Result.Fail(CreateNotFoundError());
         }
         
         bool hasTransactions = await TransactionRepository.ExistsAsync(
@@ -258,7 +258,7 @@ public sealed class CategoryService
                 );
             }
             
-            return Result.Fail(string.Empty);
+            return Result.Fail(CreateNotFoundError());
         }
         
         bool hasTransactions = await TransactionRepository.ExistsAsync(
@@ -356,7 +356,7 @@ public sealed class CategoryService
                 Logger.LogWarning("Global category '{CategoryId}' was not found.", categoryId);
             }
             
-            return Result.Fail(string.Empty);
+            return Result.Fail(CreateNotFoundError());
         }
         
         bool nameExists = await CategoryRepository.ExistsAsync(
@@ -452,7 +452,7 @@ public sealed class CategoryService
                 );
             }
             
-            return Result.Fail(string.Empty);
+            return Result.Fail(CreateNotFoundError());
         }
         
         bool nameExists = await CategoryRepository.ExistsAsync(
