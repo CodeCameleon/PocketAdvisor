@@ -1,1 +1,49 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  /* Primary — deep cobalt blue */
+  --color-primary-100: #C7D7FF;
+  --color-primary-200: #8FABF5;
+  --color-primary-400: #4E7CF6;
+  --color-primary-600-base: #2355D8;
+  --color-primary-800: #122D8A;
+  --color-primary-950: #071550;
+
+  /* Secondary — electric indigo-violet */
+  --color-secondary-100: #DDD5FF;
+  --color-secondary-200: #B8A8FF;
+  --color-secondary-400: #8A6EFF;
+  --color-secondary-600-base: #5E38F5;
+  --color-secondary-800: #341B9E;
+  --color-secondary-950: #150A52;
+
+  /* Tertiary — teal-cyan pop */
+  --color-tertiary-100: #BDFBF5;
+  --color-tertiary-200: #78F2E8;
+  --color-tertiary-400: #1DDCD0;
+  --color-tertiary-600-base: #0DAAA1;
+  --color-tertiary-800: #066B66;
+  --color-tertiary-950: #02312E;
+
+  /* Error — vivid crimson */
+  --color-error-100: #FFD6D8;
+  --color-error-200: #FFAAB0;
+  --color-error-400: #FF5C65;
+  --color-error-600-base: #E31B26;
+  --color-error-800: #8C0E14;
+  --color-error-950: #430508;
+
+  /* Neutral — backgrounds, surfaces, text */
+  --color-neutral-50: #F4F5F7;
+  --color-neutral-100: #E2E4E9;
+  --color-neutral-300: #9BA0AE;
+  --color-neutral-600-base: #4A4F5E;
+  --color-neutral-800: #1E2130;
+  --color-neutral-950: #0C0E18;
+
+  /* Neutral Variant — borders, dividers, subtle fills */
+  --color-neutral-variant-100: #E0E2F0;
+  --color-neutral-variant-200: #C2C6E0;
+  --color-neutral-variant-400: #7A82B0;
+  --color-neutral-variant-600-base: #3D4473;
+  --color-neutral-variant-800: #1E2145;
+  --color-neutral-variant-950: #0D0F28;
+}
