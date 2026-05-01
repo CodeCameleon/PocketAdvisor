@@ -97,8 +97,8 @@ npm-debug.log
 yarn-error.log
 
 # Miscellaneous
-.angular/cache
-.sass-cache/
+**/.angular/cache
+**/.sass-cache/
 connect.lock
 coverage/
 libpeerconnection.log
