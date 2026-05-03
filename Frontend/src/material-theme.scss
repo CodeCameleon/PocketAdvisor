@@ -1,0 +1,151 @@
+@use '@angular/material' as mat;
+
+$pocket-primary-palette: (
+  0:   #000000,
+  10:  #071550,   // --color-primary-950
+  20:  #122D8A,   // --color-primary-800
+  25:  #1A3CAA,
+  30:  #1D45BE,
+  35:  #204DCB,
+  40:  #2355D8,   // --color-primary-600-base
+  50:  #3869E8,
+  60:  #4E7CF6,   // --color-primary-400
+  70:  #6F96F8,
+  80:  #8FABF5,   // --color-primary-200
+  90:  #C7D7FF,   // --color-primary-100
+  95:  #E0EBFF,
+  98:  #F3F6FF,
+  99:  #F9FAFF,
+  100: #FFFFFF,
+);
+
+$pocket-secondary-palette: (
+  0:   #000000,
+  10:  #150A52,   // --color-secondary-950
+  20:  #341B9E,   // --color-secondary-800
+  25:  #422AB8,
+  30:  #4D30CC,
+  35:  #5534E0,
+  40:  #5E38F5,   // --color-secondary-600-base
+  50:  #7050F6,
+  60:  #8A6EFF,   // --color-secondary-400
+  70:  #A08BFF,
+  80:  #B8A8FF,   // --color-secondary-200
+  90:  #DDD5FF,   // --color-secondary-100
+  95:  #EEE9FF,
+  98:  #F8F6FF,
+  99:  #FBFAFF,
+  100: #FFFFFF,
+);
+
+$pocket-tertiary-palette: (
+  0:   #000000,
+  10:  #02312E,   // --color-tertiary-950
+  20:  #066B66,   // --color-tertiary-800
+  25:  #088580,
+  30:  #099690,
+  35:  #0BA099,
+  40:  #0DAAA1,   // --color-tertiary-600-base
+  50:  #12C2B8,
+  60:  #1DDCD0,   // --color-tertiary-400
+  70:  #4CE5DB,
+  80:  #78F2E8,   // --color-tertiary-200
+  90:  #BDFBF5,   // --color-tertiary-100
+  95:  #DDFDFB,
+  98:  #F2FFFE,
+  99:  #F8FFFF,
+  100: #FFFFFF,
+);
+
+$pocket-error-palette: (
+  0:   #000000,
+  10:  #430508,   // --color-error-950
+  20:  #8C0E14,   // --color-error-800
+  25:  #A81018,
+  30:  #C0131D,
+  35:  #D41721,
+  40:  #E31B26,   // --color-error-600-base
+  50:  #F03038,
+  60:  #FF5C65,   // --color-error-400
+  70:  #FF8088,
+  80:  #FFAAB0,   // --color-error-200
+  90:  #FFD6D8,   // --color-error-100
+  95:  #FFECEC,
+  98:  #FFF8F8,
+  99:  #FFFBFB,
+  100: #FFFFFF,
+);
+
+$pocket-neutral-palette: (
+  0:   #000000,
+  10:  #0C0E18,   // --color-neutral-950
+  20:  #1E2130,   // --color-neutral-800
+  25:  #282C3E,
+  30:  #32374A,
+  35:  #3C4256,
+  40:  #4A4F5E,   // --color-neutral-600-base
+  50:  #636878,
+  60:  #7D8293,
+  70:  #979BAE,
+  80:  #B1B5C6,
+  90:  #E2E4E9,   // --color-neutral-100
+  95:  #F4F5F7,   // --color-neutral-50
+  98:  #F9FAFB,
+  99:  #FBFCFD,
+  100: #FFFFFF,
+);
+
+$pocket-neutral-variant-palette: (
+  0:   #000000,
+  10:  #0D0F28,   // --color-neutral-variant-950
+  20:  #1E2145,   // --color-neutral-variant-800
+  25:  #272A57,
+  30:  #30346A,
+  35:  #383D7C,
+  40:  #3D4473,   // --color-neutral-variant-600-base
+  50:  #525A90,
+  60:  #7A82B0,   // --color-neutral-variant-400
+  70:  #9AA1C7,
+  80:  #C2C6E0,   // --color-neutral-variant-200
+  90:  #E0E2F0,   // --color-neutral-variant-100
+  95:  #EFF0F8,
+  98:  #F8F8FC,
+  99:  #FBFBFE,
+  100: #FFFFFF,
+);
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary:         $pocket-primary-palette,
+        secondary:       $pocket-secondary-palette,
+        tertiary:        $pocket-tertiary-palette,
+        error:           $pocket-error-palette,
+        neutral:         $pocket-neutral-palette,
+        neutral-variant: $pocket-neutral-variant-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+body {
+  // Default the application to a light color theme. This can be changed to
+  // `dark` to enable the dark color theme, or to `light dark` to defer to the
+  // user's system settings.
+  color-scheme: light;
+
+  // Set a default background, font and text colors for the application using
+  // Angular Material's system-level CSS variables. Learn more about these
+  // variables at https://material.angular.dev/guide/system-variables
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+  height: 100%;
+}
