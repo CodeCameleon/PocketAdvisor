@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using PocketAdvisor.WebApplication.Constants;
 using Resend;
 
 namespace PocketAdvisor.WebApplication.Extensions;
@@ -34,6 +35,26 @@ public static class ServiceCollectionExtensions
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingSecret))
             };
+        });
+    }
+    
+    #endregion
+    
+    #region AddPocketAdvisorCors
+    
+    /// <summary>
+    /// Adds the global CORS policy to the service collection.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="frontendBaseUrl">The base URL of the frontend application.</param>
+    public static void AddPocketAdvisorCors(this IServiceCollection services, string frontendBaseUrl)
+    {
+        services.AddCors(options =>
+        {
+            options.AddPolicy(CorsPolicyNames.Global, policy =>
+            {
+                policy.WithOrigins(frontendBaseUrl).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+            });
         });
     }
     

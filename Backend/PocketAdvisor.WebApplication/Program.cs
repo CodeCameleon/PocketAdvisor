@@ -8,6 +8,7 @@ using PocketAdvisor.Entities;
 using PocketAdvisor.Repositories.Extensions;
 using PocketAdvisor.Requests.Users;
 using PocketAdvisor.Services.Extensions;
+using PocketAdvisor.WebApplication.Constants;
 using PocketAdvisor.WebApplication.Extensions;
 using PocketAdvisor.WebApplication.Middlewares;
 
@@ -52,6 +53,11 @@ builder.Services.AddPocketAdvisorAuthentication(
     builder.Configuration.GetJwtSigningSecret()
 );
 
+// Adds the global CORS policy to the container.
+builder.Services.AddPocketAdvisorCors(
+    builder.Configuration.GetFrontendBaseUrl()
+);
+
 // Adds the API controllers to the container.
 builder.Services.AddControllers();
 
@@ -83,6 +89,9 @@ app.UsePocketAdvisorSwagger();
 
 // Adds the middleware for redirecting HTTP requests.
 app.UseHttpsRedirection();
+
+// Adds the middleware for the global CORS policy.
+app.UseCors(CorsPolicyNames.Global);
 
 // Adds the middleware for authentication.
 app.UseAuthentication();

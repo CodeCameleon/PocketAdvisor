@@ -18,6 +18,11 @@ public static class ConfigurationExtensions
     private const string ApiKey = "ApiKey";
     
     /// <summary>
+    /// The name of the frontend base URL in the configuration.
+    /// </summary>
+    private const string BaseUrl = "BaseUrl";
+    
+    /// <summary>
     /// The character used to separate configuration keys.
     /// </summary>
     private const char Colon = ':';
@@ -56,6 +61,11 @@ public static class ConfigurationExtensions
     /// The name of the default database username in the configuration.
     /// </summary>
     private const string DefaultUsername = "DefaultUsername";
+    
+    /// <summary>
+    /// The name of the section that contains the frontend settings in the configuration.
+    /// </summary>
+    private const string Frontend = "Frontend";
     
     /// <summary>
     /// The name of the JWT issuer in the configuration.
@@ -149,6 +159,30 @@ public static class ConfigurationExtensions
         }
         
         return string.Format(ConnectionStringTemplate, host, port, database, username, password);
+    }
+    
+    #endregion
+    
+    #region GetFrontendBaseUrl
+    
+    /// <summary>
+    /// Gets the frontend base URL from the configuration.
+    /// </summary>
+    /// <param name="configuration">The configuration instance.</param>
+    /// <returns>The frontend base URL.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// If the frontend base URL is not found in the configuration.
+    /// </exception>
+    public static string GetFrontendBaseUrl(this IConfiguration configuration)
+    {
+        string? baseUrl = configuration.GetSection(Frontend).GetValue<string>(BaseUrl);
+        
+        if (string.IsNullOrWhiteSpace(baseUrl))
+        {
+            throw CreateInvalidOperationException(Frontend, BaseUrl);
+        }
+        
+        return baseUrl;
     }
     
     #endregion
