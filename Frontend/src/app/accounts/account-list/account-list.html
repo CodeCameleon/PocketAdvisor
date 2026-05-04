@@ -1,0 +1,77 @@
+<div class="accounts-page">
+  <div class="accounts-header">
+    <div class="accounts-header-text">
+      <h1 class="accounts-title">
+        Accounts
+      </h1>
+
+      <p class="accounts-subtitle">
+        Your linked financial accounts
+      </p>
+    </div>
+
+    <button mat-flat-button class="add-account-button">
+      <mat-icon>add</mat-icon>
+
+      Add account
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="accounts-loading">
+      <mat-spinner diameter="40" />
+    </div>
+  } @else if (errorMessage()) {
+    <div class="error-banner">
+      <mat-icon>error_outline</mat-icon>
+
+      <span>
+        {{errorMessage()}}
+      </span>
+    </div>
+  } @else if (accounts().length === 0) {
+    <div class="accounts-empty">
+      <mat-icon class="accounts-empty-icon">account_balance_wallet</mat-icon>
+
+      <p class="accounts-empty-title">
+        No accounts yet
+      </p>
+
+      <p class="accounts-empty-subtitle">
+        Add your first account to start tracking your finances.
+      </p>
+    </div>
+  } @else {
+    <div class="accounts-grid">
+      @for (account of accounts(); track account.id) {
+        <div class="account-card">
+          <div class="account-card-header">
+            <div class="account-icon-wrap">
+              <mat-icon class="account-icon">account_balance</mat-icon>
+            </div>
+
+            <span class="account-name">
+              {{account.name}}
+            </span>
+          </div>
+
+          <div class="account-card-balance">
+            <span class="account-balance-label">
+              Balance
+            </span>
+
+            <span class="account-balance-value">
+              {{account.calculatedBalance | currency : currencyAlpha(account.currencyCode) : 'symbol-narrow' : '1.2-2'}}
+            </span>
+          </div>
+
+          <div class="account-card-footer">
+            <span class="account-currency-badge">
+              {{currencyAlpha(account.currencyCode)}}
+            </span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
