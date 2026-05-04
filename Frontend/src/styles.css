@@ -47,3 +47,146 @@
   --color-neutral-variant-800: #1E2145;
   --color-neutral-variant-950: #0D0F28;
 }
+
+/* ─── Auth pages — shared layout ─────────────────────────────────────────── */
+
+.auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  background-color: var(--color-neutral-50);
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border: 1px solid var(--color-neutral-variant-100);
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 2px 16px 0 rgba(35, 85, 216, 0.07);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.auth-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-primary-800);
+  margin: 0 0 0.375rem 0;
+  letter-spacing: -0.03em;
+}
+
+.auth-subtitle {
+  font-size: 0.9375rem;
+  color: var(--color-neutral-600-base);
+  margin: 0;
+}
+
+/* ─── Auth pages — form layout ────────────────────────────────────────────── */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* ─── Auth pages — submit button ─────────────────────────────────────────── */
+
+.submit-button {
+  width: 100%;
+  margin-top: 0.75rem;
+  height: 44px;
+  font-size: 1rem;
+  font-weight: 600;
+  background-color: var(--color-primary-600-base);
+  color: #fff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: var(--color-primary-800);
+}
+
+/* ─── Auth pages — inline messages ───────────────────────────────────────── */
+
+.error-message {
+  font-size: 0.875rem;
+  color: var(--color-error-600-base);
+  margin: 0 0 0 0;
+}
+
+.success-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.875rem 1rem;
+  background-color: color-mix(in srgb, var(--color-tertiary-400) 12%, transparent);
+  border: 1px solid var(--color-tertiary-400);
+  border-radius: 8px;
+  color: var(--color-tertiary-800);
+  font-size: 0.9375rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.success-banner mat-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ─── Auth pages — navigation links ──────────────────────────────────────── */
+
+.auth-links {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-neutral-600-base);
+}
+
+.auth-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--color-primary-600-base);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+.auth-link-divider {
+  margin: 0 0.5rem;
+  color: var(--color-neutral-300);
+}
+
+/* ─── Auth pages — forgot-password specifics ──────────────────────────────── */
+
+.instruction-text {
+  font-size: 0.9375rem;
+  color: var(--color-neutral-600-base);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
+}
+
+.back-icon {
+  font-size: 1rem;
+  width: 1rem;
+  height: 1rem;
+}

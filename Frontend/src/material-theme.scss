@@ -1,4 +1,5 @@
 @use '@angular/material' as mat;
+@use 'sass:map';
 
 $pocket-primary-palette: (
   0:   #000000,
@@ -78,7 +79,13 @@ $pocket-error-palette: (
 
 $pocket-neutral-palette: (
   0:   #000000,
+  4:   #050609,
+  6:   #080A10,
   10:  #0C0E18,   // --color-neutral-950
+  12:  #101320,
+  17:  #161924,
+  22:  #1A1E2B,
+  24:  #1C2030,
   20:  #1E2130,   // --color-neutral-800
   25:  #282C3E,
   30:  #32374A,
@@ -88,8 +95,12 @@ $pocket-neutral-palette: (
   60:  #7D8293,
   70:  #979BAE,
   80:  #B1B5C6,
+  87:  #D3D6DF,
   90:  #E2E4E9,   // --color-neutral-100
+  92:  #EAECF1,
+  94:  #EFF1F4,
   95:  #F4F5F7,   // --color-neutral-50
+  96:  #F6F7F9,
   98:  #F9FAFB,
   99:  #FBFCFD,
   100: #FFFFFF,
@@ -114,17 +125,25 @@ $pocket-neutral-variant-palette: (
   100: #FFFFFF,
 );
 
+$pocket-theme-palette: map.merge(
+  $pocket-primary-palette,
+  (
+    secondary:       $pocket-secondary-palette,
+    neutral:         $pocket-neutral-palette,
+    neutral-variant: $pocket-neutral-variant-palette,
+    error:           $pocket-error-palette,
+  )
+);
+
 html {
   height: 100%;
+  color-scheme: light;
+
   @include mat.theme(
     (
       color: (
-        primary:         $pocket-primary-palette,
-        secondary:       $pocket-secondary-palette,
-        tertiary:        $pocket-tertiary-palette,
-        error:           $pocket-error-palette,
-        neutral:         $pocket-neutral-palette,
-        neutral-variant: $pocket-neutral-variant-palette,
+        primary:  $pocket-theme-palette,
+        tertiary: $pocket-tertiary-palette,
       ),
       typography: Roboto,
       density: 0,
@@ -133,11 +152,6 @@ html {
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light;
-
   // Set a default background, font and text colors for the application using
   // Angular Material's system-level CSS variables. Learn more about these
   // variables at https://material.angular.dev/guide/system-variables
