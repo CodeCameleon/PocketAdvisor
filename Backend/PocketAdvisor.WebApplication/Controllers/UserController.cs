@@ -135,7 +135,7 @@ public sealed class UserController
                             UrlTemplate,
                             FrontendOptions.Value.BaseUrl,
                             FrontendOptions.Value.EmailVerificationPath,
-                            result.Value
+                            Uri.EscapeDataString(result.Value)
                         )
                     }
                 }
@@ -184,7 +184,7 @@ public sealed class UserController
                             UrlTemplate,
                             FrontendOptions.Value.BaseUrl,
                             FrontendOptions.Value.PasswordResetPath,
-                            result.Value
+                            Uri.EscapeDataString(result.Value)
                         )
                     }
                 }

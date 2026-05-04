@@ -23,7 +23,8 @@ import { AuthCard } from '../auth-card/auth-card';
     MatProgressSpinnerModule,
     AuthCard,
   ],
-  templateUrl: './forgot-password.html'
+  templateUrl: './forgot-password.html',
+  styleUrl: './forgot-password.css'
 })
 export class ForgotPassword {
   private readonly fb = inject(FormBuilder);

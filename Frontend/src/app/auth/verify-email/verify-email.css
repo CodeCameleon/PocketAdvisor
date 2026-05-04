@@ -1,0 +1,14 @@
+.verify-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 0;
+  margin-bottom: 1.5rem;
+}
+
+.status-text {
+  font-size: 0.9375rem;
+  color: var(--color-neutral-600-base);
+  margin: 0;
+}

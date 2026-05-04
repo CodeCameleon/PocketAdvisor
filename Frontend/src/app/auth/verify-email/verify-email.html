@@ -1,0 +1,33 @@
+<app-auth-card subtitle="Email Verification">
+  @if (loading()) {
+    <div class="verify-status">
+      <mat-spinner diameter="40" />
+
+      <p class="status-text">
+        Verifying your email address…
+      </p>
+    </div>
+  } @else if (success()) {
+    <div class="success-banner">
+      <mat-icon>mark_email_read</mat-icon>
+
+      <span>
+        Your email address has been verified. You can now sign in.
+      </span>
+    </div>
+  } @else {
+    <div class="error-banner">
+      <mat-icon>error_outline</mat-icon>
+
+      <span>
+        {{errorMessage()}}
+      </span>
+    </div>
+  }
+
+  <div class="auth-links">
+    <a routerLink="/auth/login" class="auth-link">
+      Back to sign in
+    </a>
+  </div>
+</app-auth-card>
