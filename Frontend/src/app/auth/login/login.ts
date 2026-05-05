@@ -47,7 +47,7 @@ export class Login {
     this.sessionService.login(this.form.getRawValue()).subscribe({
       next: () => {
         this.loading.set(false);
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/accounts']);
       },
       error: (err) => {
         this.loading.set(false);

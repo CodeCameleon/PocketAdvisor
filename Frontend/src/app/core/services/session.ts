@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 
 import { LoginRequest } from '../models/login-request';
 import { LoginResponse } from '../models/login-response';
@@ -17,17 +17,19 @@ export class SessionService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/sessions`;
 
-  /** Authenticates a user, stores the returned tokens, and returns the response. */
-  login(request: LoginRequest): Observable<LoginResponse> {
+  /** Authenticates a user and stores the returned tokens. */
+  login(request: LoginRequest): Observable<void> {
     return this.http.post<LoginResponse>(`${this.base}/login`, request).pipe(
-      tap(response => this.storeTokens(response))
+      tap(response => this.storeTokens(response)),
+      map(() => void 0)
     );
   }
 
-  /** Rotates the refresh token, stores the new tokens, and returns the response. */
-  refresh(request: RefreshRequest): Observable<LoginResponse> {
+  /** Rotates the refresh token and stores the new tokens. */
+  refresh(request: RefreshRequest): Observable<void> {
     return this.http.post<LoginResponse>(`${this.base}/refresh`, request).pipe(
-      tap(response => this.storeTokens(response))
+      tap(response => this.storeTokens(response)),
+      map(() => void 0)
     );
   }
 
