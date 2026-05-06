@@ -2,3 +2,9 @@
   display: block;
   height: 100dvh;
 }
+
+.app-content {
+  padding-top: 60px;
+  height: 100%;
+  box-sizing: border-box;
+}

@@ -1,0 +1,25 @@
+<mat-toolbar class="navbar">
+  <nav class="navbar-left">
+    @if (isLoggedIn) {
+      <a mat-button routerLink="/accounts" routerLinkActive="nav-link-active">
+        <mat-icon>account_balance_wallet</mat-icon>
+
+        Accounts
+      </a>
+    }
+  </nav>
+
+  <span class="navbar-title">
+    Pocket Advisor
+  </span>
+
+  <div class="navbar-right">
+    @if (isLoggedIn) {
+      <button mat-button class="nav-auth-button" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+
+        Logout
+      </button>
+    }
+  </div>
+</mat-toolbar>
