@@ -3,12 +3,14 @@ import { CurrencyPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { AccountService } from '../../core/services/account';
 import { AccountResponse } from '../../core/models/account-response';
 import { CurrencyCode } from '../../core/enums/currency-code';
 import { CreateAccountDialog } from '../create-account-dialog/create-account-dialog';
+import { DeleteAccountDialog } from '../delete-account-dialog/delete-account-dialog';
 
 @Component({
   selector: 'app-account-list',
@@ -16,6 +18,7 @@ import { CreateAccountDialog } from '../create-account-dialog/create-account-dia
     CurrencyPipe,
     MatButtonModule,
     MatIconModule,
+    MatMenuModule,
     MatProgressSpinnerModule
   ],
   templateUrl: './account-list.html',
@@ -43,6 +46,22 @@ export class AccountList implements OnInit {
 
     ref.afterClosed().subscribe((created: boolean) => {
       if (created) {
+        this.loadAccounts();
+      }
+    });
+  }
+
+  openDeleteDialog(account: AccountResponse): void {
+    const ref = this.dialog.open(DeleteAccountDialog, {
+      width: '480px',
+      maxWidth: '95vw',
+      autoFocus: 'first-tabbable',
+      restoreFocus: true,
+      data: { id: account.id, name: account.name },
+    });
+
+    ref.afterClosed().subscribe((deleted: boolean) => {
+      if (deleted) {
         this.loadAccounts();
       }
     });

@@ -153,6 +153,35 @@
   white-space: nowrap;
 }
 
+/* Card header: menu button */
+
+.account-menu-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--color-neutral-300);
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.account-card:hover .account-menu-btn,
+.account-menu-btn:focus-visible {
+  opacity: 1;
+}
+
+.account-menu-btn:hover {
+  color: var(--color-neutral-600-base);
+}
+
+/* Delete menu item */
+
+.menu-item-delete {
+  color: var(--color-error-700, #c62828) !important;
+}
+
+.menu-item-delete mat-icon {
+  color: inherit !important;
+}
+
 /* Card balance section */
 
 .account-card-balance {

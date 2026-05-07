@@ -53,6 +53,18 @@
             <span class="account-name">
               {{account.name}}
             </span>
+
+            <button mat-icon-button class="account-menu-btn" [matMenuTriggerFor]="accountMenu" (click)="$event.stopPropagation()" aria-label="Account options">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+
+            <mat-menu #accountMenu="matMenu">
+              <button mat-menu-item class="menu-item-delete" (click)="openDeleteDialog(account)">
+                <mat-icon>delete_outline</mat-icon>
+
+                Delete account
+              </button>
+            </mat-menu>
           </div>
 
           <div class="account-card-balance">
