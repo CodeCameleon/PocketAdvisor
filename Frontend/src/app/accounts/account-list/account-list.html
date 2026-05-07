@@ -59,6 +59,12 @@
             </button>
 
             <mat-menu #accountMenu="matMenu">
+              <button mat-menu-item (click)="openRenameDialog(account)">
+                <mat-icon>edit_outline</mat-icon>
+
+                Rename account
+              </button>
+
               <button mat-menu-item class="menu-item-delete" (click)="openDeleteDialog(account)">
                 <mat-icon>delete_outline</mat-icon>
 

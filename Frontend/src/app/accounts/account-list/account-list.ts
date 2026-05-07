@@ -11,6 +11,7 @@ import { AccountResponse } from '../../core/models/account-response';
 import { CurrencyCode } from '../../core/enums/currency-code';
 import { CreateAccountDialog } from '../create-account-dialog/create-account-dialog';
 import { DeleteAccountDialog } from '../delete-account-dialog/delete-account-dialog';
+import { UpdateAccountNameDialog } from '../update-account-name-dialog/update-account-name-dialog';
 
 @Component({
   selector: 'app-account-list',
@@ -51,6 +52,22 @@ export class AccountList implements OnInit {
     });
   }
 
+  openRenameDialog(account: AccountResponse): void {
+    const ref = this.dialog.open(UpdateAccountNameDialog, {
+      width: '480px',
+      maxWidth: '95vw',
+      autoFocus: 'first-tabbable',
+      restoreFocus: true,
+      data: { id: account.id, name: account.name },
+    });
+
+    ref.afterClosed().subscribe((updated: boolean) => {
+      if (updated) {
+        this.loadAccounts();
+      }
+    });
+  }
+
   openDeleteDialog(account: AccountResponse): void {
     const ref = this.dialog.open(DeleteAccountDialog, {
       width: '480px',
@@ -67,7 +84,7 @@ export class AccountList implements OnInit {
     });
   }
 
-  /** Converts a numeric CurrencyCode enum value to its ISO 4217 alpha string (e.g. 840 → "USD"). */
+  /** Converts a numeric CurrencyCode enum value to its ISO 4217 alpha string (e.g. 840 -> "USD"). */
   currencyAlpha(code: CurrencyCode): string {
     return CurrencyCode[code].toUpperCase();
   }

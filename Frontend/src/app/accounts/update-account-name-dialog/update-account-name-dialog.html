@@ -1,0 +1,49 @@
+<h2 mat-dialog-title class="dialog-title">
+  Rename account
+</h2>
+
+<mat-dialog-content>
+  <p class="dialog-subtitle">
+    Enter a new name for this account.
+  </p>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate id="update-account-name-form" class="dialog-form">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
+      <mat-label>Account name</mat-label>
+
+      <input matInput formControlName="name" autocomplete="off" placeholder="e.g. Main Chequing" />
+
+      <mat-icon matSuffix>label_outline</mat-icon>
+
+      @if (form.controls.name.hasError('serverError')) {
+        <mat-error>
+          {{form.controls.name.getError('serverError')}}
+        </mat-error>
+      }
+    </mat-form-field>
+
+    @if (errorMessage()) {
+      <div class="error-banner">
+        <mat-icon>error_outline</mat-icon>
+
+        <span>
+          {{errorMessage()}}
+        </span>
+      </div>
+    }
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-button type="button" (click)="onCancel()" [disabled]="loading()">
+    Cancel
+  </button>
+
+  <button mat-flat-button class="submit-button" type="submit" form="update-account-name-form" [disabled]="loading()">
+    @if (loading()) {
+      <mat-spinner diameter="18" class="submit-spinner" />
+    } @else {
+      Save
+    }
+  </button>
+</mat-dialog-actions>
