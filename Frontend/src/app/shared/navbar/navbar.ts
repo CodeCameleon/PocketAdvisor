@@ -22,9 +22,7 @@ export class Navbar {
   private readonly sessionService = inject(SessionService);
   private readonly router = inject(Router);
 
-  get isLoggedIn(): boolean {
-    return this.sessionService.isLoggedIn();
-  }
+  readonly isLoggedIn = this.sessionService.isLoggedIn;
 
   logout(): void {
     this.sessionService.logout();

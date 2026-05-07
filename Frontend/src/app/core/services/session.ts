@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable, tap } from 'rxjs';
 
@@ -16,6 +16,13 @@ export class SessionService {
 
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/sessions`;
+
+  private readonly _jwt = signal<string | null>(
+    localStorage.getItem(SessionService.JsonWebTokenKey)
+  );
+
+  /** Signal that is true when a JWT is currently stored. */
+  readonly isLoggedIn = computed(() => this._jwt() !== null);
 
   /** Authenticates a user and stores the returned tokens. */
   login(request: LoginRequest): Observable<void> {
@@ -37,11 +44,12 @@ export class SessionService {
   logout(): void {
     localStorage.removeItem(SessionService.JsonWebTokenKey);
     localStorage.removeItem(SessionService.RefreshTokenKey);
+    this._jwt.set(null);
   }
 
   /** Returns the stored json web token, or null if not present. */
   getJwt(): string | null {
-    return localStorage.getItem(SessionService.JsonWebTokenKey);
+    return this._jwt();
   }
 
   /** Returns the stored refresh token, or null if not present. */
@@ -49,13 +57,9 @@ export class SessionService {
     return localStorage.getItem(SessionService.RefreshTokenKey);
   }
 
-  /** Returns true if a json web token is currently stored. */
-  isLoggedIn(): boolean {
-    return this.getJwt() !== null;
-  }
-
   private storeTokens(response: LoginResponse): void {
     localStorage.setItem(SessionService.JsonWebTokenKey, response.jsonWebToken);
     localStorage.setItem(SessionService.RefreshTokenKey, response.refreshToken);
+    this._jwt.set(response.jsonWebToken);
   }
 }
