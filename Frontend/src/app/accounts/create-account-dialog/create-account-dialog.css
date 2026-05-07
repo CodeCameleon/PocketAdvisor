@@ -1,0 +1,84 @@
+/* ─── Dialog title ─────────────────────────────────────────────────────────── */
+
+.dialog-title {
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  color: var(--color-primary-800) !important;
+  letter-spacing: -0.02em;
+  padding-bottom: 0.25rem;
+}
+
+/* ─── Content area ─────────────────────────────────────────────────────────── */
+
+.dialog-subtitle {
+  font-size: 0.9375rem;
+  color: var(--color-neutral-600-base);
+  margin: 0 0 1.25rem;
+  line-height: 1.5;
+}
+
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* ─── Error banner ─────────────────────────────────────────────────────────── */
+
+.error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.75rem 1rem;
+  background-color: color-mix(in srgb, var(--color-error-400) 10%, transparent);
+  border: 1px solid var(--color-error-400);
+  border-radius: 8px;
+  color: var(--color-error-800);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.error-banner mat-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ─── Suppress the horizontal scrollbar Material adds to dialog content ───── */
+
+:host ::ng-deep .mat-mdc-dialog-content {
+  overflow-x: hidden !important;
+}
+
+/* ─── Actions ──────────────────────────────────────────────────────────────── */
+
+.dialog-actions {
+  display: flex !important;
+  justify-content: space-between !important;
+  padding: 0.5rem 1.5rem 1rem !important;
+}
+
+.submit-button {
+  background-color: var(--color-primary-600-base);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 600;
+  min-width: 130px;
+  width: auto !important;
+  flex: 0 0 auto !important;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: var(--color-primary-800);
+}
+
+.submit-button:disabled {
+  opacity: 0.65;
+}
+
+.submit-spinner {
+  display: inline-flex;
+}

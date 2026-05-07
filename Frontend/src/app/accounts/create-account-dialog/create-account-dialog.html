@@ -1,0 +1,91 @@
+<h2 mat-dialog-title class="dialog-title">
+  Add account
+</h2>
+
+<mat-dialog-content>
+  <p class="dialog-subtitle">
+    Enter your account details below. You can only change the name later.
+  </p>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate id="create-account-form" class="dialog-form">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
+      <mat-label>Account name</mat-label>
+
+      <input matInput formControlName="name" autocomplete="off" placeholder="e.g. Main Chequing" />
+
+      <mat-icon matSuffix>label_outline</mat-icon>
+
+      @if (form.controls.name.hasError('serverError')) {
+        <mat-error>
+          {{form.controls.name.getError('serverError')}}
+        </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
+      <mat-label>Opening balance</mat-label>
+
+      <input matInput type="number" formControlName="balance" autocomplete="off" placeholder="0.00" />
+
+      <mat-icon matSuffix>payments</mat-icon>
+
+      @if (form.controls.balance.hasError('serverError')) {
+        <mat-error>
+          {{form.controls.balance.getError('serverError')}}
+        </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
+      <mat-label>Currency</mat-label>
+
+      <mat-select formControlName="currencyCode">
+        <mat-optgroup label="Popular">
+          @for (opt of pinnedOptions; track opt.value) {
+            <mat-option [value]="opt.value">
+              {{opt.label}}
+            </mat-option>
+          }
+        </mat-optgroup>
+
+        <mat-optgroup label="All currencies">
+          @for (opt of allOptions; track opt.value) {
+            <mat-option [value]="opt.value">
+              {{opt.label}}
+            </mat-option>
+          }
+        </mat-optgroup>
+      </mat-select>
+
+      @if (form.controls.currencyCode.hasError('serverError')) {
+        <mat-error>
+          {{form.controls.currencyCode.getError('serverError')}}
+        </mat-error>
+      }
+    </mat-form-field>
+
+    @if (errorMessage()) {
+      <div class="error-banner">
+        <mat-icon>error_outline</mat-icon>
+
+        <span>
+          {{errorMessage()}}
+        </span>
+      </div>
+    }
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-button type="button" (click)="onCancel()" [disabled]="loading()">
+    Cancel
+  </button>
+
+  <button mat-flat-button class="submit-button" type="submit" form="create-account-form" [disabled]="loading()">
+    @if (loading()) {
+      <mat-spinner diameter="18" class="submit-spinner" />
+    } @else {
+      Add account
+    }
+  </button>
+</mat-dialog-actions>
