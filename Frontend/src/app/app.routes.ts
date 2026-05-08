@@ -20,6 +20,11 @@ export const routes: Routes = [
     loadChildren: () => import('./auth/auth-module').then(m => m.AuthModule)
   },
   {
+    path: 'categories',
+    canActivate: [authGuard],
+    loadChildren: () => import('./categories/categories-module').then(m => m.CategoriesModule)
+  },
+  {
     path: '**',
     redirectTo: 'auth/login'
   }

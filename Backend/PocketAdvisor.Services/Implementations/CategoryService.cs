@@ -303,7 +303,8 @@ public sealed class CategoryService
         List<CategoryResponse> response = categories.Select(c => new CategoryResponse
         {
             Id = c.Id,
-            Name = c.Name
+            Name = c.Name,
+            IsGlobal = c.UserId == null
         }).ToList();
         
         if (Logger.IsEnabled(LogLevel.Information))

@@ -1,0 +1,81 @@
+<div class="categories-page">
+  <div class="categories-header">
+    <div class="categories-header-text">
+      <h1 class="categories-title">
+        Categories
+      </h1>
+
+      <p class="categories-subtitle">
+        Organise your transactions with categories
+      </p>
+    </div>
+
+    <button mat-flat-button class="add-category-button" (click)="openCreateDialog()">
+      <mat-icon>add</mat-icon>
+
+      Add category
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="categories-loading">
+      <mat-spinner diameter="40" />
+    </div>
+  } @else if (errorMessage()) {
+    <div class="error-banner">
+      <mat-icon>error_outline</mat-icon>
+
+      <span>
+        {{errorMessage()}}
+      </span>
+    </div>
+  } @else if (categories().length === 0) {
+    <div class="categories-empty">
+      <mat-icon class="categories-empty-icon">label_outline</mat-icon>
+
+      <p class="categories-empty-title">
+        No categories yet
+      </p>
+
+      <p class="categories-empty-subtitle">
+        Add your first category to start organising your transactions.
+      </p>
+    </div>
+  } @else {
+    <div class="categories-grid">
+      @for (category of categories(); track category.id) {
+        <div class="category-card">
+          <div class="category-card-header">
+            <div class="category-icon-wrap" [class.global]="category.isGlobal">
+              <mat-icon class="category-icon">{{category.isGlobal ? 'public' : 'label'}}</mat-icon>
+            </div>
+
+            <span class="category-name">
+              {{category.name}}
+            </span>
+
+            @if (!category.isGlobal) {
+              <button mat-icon-button class="category-menu-btn" [matMenuTriggerFor]="categoryMenu" (click)="$event.stopPropagation()" aria-label="Category options">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+
+              <mat-menu #categoryMenu="matMenu">
+                <button mat-menu-item (click)="openRenameDialog(category)">
+                  <mat-icon>edit_outline</mat-icon>
+
+                  Rename category
+                </button>
+
+                <button mat-menu-item class="menu-item-delete" (click)="openDeleteDialog(category)">
+                  <mat-icon>delete_outline</mat-icon>
+
+                  Delete category
+                </button>
+              </mat-menu>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

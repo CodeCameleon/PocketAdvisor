@@ -1,0 +1,34 @@
+<h2 mat-dialog-title class="dialog-title">
+  Delete category
+</h2>
+
+<mat-dialog-content>
+  <p class="dialog-body">
+    Are you sure you want to delete <strong>{{categoryName}}</strong>?
+    This action cannot be undone.
+  </p>
+
+  @if (errorMessage()) {
+    <div class="error-banner">
+      <mat-icon>error_outline</mat-icon>
+
+      <span>
+        {{errorMessage()}}
+      </span>
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-button type="button" (click)="onCancel()" [disabled]="loading()">
+    Cancel
+  </button>
+
+  <button mat-flat-button class="delete-button" type="button" (click)="onConfirm()" [disabled]="loading()">
+    @if (loading()) {
+      <mat-spinner diameter="18" class="submit-spinner" />
+    } @else {
+      Delete category
+    }
+  </button>
+</mat-dialog-actions>

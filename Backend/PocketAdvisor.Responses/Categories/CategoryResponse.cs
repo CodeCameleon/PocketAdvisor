@@ -14,4 +14,9 @@ public sealed class CategoryResponse
     /// The name of the category.
     /// </summary>
     public required string Name { get; init; }
+    
+    /// <summary>
+    /// Indicates whether the category is global (available to all users) or personal.
+    /// </summary>
+    public required bool IsGlobal { get; init; }
 }
