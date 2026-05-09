@@ -44,7 +44,7 @@
   } @else {
     <div class="accounts-grid">
       @for (account of accounts(); track account.id) {
-        <div class="account-card">
+        <div class="account-card" (click)="openTransactions(account)" role="button" tabindex="0" (keydown.enter)="openTransactions(account)" (keydown.space)="openTransactions(account)" [attr.aria-label]="'View transactions for ' + account.name">
           <div class="account-card-header">
             <div class="account-icon-wrap">
               <mat-icon class="account-icon">account_balance</mat-icon>

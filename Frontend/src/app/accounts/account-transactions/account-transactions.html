@@ -1,0 +1,90 @@
+<div class="transactions-page">
+  <div class="transactions-header">
+    <button mat-icon-button class="back-btn" (click)="goBack()" aria-label="Back to accounts">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+
+    <div class="transactions-header-text">
+      <h1 class="transactions-title">
+        @if (account()) {
+          {{account()!.name}}
+        } @else {
+          Transactions
+        }
+      </h1>
+
+      <p class="transactions-subtitle">
+        Transaction history
+      </p>
+    </div>
+
+    @if (account()) {
+      <div class="transactions-header-balance">
+        <span class="header-balance-label">Balance</span>
+
+        <span class="header-balance-value">
+          {{account()!.calculatedBalance | currency : currencyAlpha(account()!.currencyCode) : 'symbol-narrow' : '1.2-2'}}
+        </span>
+      </div>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="transactions-loading">
+      <mat-spinner diameter="40" />
+    </div>
+  } @else if (errorMessage()) {
+    <div class="error-banner">
+      <mat-icon>error_outline</mat-icon>
+
+      <span>
+        {{errorMessage()}}
+      </span>
+    </div>
+  } @else if (transactions().length === 0) {
+    <div class="transactions-empty">
+      <mat-icon class="transactions-empty-icon">receipt_long</mat-icon>
+
+      <p class="transactions-empty-title">
+        No transactions yet
+      </p>
+
+      <p class="transactions-empty-subtitle">
+        Transactions for this account will appear here.
+      </p>
+    </div>
+  } @else {
+    <div class="transactions-list">
+      @for (tx of transactions(); track tx.id) {
+        <div class="transaction-row">
+          <div class="transaction-icon-wrap" [class.income]="transactionAmount(tx) > 0" [class.expense]="transactionAmount(tx) < 0">
+            <mat-icon class="transaction-icon">
+              {{transactionAmount(tx) > 0 ? 'arrow_downward' : 'arrow_upward'}}
+            </mat-icon>
+          </div>
+
+          <div class="transaction-info">
+            <span class="transaction-date">
+              {{tx.occurredAt | date : 'MMM d, y'}}
+            </span>
+          </div>
+
+          <div class="transaction-items-count">
+            <mat-icon class="items-icon">inventory_2</mat-icon>
+
+            <span>
+              {{tx.items.length}}
+              {{tx.items.length === 1 ? 'item' : 'items'}}
+            </span>
+          </div>
+
+          <div class="transaction-amount" [class.income]="transactionAmount(tx) > 0" [class.expense]="transactionAmount(tx) < 0">
+            @if (account()) {
+              {{(transactionAmount(tx) > 0 ? '+' : '') + (transactionAmount(tx) | currency : currencyAlpha(account()!.currencyCode) : 'symbol-narrow' : '1.2-2')}}
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

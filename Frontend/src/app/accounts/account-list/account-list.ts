@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
+import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -28,6 +29,7 @@ import { UpdateAccountNameDialog } from '../update-account-name-dialog/update-ac
 export class AccountList implements OnInit {
   private readonly accountService = inject(AccountService);
   private readonly dialog = inject(MatDialog);
+  private readonly router = inject(Router);
 
   readonly accounts = signal<AccountResponse[]>([]);
   readonly loading = signal(true);
@@ -35,6 +37,10 @@ export class AccountList implements OnInit {
 
   ngOnInit(): void {
     this.loadAccounts();
+  }
+
+  openTransactions(account: AccountResponse): void {
+    this.router.navigate(['/accounts', account.id, 'transactions']);
   }
 
   openCreateDialog(): void {
