@@ -1,0 +1,49 @@
+<h2 mat-dialog-title class="dialog-title">
+  Add global category
+</h2>
+
+<mat-dialog-content>
+  <p class="dialog-subtitle">
+    Enter a name for the new global category.
+  </p>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate id="create-global-category-form" class="dialog-form">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
+      <mat-label>Category name</mat-label>
+
+      <input matInput formControlName="name" autocomplete="off" placeholder="e.g. Groceries" />
+
+      <mat-icon matSuffix>public</mat-icon>
+
+      @if (form.controls.name.hasError('serverError')) {
+        <mat-error>
+          {{form.controls.name.getError('serverError')}}
+        </mat-error>
+      }
+    </mat-form-field>
+
+    @if (errorMessage()) {
+      <div class="error-banner">
+        <mat-icon>error_outline</mat-icon>
+
+        <span>
+          {{errorMessage()}}
+        </span>
+      </div>
+    }
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-button type="button" (click)="onCancel()" [disabled]="loading()">
+    Cancel
+  </button>
+
+  <button mat-flat-button class="submit-button" type="submit" form="create-global-category-form" [disabled]="loading()">
+    @if (loading()) {
+      <mat-spinner diameter="18" class="submit-spinner" />
+    } @else {
+      Add category
+    }
+  </button>
+</mat-dialog-actions>
