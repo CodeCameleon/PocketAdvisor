@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
@@ -10,6 +11,7 @@ import { AccountService } from '../../core/services/account';
 import { TransactionResponse } from '../../core/models/transaction-response';
 import { AccountResponse } from '../../core/models/account-response';
 import { CurrencyCode } from '../../core/enums/currency-code';
+import { CreateTransactionDialog } from '../create-transaction-dialog/create-transaction-dialog';
 
 @Component({
   selector: 'app-account-transactions',
@@ -26,6 +28,7 @@ import { CurrencyCode } from '../../core/enums/currency-code';
 export class AccountTransactions implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
   private readonly transactionService = inject(TransactionService);
   private readonly accountService = inject(AccountService);
 
@@ -33,6 +36,8 @@ export class AccountTransactions implements OnInit {
   readonly transactions = signal<TransactionResponse[]>([]);
   readonly loading = signal(true);
   readonly errorMessage = signal('');
+
+  private allAccounts: AccountResponse[] = [];
 
   private accountId = '';
 
@@ -43,6 +48,25 @@ export class AccountTransactions implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/accounts']);
+  }
+
+  openCreateDialog(): void {
+    const ref = this.dialog.open(CreateTransactionDialog, {
+      width: '620px',
+      maxWidth: '95vw',
+      autoFocus: 'first-tabbable',
+      restoreFocus: true,
+      data: {
+        accountId: this.accountId,
+        otherAccounts: this.allAccounts.filter(a => a.id !== this.accountId)
+      },
+    });
+
+    ref.afterClosed().subscribe((created: boolean) => {
+      if (created) {
+        this.loadData();
+      }
+    });
   }
 
   /** Converts a numeric CurrencyCode enum value to its ISO 4217 alpha string (e.g. 840 -> "USD"). */
@@ -63,6 +87,7 @@ export class AccountTransactions implements OnInit {
 
     this.accountService.getAccounts().subscribe({
       next: (accounts) => {
+        this.allAccounts = accounts;
         const found = accounts.find(a => a.id === this.accountId) ?? null;
         this.account.set(found);
 

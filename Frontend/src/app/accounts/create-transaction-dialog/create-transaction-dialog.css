@@ -1,0 +1,170 @@
+/* ─── Dialog title ─────────────────────────────────────────────────────────── */
+
+.dialog-title {
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  color: var(--color-primary-800) !important;
+  letter-spacing: -0.02em;
+  padding-bottom: 0.25rem;
+}
+
+/* ─── Content area ─────────────────────────────────────────────────────────── */
+
+.dialog-subtitle {
+  font-size: 0.9375rem;
+  color: var(--color-neutral-600-base);
+  margin: 0 0 1.25rem;
+  line-height: 1.5;
+}
+
+.data-loading {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* ─── Items section ────────────────────────────────────────────────────────── */
+
+.items-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--color-neutral-variant-100);
+  border-radius: 8px;
+  background-color: color-mix(in srgb, var(--color-primary-100) 30%, transparent);
+}
+
+.items-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.items-section-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-neutral-800);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.add-item-button {
+  color: var(--color-primary-600-base);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* ─── Item row ─────────────────────────────────────────────────────────────── */
+
+.item-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.item-row-fields {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: auto auto;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.item-field-name {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.item-field-price {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.item-field-unit {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.item-field-amount {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.remove-item-button {
+  color: var(--color-error-400);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.remove-item-button:hover {
+  color: var(--color-error-800);
+}
+
+/* ─── Error banner ─────────────────────────────────────────────────────────── */
+
+.error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.75rem 1rem;
+  background-color: color-mix(in srgb, var(--color-error-400) 10%, transparent);
+  border: 1px solid var(--color-error-400);
+  border-radius: 8px;
+  color: var(--color-error-800);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.error-banner mat-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ─── Suppress horizontal scrollbar Material adds to dialog content ────────── */
+
+:host ::ng-deep .mat-mdc-dialog-content {
+  overflow-x: hidden !important;
+}
+
+/* ─── Actions ──────────────────────────────────────────────────────────────── */
+
+.dialog-actions {
+  display: flex !important;
+  justify-content: space-between !important;
+  padding: 0.5rem 1.5rem 1rem !important;
+}
+
+.submit-button {
+  background-color: var(--color-primary-600-base);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 600;
+  min-width: 140px;
+  width: auto !important;
+  flex: 0 0 auto !important;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: var(--color-primary-800);
+}
+
+.submit-button:disabled {
+  opacity: 0.65;
+}
+
+.submit-spinner {
+  display: inline-flex;
+  --mat-progress-spinner-active-indicator-color: #fff;
+}

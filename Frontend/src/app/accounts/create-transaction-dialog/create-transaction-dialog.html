@@ -1,0 +1,183 @@
+<h2 mat-dialog-title class="dialog-title">
+  Add transaction
+</h2>
+
+<mat-dialog-content>
+  <p class="dialog-subtitle">
+    Record a new transaction for this account.
+  </p>
+
+  @if (loadingData()) {
+    <div class="data-loading">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate id="create-transaction-form" class="dialog-form">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
+        <mat-label>Date</mat-label>
+
+        <input matInput type="date" formControlName="occurredAt" />
+
+        <mat-icon matSuffix>calendar_today</mat-icon>
+
+        @if (form.controls.occurredAt.hasError('serverError')) {
+          <mat-error>
+            {{form.controls.occurredAt.getError('serverError')}}
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
+        <mat-label>Category</mat-label>
+
+        <mat-select formControlName="categoryId">
+          @for (cat of categories(); track cat.id) {
+            <mat-option [value]="cat.id">
+              {{cat.name}}
+            </mat-option>
+          }
+        </mat-select>
+
+        @if (form.controls.categoryId.hasError('serverError')) {
+          <mat-error>
+            {{form.controls.categoryId.getError('serverError')}}
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
+        <mat-label>Type</mat-label>
+
+        <mat-select formControlName="type">
+          <mat-option value="expense">
+            Expense (money out)
+          </mat-option>
+
+          <mat-option value="income">
+            Income (money in)
+          </mat-option>
+
+          @if (otherAccounts.length > 0) {
+            <mat-optgroup label="Transfer to">
+              @for (account of otherAccounts; track account.id) {
+                <mat-option [value]="account.id">
+                  {{account.name}} (transfer)
+                </mat-option>
+              }
+            </mat-optgroup>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <div class="items-section" formArrayName="items">
+        <div class="items-section-header">
+          <span class="items-section-label">
+            Items
+          </span>
+
+          <button mat-button type="button" class="add-item-button" (click)="addItem()">
+            <mat-icon>add</mat-icon>
+
+            Add item
+          </button>
+        </div>
+
+        @for (itemGroup of itemsArray.controls; track $index; let i = $index) {
+          <div [formGroupName]="i" class="item-row">
+            <div class="item-row-fields">
+              <mat-form-field appearance="outline" class="item-field-name">
+                <mat-label>Item</mat-label>
+
+                <mat-select formControlName="itemId" (selectionChange)="onItemChange(i)">
+                  @for (item of items(); track item.id) {
+                    <mat-option [value]="item.id">
+                      {{item.name}}
+                    </mat-option>
+                  }
+                </mat-select>
+
+                @if (itemsArray.at(i).get('itemId')?.hasError('serverError')) {
+                  <mat-error>
+                    {{itemsArray.at(i).get('itemId')?.getError('serverError')}}
+                  </mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="item-field-price">
+                <mat-label>Price</mat-label>
+
+                <input matInput type="number" formControlName="totalPrice" placeholder="0.00" />
+
+                @if (itemsArray.at(i).get('totalPrice')?.hasError('serverError')) {
+                  <mat-error>
+                    {{itemsArray.at(i).get('totalPrice')?.getError('serverError')}}
+                  </mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="item-field-amount">
+                <mat-label>Qty</mat-label>
+
+                <input matInput type="number" formControlName="amount" placeholder="1" />
+
+                @if (itemsArray.at(i).get('amount')?.hasError('serverError')) {
+                  <mat-error>
+                    {{itemsArray.at(i).get('amount')?.getError('serverError')}}
+                  </mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="item-field-unit">
+                <mat-label>Unit</mat-label>
+
+                <mat-select formControlName="unit">
+                  @for (opt of unitOptionsForRow(i); track opt.value) {
+                    <mat-option [value]="opt.value">
+                      {{opt.label}}
+                    </mat-option>
+                  }
+                </mat-select>
+
+                @if (itemsArray.at(i).get('unit')?.hasError('serverError')) {
+                  <mat-error>
+                    {{itemsArray.at(i).get('unit')?.getError('serverError')}}
+                  </mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            @if (itemsArray.length > 1) {
+              <button mat-icon-button type="button" class="remove-item-button" (click)="removeItem(i)" aria-label="Remove item">
+                <mat-icon>remove_circle_outline</mat-icon>
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      @if (errorMessage()) {
+        <div class="error-banner">
+          <mat-icon>error_outline</mat-icon>
+
+          <span>
+            {{errorMessage()}}
+          </span>
+        </div>
+      }
+    </form>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-button type="button" (click)="onCancel()" [disabled]="loading()">
+    Cancel
+  </button>
+
+  <button mat-flat-button class="submit-button" type="submit" form="create-transaction-form" [disabled]="loading() || loadingData()">
+    @if (loading()) {
+      <mat-spinner diameter="18" class="submit-spinner" />
+    } @else {
+      Add transaction
+    }
+  </button>
+</mat-dialog-actions>
