@@ -1,0 +1,85 @@
+<div class="items-page">
+  <div class="items-header">
+    <div class="items-header-text">
+      <h1 class="items-title">
+        Items
+      </h1>
+
+      <p class="items-subtitle">
+        Your tracked items and their units
+      </p>
+    </div>
+
+    <button mat-flat-button class="add-item-button" (click)="openCreateDialog()">
+      <mat-icon>add</mat-icon>
+
+      Add item
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="items-loading">
+      <mat-spinner diameter="40" />
+    </div>
+  } @else if (errorMessage()) {
+    <div class="error-banner">
+      <mat-icon>error_outline</mat-icon>
+
+      <span>
+        {{errorMessage()}}
+      </span>
+    </div>
+  } @else if (items().length === 0) {
+    <div class="items-empty">
+      <mat-icon class="items-empty-icon">inventory_2</mat-icon>
+
+      <p class="items-empty-title">
+        No items yet
+      </p>
+
+      <p class="items-empty-subtitle">
+        Add your first item to start tracking quantities and values.
+      </p>
+    </div>
+  } @else {
+    <div class="items-grid">
+      @for (item of items(); track item.id) {
+        <div class="item-card">
+          <div class="item-card-header">
+            <div class="item-icon-wrap">
+              <mat-icon class="item-icon">{{unitCategoryIcon(item.unitCategory)}}</mat-icon>
+            </div>
+
+            <span class="item-name">
+              {{item.name}}
+            </span>
+
+            <button mat-icon-button class="item-menu-btn" [matMenuTriggerFor]="itemMenu" (click)="$event.stopPropagation()" aria-label="Item options">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+
+            <mat-menu #itemMenu="matMenu">
+              <button mat-menu-item (click)="openRenameDialog(item)">
+                <mat-icon>edit_outline</mat-icon>
+
+                Rename item
+              </button>
+
+              <button mat-menu-item class="menu-item-delete" (click)="openDeleteDialog(item)">
+                <mat-icon>delete_outline</mat-icon>
+
+                Delete item
+              </button>
+            </mat-menu>
+          </div>
+
+          <div class="item-card-footer">
+            <span class="item-category-badge">
+              {{unitCategoryLabel(item.unitCategory)}}
+            </span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

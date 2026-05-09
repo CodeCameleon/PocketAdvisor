@@ -1,0 +1,221 @@
+/* ─── Page layout ─────────────────────────────────────────────────────────── */
+
+.items-page {
+  padding: 2rem 2.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ─── Header ──────────────────────────────────────────────────────────────── */
+
+.items-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.items-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.items-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-primary-800);
+  margin: 0;
+  letter-spacing: -0.03em;
+}
+
+.items-subtitle {
+  font-size: 0.9375rem;
+  color: var(--color-neutral-600-base);
+  margin: 0;
+}
+
+.add-item-button {
+  background-color: var(--color-primary-600-base);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 600;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.add-item-button:hover:not(:disabled) {
+  background-color: var(--color-primary-800);
+}
+
+/* ─── Loading state ───────────────────────────────────────────────────────── */
+
+.items-loading {
+  display: flex;
+  justify-content: center;
+  padding: 4rem 0;
+}
+
+/* ─── Empty state ─────────────────────────────────────────────────────────── */
+
+.items-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 5rem 1rem;
+  text-align: center;
+}
+
+.items-empty-icon {
+  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
+  color: var(--color-neutral-300);
+  margin-bottom: 0.5rem;
+}
+
+.items-empty-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-neutral-800);
+  margin: 0;
+}
+
+.items-empty-subtitle {
+  font-size: 0.9375rem;
+  color: var(--color-neutral-600-base);
+  margin: 0;
+}
+
+/* ─── Items grid ──────────────────────────────────────────────────────────── */
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+/* ─── Item card ───────────────────────────────────────────────────────────── */
+
+.item-card {
+  background: #fff;
+  border: 1px solid var(--color-neutral-variant-100);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 16px 0 rgba(35, 85, 216, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  cursor: pointer;
+}
+
+.item-card:hover {
+  box-shadow: 0 4px 24px 0 rgba(35, 85, 216, 0.13);
+  transform: translateY(-2px);
+}
+
+/* Card header: icon + name */
+
+.item-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.item-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 8px;
+  background-color: color-mix(in srgb, var(--color-primary-400) 12%, transparent);
+  flex-shrink: 0;
+}
+
+.item-icon {
+  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--color-primary-600-base);
+}
+
+.item-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-neutral-800);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Card header: menu button */
+
+.item-menu-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--color-neutral-300);
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.item-card:hover .item-menu-btn,
+.item-menu-btn:focus-visible {
+  opacity: 1;
+}
+
+.item-menu-btn:hover {
+  color: var(--color-neutral-600-base);
+}
+
+/* Delete menu item */
+
+.menu-item-delete {
+  color: var(--color-error-700, #c62828) !important;
+}
+
+.menu-item-delete mat-icon {
+  color: inherit !important;
+}
+
+/* Card footer: category badge */
+
+.item-card-footer {
+  display: flex;
+  align-items: center;
+}
+
+.item-category-badge {
+  display: inline-block;
+  padding: 0.2rem 0.625rem;
+  border-radius: 999px;
+  background-color: var(--color-neutral-variant-100);
+  color: var(--color-neutral-variant-600-base);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* ─── Error banner ────────────────────────────────────────────────────────── */
+
+.error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.875rem 1rem;
+  background-color: color-mix(in srgb, var(--color-error-400) 10%, transparent);
+  border: 1px solid var(--color-error-400);
+  border-radius: 8px;
+  color: var(--color-error-800);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.error-banner mat-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}

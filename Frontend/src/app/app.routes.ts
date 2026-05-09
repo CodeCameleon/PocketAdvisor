@@ -31,6 +31,11 @@ export const routes: Routes = [
     loadChildren: () => import('./categories/categories-module').then(m => m.CategoriesModule)
   },
   {
+    path: 'items',
+    canActivate: [authGuard],
+    loadChildren: () => import('./items/items-module').then(m => m.ItemsModule)
+  },
+  {
     path: '**',
     redirectTo: 'auth/login'
   }
