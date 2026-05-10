@@ -62,33 +62,76 @@
   } @else {
     <div class="transactions-list">
       @for (tx of transactions(); track tx.id) {
-        <div class="transaction-row">
-          <div class="transaction-icon-wrap" [class.income]="transactionAmount(tx) > 0" [class.expense]="transactionAmount(tx) < 0">
-            <mat-icon class="transaction-icon">
-              {{transactionAmount(tx) > 0 ? 'arrow_downward' : 'arrow_upward'}}
-            </mat-icon>
+        <div class="transaction-card" [class.expanded]="expandedTxId() === tx.id">
+          <div class="transaction-row" (click)="toggleExpand(tx.id)" role="button" [attr.aria-expanded]="expandedTxId() === tx.id" tabindex="0" (keydown.enter)="toggleExpand(tx.id)" (keydown.space)="toggleExpand(tx.id)">
+            <div class="transaction-icon-wrap" [class.income]="transactionAmount(tx) > 0" [class.expense]="transactionAmount(tx) < 0">
+              <mat-icon class="transaction-icon">
+                {{transactionAmount(tx) > 0 ? 'arrow_downward' : 'arrow_upward'}}
+              </mat-icon>
+            </div>
+
+            <div class="transaction-info">
+              <span class="transaction-date">
+                {{tx.occurredAt | date : 'MMM d, y'}}
+              </span>
+            </div>
+
+            <div class="transaction-items-count">
+              <mat-icon class="items-icon">inventory_2</mat-icon>
+
+              <span>
+                {{tx.items.length}}
+                {{tx.items.length === 1 ? 'item' : 'items'}}
+              </span>
+            </div>
+
+            <div class="transaction-amount" [class.income]="transactionAmount(tx) > 0" [class.expense]="transactionAmount(tx) < 0">
+              @if (account()) {
+                {{(transactionAmount(tx) > 0 ? '+' : '') + (transactionAmount(tx) | currency : currencyAlpha(account()!.currencyCode) : 'symbol-narrow' : '1.2-2')}}
+              }
+            </div>
+
+            <mat-icon class="expand-chevron" [class.open]="expandedTxId() === tx.id">expand_more</mat-icon>
           </div>
 
-          <div class="transaction-info">
-            <span class="transaction-date">
-              {{tx.occurredAt | date : 'MMM d, y'}}
-            </span>
-          </div>
+          @if (expandedTxId() === tx.id) {
+            <div class="transaction-items-panel" @expandCollapse>
+              @for (item of tx.items; track item.itemId) {
+                <div class="transaction-item-row">
+                  <mat-icon class="item-icon">sell</mat-icon>
 
-          <div class="transaction-items-count">
-            <mat-icon class="items-icon">inventory_2</mat-icon>
+                  <div class="item-details">
+                    <div class="item-label-group">
+                      <span class="item-name">
+                        {{itemName(item.itemId)}}
+                      </span>
 
-            <span>
-              {{tx.items.length}}
-              {{tx.items.length === 1 ? 'item' : 'items'}}
-            </span>
-          </div>
+                      <span class="item-amount-value">
+                        {{item.amountValue}}
+                        {{unitLabel(item.amountUnit)}}
+                      </span>
+                    </div>
 
-          <div class="transaction-amount" [class.income]="transactionAmount(tx) > 0" [class.expense]="transactionAmount(tx) < 0">
-            @if (account()) {
-              {{(transactionAmount(tx) > 0 ? '+' : '') + (transactionAmount(tx) | currency : currencyAlpha(account()!.currencyCode) : 'symbol-narrow' : '1.2-2')}}
-            }
-          </div>
+                    <span class="item-price">
+                      @if (account()) {
+                        {{item.totalPrice | currency : currencyAlpha(account()!.currencyCode) : 'symbol-narrow' : '1.2-2'}}
+                      }
+                    </span>
+                  </div>
+
+                  @if (tx.items.length > 1) {
+                    <button mat-icon-button class="delete-item-btn" [disabled]="deletingItemId() === item.itemId" (click)="deleteItem(tx, item.itemId, $event)" aria-label="Delete item">
+                      @if (deletingItemId() === item.itemId) {
+                        <mat-spinner diameter="18" />
+                      } @else {
+                        <mat-icon>delete_outline</mat-icon>
+                      }
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          }
         </div>
       }
     </div>

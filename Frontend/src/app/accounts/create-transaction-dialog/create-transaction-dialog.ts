@@ -15,7 +15,7 @@ import { ApiErrorService } from '../../core/services/api-error';
 import { CategoryResponse } from '../../core/models/category-response';
 import { ItemResponse } from '../../core/models/item-response';
 import { AccountResponse } from '../../core/models/account-response';
-import { Unit } from '../../core/enums/unit';
+import { Unit, UNIT_LABELS } from '../../core/enums/unit';
 import { UnitCategory } from '../../core/enums/unit-category';
 
 export interface CreateTransactionDialogData {
@@ -28,38 +28,6 @@ interface UnitOption {
   value: Unit;
 }
 
-const UNIT_LABELS: Record<Unit, string> = {
-  [Unit.Piece]: 'Piece',
-  [Unit.Millimeter]: 'Millimeter',
-  [Unit.Centimeter]: 'Centimeter',
-  [Unit.Meter]: 'Meter',
-  [Unit.Kilometer]: 'Kilometer',
-  [Unit.Milligram]: 'Milligram',
-  [Unit.Gram]: 'Gram',
-  [Unit.Kilogram]: 'Kilogram',
-  [Unit.Tonne]: 'Tonne',
-  [Unit.SquareMeter]: 'Square Meter',
-  [Unit.SquareKilometer]: 'Square Kilometer',
-  [Unit.Acre]: 'Acre',
-  [Unit.Hectare]: 'Hectare',
-  [Unit.Milliliter]: 'Milliliter',
-  [Unit.Liter]: 'Liter',
-  [Unit.CubicMeter]: 'Cubic Meter',
-  [Unit.Second]: 'Second',
-  [Unit.Minute]: 'Minute',
-  [Unit.Hour]: 'Hour',
-  [Unit.Day]: 'Day',
-  [Unit.Month]: 'Month',
-  [Unit.Year]: 'Year',
-  [Unit.Joule]: 'Joule',
-  [Unit.Kilojoule]: 'Kilojoule',
-  [Unit.KilowattHour]: 'Kilowatt-hour',
-  [Unit.Byte]: 'Byte',
-  [Unit.Kilobyte]: 'Kilobyte',
-  [Unit.Megabyte]: 'Megabyte',
-  [Unit.Gigabyte]: 'Gigabyte',
-  [Unit.Terabyte]: 'Terabyte'
-};
 
 /** Maps UnitCategory enum values to the Unit hundred-range they occupy.
  *  Uncategorized (1) → units 1–99, Length (2) → 101–199, etc. */
