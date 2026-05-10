@@ -91,6 +91,10 @@
               }
             </div>
 
+            <button mat-icon-button class="delete-transaction-btn" (click)="openDeleteDialog(tx, $event)" aria-label="Delete transaction">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+
             <mat-icon class="expand-chevron" [class.open]="expandedTxId() === tx.id">expand_more</mat-icon>
           </div>
 

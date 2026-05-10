@@ -275,6 +275,16 @@
   color: var(--color-error-600-base);
 }
 
+.delete-transaction-btn {
+  flex-shrink: 0;
+  color: var(--color-neutral-300);
+  transition: color 0.12s ease;
+}
+
+.delete-transaction-btn:hover {
+  color: var(--color-error-600-base);
+}
+
 /* ─── Direction icon ──────────────────────────────────────────────────────── */
 
 .transaction-icon-wrap {

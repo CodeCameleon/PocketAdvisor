@@ -16,6 +16,7 @@ import { AccountResponse } from '../../core/models/account-response';
 import { CurrencyCode } from '../../core/enums/currency-code';
 import { Unit, UNIT_LABELS } from '../../core/enums/unit';
 import { CreateTransactionDialog } from '../create-transaction-dialog/create-transaction-dialog';
+import { DeleteTransactionDialog } from '../delete-transaction-dialog/delete-transaction-dialog';
 
 @Component({
   selector: 'app-account-transactions',
@@ -101,6 +102,36 @@ export class AccountTransactions implements OnInit {
       error: () => {
         this.deletingItemId.set(null);
       },
+    });
+  }
+
+  openDeleteDialog(tx: TransactionResponse, event: MouseEvent): void {
+    event.stopPropagation();
+
+    const ref = this.dialog.open(DeleteTransactionDialog, {
+      width: '480px',
+      maxWidth: '95vw',
+      autoFocus: 'first-tabbable',
+      restoreFocus: true,
+      data: {
+        id: tx.id,
+        occurredAt: tx.occurredAt,
+        itemCount: tx.items.length,
+      },
+    });
+
+    ref.afterClosed().subscribe((deleted: boolean) => {
+      if (deleted) {
+        this.transactions.update(txs => txs.filter(t => t.id !== tx.id));
+
+        // Refresh account balance
+        this.accountService.getAccounts().subscribe({
+          next: accounts => {
+            const found = accounts.find(a => a.id === this.accountId) ?? null;
+            this.account.set(found);
+          },
+        });
+      }
     });
   }
 
