@@ -25,6 +25,13 @@ export class TransactionService {
     });
   }
 
+  /** Returns all transactions that contain the specified item across all accounts. */
+  getTransactionsByItem(itemId: string): Observable<TransactionResponse[]> {
+    return this.http.get<TransactionResponse[]>(`${this.base}`, {
+      params: { itemId },
+    });
+  }
+
   /** Deletes the specified transaction and all of its items. */
   deleteTransaction(id: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/${id}`);

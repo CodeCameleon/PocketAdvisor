@@ -427,4 +427,56 @@ public sealed class TransactionService
     }
     
     #endregion
+    
+    #region GetTransactionsByItemAsync
+    
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<TransactionResponse>> GetTransactionsByItemAsync(Guid itemId, Guid userId)
+    {
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation(
+                "Retrieving transactions for item '{ItemId}' and user '{UserId}'...",
+                itemId,
+                userId
+            );
+        }
+        
+        IReadOnlyList<Transaction> transactions = await TransactionRepository.GetAllAsync(
+            t => t.TransactionItems!.Any(ti => ti.ItemId == itemId) && (
+                (t.FromAccountId.HasValue && t.FromAccount!.UserId == userId) ||
+                (t.ToAccountId.HasValue && t.ToAccount!.UserId == userId)
+            ),
+            includes: q => q.Include(t => t.TransactionItems!)
+        );
+        
+        List<TransactionResponse> response = transactions.Select(t => new TransactionResponse
+        {
+            Id = t.Id,
+            OccurredAt = t.OccurredAt,
+            CategoryId = t.CategoryId,
+            FromAccountId = t.FromAccountId,
+            ToAccountId = t.ToAccountId,
+            Items = t.TransactionItems!.Select(ti => new TransactionItemResponse
+            {
+                ItemId = ti.ItemId,
+                TotalPrice = ti.TotalPrice,
+                AmountValue = ti.Amount.Value,
+                AmountUnit = ti.Amount.Unit
+            }).ToList()
+        }).ToList();
+        
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation(
+                "Retrieved {Count} transactions for item '{ItemId}'.",
+                response.Count,
+                itemId
+            );
+        }
+        
+        return response;
+    }
+    
+    #endregion
 }

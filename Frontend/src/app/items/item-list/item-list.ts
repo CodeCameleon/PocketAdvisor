@@ -1,4 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -26,6 +27,7 @@ import { UpdateItemNameDialog } from '../update-item-name-dialog/update-item-nam
 export class ItemList implements OnInit {
   private readonly itemService = inject(ItemService);
   private readonly dialog = inject(MatDialog);
+  private readonly router = inject(Router);
 
   readonly items = signal<ItemResponse[]>([]);
   readonly loading = signal(true);
@@ -33,6 +35,10 @@ export class ItemList implements OnInit {
 
   ngOnInit(): void {
     this.loadItems();
+  }
+
+  openDetail(item: ItemResponse): void {
+    this.router.navigate(['/items', item.id]);
   }
 
   openCreateDialog(): void {

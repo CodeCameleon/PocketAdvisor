@@ -44,7 +44,7 @@
   } @else {
     <div class="items-grid">
       @for (item of items(); track item.id) {
-        <div class="item-card">
+        <div class="item-card" (click)="openDetail(item)" role="button" tabindex="0" (keydown.enter)="openDetail(item)" (keydown.space)="openDetail(item)">
           <div class="item-card-header">
             <div class="item-icon-wrap">
               <mat-icon class="item-icon">{{unitCategoryIcon(item.unitCategory)}}</mat-icon>

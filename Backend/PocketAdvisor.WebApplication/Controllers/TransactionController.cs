@@ -102,16 +102,42 @@ public sealed class TransactionController
     #region GetTransactionsAsync
     
     /// <summary>
-    /// Retrieves all transactions associated with the specified account for the
+    /// Retrieves all transactions associated with the specified account or item for the
     /// currently authenticated user asynchronously.
     /// </summary>
     /// <param name="accountId">The identifier of the account to filter transactions by.</param>
+    /// <param name="itemId">The identifier of the item to filter transactions by.</param>
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyList<TransactionResponse>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetTransactionsAsync([FromQuery] Guid accountId)
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetTransactionsAsync([FromQuery] Guid? accountId, [FromQuery] Guid? itemId)
     {
-        IReadOnlyList<TransactionResponse> response = await Service.GetTransactionsAsync(accountId, CurrentUserId);
-        return Ok(response);
+        if (accountId.HasValue && itemId.HasValue)
+        {
+            return NotFound();
+        }
+        
+        if (accountId.HasValue)
+        {
+            IReadOnlyList<TransactionResponse> response = await Service.GetTransactionsAsync(
+                accountId.Value,
+                CurrentUserId
+            );
+            
+            return Ok(response);
+        }
+        
+        if (itemId.HasValue)
+        {
+            IReadOnlyList<TransactionResponse> response = await Service.GetTransactionsByItemAsync(
+                itemId.Value,
+                CurrentUserId
+            );
+            
+            return Ok(response);
+        }
+        
+        return NotFound();
     }
     
     #endregion

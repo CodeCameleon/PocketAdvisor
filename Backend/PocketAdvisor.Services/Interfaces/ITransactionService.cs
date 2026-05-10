@@ -54,4 +54,15 @@ public interface ITransactionService
     /// read-only list of <see cref="TransactionResponse" /> objects.
     /// </returns>
     Task<IReadOnlyList<TransactionResponse>> GetTransactionsAsync(Guid accountId, Guid userId);
+    
+    /// <summary>
+    /// Retrieves all transactions that contain the specified item across all accounts.
+    /// </summary>
+    /// <param name="itemId">The identifier of the item to filter transactions by.</param>
+    /// <param name="userId">The identifier of the currently authenticated user.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a
+    /// read-only list of <see cref="TransactionResponse" /> objects.
+    /// </returns>
+    Task<IReadOnlyList<TransactionResponse>> GetTransactionsByItemAsync(Guid itemId, Guid userId);
 }
