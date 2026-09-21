@@ -214,7 +214,7 @@ The `Quantity` value object stored in `TransactionItem.Amount` is a fully compar
 
 ## 5. API Reference
 
-All endpoints are prefixed with `/api`. Authenticated endpoints require an `Authorization: Bearer <jwt>` header. The application exposes Swagger UI at startup in all environments.
+All endpoints are prefixed with `/api`. Authenticated endpoints require an `Authorization: Bearer <jwt>` header. The application only exposes the Swagger JSON document and UI in the development environment.
 
 ### Sessions
 
@@ -402,6 +402,6 @@ The API is designed to conform to REST principles:
 
 - Automatic EF Core migrations are applied on startup, so the database schema is always in sync with the code after a deployment.
 - In Development mode, a `DataSeeder` populates the database with realistic test data (two users, multiple accounts, categories, items, and 32 transactions) if no data exists, enabling immediate exploration without manual setup.
-- Swagger UI is available in all environments for API exploration.
+- Swagger UI is available in the development environment for API exploration. Outside development neither the UI nor the generated `swagger.json` is served, so the API surface is not published in production.
 - Prettier enforces consistent code formatting across the frontend without developer configuration.
 - Central package version management (`Directory.Packages.props`) ensures all backend projects use identical dependency versions.

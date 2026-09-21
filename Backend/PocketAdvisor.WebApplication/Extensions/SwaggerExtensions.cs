@@ -68,11 +68,18 @@ public static class SwaggerExtensions
     #region AddPocketAdvisorSwagger
     
     /// <summary>
-    /// Adds the services needed for Swagger to the service collection.
+    /// Adds the services needed for Swagger to the service collection.<br />
+    /// The services are only registered in the development environment.
     /// </summary>
     /// <param name="services">The service collection.</param>
-    public static void AddPocketAdvisorSwagger(this IServiceCollection services)
+    /// <param name="environment">The host environment used to determine the current mode.</param>
+    public static void AddPocketAdvisorSwagger(this IServiceCollection services, IHostEnvironment environment)
     {
+        if (!environment.IsDevelopment())
+        {
+            return;
+        }
+        
         services.AddEndpointsApiExplorer();
         
         services.AddSwaggerGen(options =>
@@ -111,21 +118,24 @@ public static class SwaggerExtensions
     #region UsePocketAdvisorSwagger
     
     /// <summary>
-    /// Adds the middleware for Swagger JSON and user interface generation.
-    /// The Swagger UI is only available in the development environment.
+    /// Adds the middleware for Swagger JSON and user interface generation.<br />
+    /// Both the generated JSON document and the Swagger UI are only
+    /// available in the development environment.
     /// </summary>
     /// <param name="application">The web application instance.</param>
     public static void UsePocketAdvisorSwagger(this Microsoft.AspNetCore.Builder.WebApplication application)
     {
+        if (!application.Environment.IsDevelopment())
+        {
+            return;
+        }
+        
         application.UseSwagger();
         
-        if (application.Environment.IsDevelopment())
+        application.UseSwaggerUI(options =>
         {
-            application.UseSwaggerUI(options =>
-            {
-                options.SwaggerEndpoint(SwaggerUrl, SwaggerName);
-            });
-        }
+            options.SwaggerEndpoint(SwaggerUrl, SwaggerName);
+        });
     }
     
     #endregion

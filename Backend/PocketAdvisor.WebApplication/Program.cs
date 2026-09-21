@@ -61,8 +61,8 @@ builder.Services.AddPocketAdvisorCors(
 // Adds the API controllers to the container.
 builder.Services.AddControllers();
 
-// Adds the Swagger services to the container.
-builder.Services.AddPocketAdvisorSwagger();
+// Adds the Swagger services to the container in the development environment.
+builder.Services.AddPocketAdvisorSwagger(builder.Environment);
 
 // Builds the web application.
 WebApplication app = builder.Build();
@@ -84,7 +84,7 @@ using (IServiceScope scope = app.Services.CreateScope())
 // Adds the middleware for handling exceptions.
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-// Adds the middleware for Swagger generation.
+// Adds the middleware for Swagger generation in the development environment.
 app.UsePocketAdvisorSwagger();
 
 // Adds the middleware for redirecting HTTP requests.
