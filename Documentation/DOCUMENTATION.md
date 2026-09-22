@@ -42,6 +42,7 @@ The application supports two user roles:
 | Validation | **FluentValidation 12** | Declarative, chainable validators that live in dedicated classes, keeping controllers and services clean. Integrates seamlessly with ASP.NET Core's dependency injection and `ValidationProblemDetails` error format. |
 | Result handling | **FluentResults 4** | A functional-style `Result<T>` / `Result` wrapper that avoids exception-driven control flow for expected business errors (not-found, conflict, invalid input). Errors carry structured metadata so controllers can map them to the correct HTTP status code without conditional logic scattered across the codebase. |
 | Authentication | **Microsoft JWT Bearer (JwtBearer 10)** | Standard bearer-token authentication baked into ASP.NET Core; avoids third-party auth servers for a university-scale project while still being industry-standard. |
+| Rate limiting | **ASP.NET Core rate limiting middleware** | Part of the shared framework, so no third-party dependency is needed. The sliding-window algorithm was chosen over a fixed window because a fixed window allows a double burst around the period boundary. |
 | Password hashing | **ASP.NET Core Identity `PasswordHasher<T>`** | Provides PBKDF2-based hashing with a built-in rehash path (`SuccessRehashNeeded`), so password security can be upgraded transparently without breaking existing sessions. |
 | Email delivery | **Resend SDK** | Resend offers template-based transactional email with a minimal SDK. Templates for email-verification and password-reset are maintained in the Resend dashboard and referenced by GUID, keeping HTML out of source control. |
 | Secrets management | **SecureStore** | Sensitive configuration values (JWT signing key, token HMAC secrets, Resend API key) are stored in an encrypted `secrets.bin` file rather than plain `appsettings.json` or environment variables, reducing accidental exposure. |
@@ -301,6 +302,21 @@ Passwords are hashed with ASP.NET Core Identity's `PasswordHasher<T>`, which use
 
 A global CORS policy is registered that allows requests only from the configured frontend base URL. All other origins are rejected.
 
+### Rate limiting
+
+The anonymous authentication endpoints are protected by the ASP.NET Core rate limiting middleware. Two named policies are registered, both using a **sliding window** partitioned by the caller's IP address:
+
+| Policy | Endpoints | Default limit |
+|---|---|---|
+| `PocketAdvisorAuthenticationRateLimiterPolicy` | `POST /api/sessions/login`, and every `/api/users` endpoint (register, verify-email, forgot-password, reset-password) | 5 requests / 60 s |
+| `PocketAdvisorRefreshRateLimiterPolicy` | `POST /api/sessions/refresh` | 30 requests / 60 s |
+
+The refresh endpoint is more permissive because the Angular interceptor calls it automatically whenever a JWT expires, so several users sharing a single NAT address would otherwise exhaust a strict limit through normal use. The limits are read from the `RateLimiting` section of `appsettings.json` at startup, where a missing or non-positive value aborts startup. The window is divided into six segments, and queueing is disabled so that excess requests are rejected immediately rather than delayed.
+
+A rejected request receives `429 Too Many Requests` with an RFC 9457 `ProblemDetails` body and a `Retry-After` header.
+
+> **Deployment note.** The partition key is `HttpContext.Connection.RemoteIpAddress`. Behind a reverse proxy or load balancer this is the proxy's own address, which would place every caller into a single partition. Such a deployment must additionally enable `ForwardedHeadersMiddleware` so that the original client address is restored.
+
 ### Secret management
 
 Sensitive values (JWT signing key, HMAC secrets for the three token types, Resend API key) are stored in an encrypted `secrets.bin` file managed by the SecureStore library, with the decryption key in a separate `secrets.key` file. This file is not committed to source control.
@@ -369,7 +385,7 @@ The API is designed to conform to REST principles:
 
 - Resources are identified by URL nouns (`/api/accounts`, `/api/transactions/{id}`).
 - HTTP methods are used semantically: `GET` for retrieval, `POST` for creation, `PATCH` for partial update, `DELETE` for removal.
-- HTTP status codes are used accurately: `201 Created` for new resources, `204 No Content` for successful mutations that return nothing, `400 Bad Request` with a `ValidationProblemDetails` body for validation failures, `401 Unauthorized` for missing/invalid tokens, `403 Forbidden` for role violations, `404 Not Found` for missing resources, `409 Conflict` for constraint violations, `500 Internal Server Error` for unexpected failures.
+- HTTP status codes are used accurately: `201 Created` for new resources, `204 No Content` for successful mutations that return nothing, `400 Bad Request` with a `ValidationProblemDetails` body for validation failures, `401 Unauthorized` for missing/invalid tokens, `403 Forbidden` for role violations, `404 Not Found` for missing resources, `409 Conflict` for constraint violations, `429 Too Many Requests` when a rate limit is exceeded, `500 Internal Server Error` for unexpected failures.
 - The API is stateless: all authentication state is carried in the JWT on each request, with no server-side session.
 
 ### Security
@@ -379,6 +395,7 @@ The API is designed to conform to REST principles:
 - All secrets (signing keys, HMAC keys, API keys) are stored in an encrypted file outside the application's configuration JSON.
 - JWTs have a short 15-minute expiry to limit the window of exposure if intercepted.
 - CORS restricts the browser origins that can call the API.
+- The anonymous authentication endpoints are rate limited per IP address, so credential brute-forcing, one-time-token guessing and password-reset email flooding are throttled before they reach the service layer.
 
 ### Error handling
 

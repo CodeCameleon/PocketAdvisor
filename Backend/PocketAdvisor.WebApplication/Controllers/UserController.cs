@@ -1,9 +1,11 @@
 ﻿using FluentResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 using PocketAdvisor.Requests.Users;
 using PocketAdvisor.Services.Configurations;
 using PocketAdvisor.Services.Interfaces;
+using PocketAdvisor.WebApplication.Constants;
 using Resend;
 
 namespace PocketAdvisor.WebApplication.Controllers;
@@ -12,6 +14,8 @@ namespace PocketAdvisor.WebApplication.Controllers;
 /// The controller responsible for handling user-related operations.
 /// </summary>
 [Route("api/users")]
+[EnableRateLimiting(RateLimiterPolicyNames.Authentication)]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
 public sealed class UserController
     : BaseController<IUserService>
 {

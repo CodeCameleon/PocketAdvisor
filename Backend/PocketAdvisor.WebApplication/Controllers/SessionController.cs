@@ -1,8 +1,10 @@
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using PocketAdvisor.Requests.Users;
 using PocketAdvisor.Responses.Users;
 using PocketAdvisor.Services.Interfaces;
+using PocketAdvisor.WebApplication.Constants;
 
 namespace PocketAdvisor.WebApplication.Controllers;
 
@@ -30,8 +32,10 @@ public sealed class SessionController
     /// </summary>
     /// <param name="request">The credentials of the user to authenticate.</param>
     [HttpPost("login")]
+    [EnableRateLimiting(RateLimiterPolicyNames.Authentication)]
     [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> LoginAsync([FromBody] LoginRequest request)
     {
         Result<LoginResponse> result = await Service.LoginAsync(request);
@@ -53,8 +57,10 @@ public sealed class SessionController
     /// </summary>
     /// <param name="request">The refresh token presented by the client.</param>
     [HttpPost("refresh")]
+    [EnableRateLimiting(RateLimiterPolicyNames.Refresh)]
     [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> RefreshAsync([FromBody] RefreshRequest request)
     {
         Result<LoginResponse> result = await Service.RefreshAsync(request);

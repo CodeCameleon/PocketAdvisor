@@ -37,6 +37,10 @@ export class ApiErrorService {
       return 'A conflict occurred. This resource may already exist.';
     }
 
+    if (error.status === 429) {
+      return 'Too many requests. Please wait a moment and try again.';
+    }
+
     const body = error.error as ValidationProblemDetails | null;
     const errorMap = body?.errors ?? {};
 

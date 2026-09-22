@@ -13,6 +13,11 @@ public static class ConfigurationExtensions
     private const string Audience = "Audience";
     
     /// <summary>
+    /// The name of the request limit for the authentication endpoints in the configuration.
+    /// </summary>
+    private const string AuthenticationPermitLimit = "AuthenticationPermitLimit";
+    
+    /// <summary>
     /// The name of the api key for the Resend service in the configuration.
     /// </summary>
     private const string ApiKey = "ApiKey";
@@ -93,6 +98,21 @@ public static class ConfigurationExtensions
     private const string KeyNotFoundMessageTemplate = "The required configuration key '{0}' is missing or empty.";
     
     /// <summary>
+    /// The message template used for configuration keys whose value is not a positive integer.
+    /// </summary>
+    private const string NotPositiveIntegerMessageTemplate = "The configuration key '{0}' must be a positive integer.";
+    
+    /// <summary>
+    /// The name of the section that contains the rate limiting settings in the configuration.
+    /// </summary>
+    private const string RateLimiting = "RateLimiting";
+    
+    /// <summary>
+    /// The name of the request limit for the token refresh endpoint in the configuration.
+    /// </summary>
+    private const string RefreshPermitLimit = "RefreshPermitLimit";
+    
+    /// <summary>
     /// The name of the section that contains the Resend settings in the configuration.
     /// </summary>
     private const string Resend = "Resend";
@@ -111,6 +131,11 @@ public static class ConfigurationExtensions
     /// The name of the section that contains token secrets in the configuration.
     /// </summary>
     private const string TokenSecrets = "TokenSecrets";
+    
+    /// <summary>
+    /// The name of the length of the rate limiting window in the configuration.
+    /// </summary>
+    private const string WindowSeconds = "WindowSeconds";
     
     #endregion
     
@@ -259,6 +284,59 @@ public static class ConfigurationExtensions
     
     #endregion
     
+    #region GetRateLimitingAuthenticationPermitLimit
+    
+    /// <summary>
+    /// Gets the number of requests allowed on the authentication endpoints
+    /// within a single rate limiting window from the configuration.
+    /// </summary>
+    /// <param name="configuration">The configuration instance.</param>
+    /// <returns>The request limit of the authentication endpoints.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// If the request limit is not found in the configuration, or it is not a positive integer.
+    /// </exception>
+    public static int GetRateLimitingAuthenticationPermitLimit(this IConfiguration configuration)
+    {
+        return configuration.GetRequiredPositiveInt32(RateLimiting, AuthenticationPermitLimit);
+    }
+    
+    #endregion
+    
+    #region GetRateLimitingRefreshPermitLimit
+    
+    /// <summary>
+    /// Gets the number of requests allowed on the token refresh endpoint
+    /// within a single rate limiting window from the configuration.
+    /// </summary>
+    /// <param name="configuration">The configuration instance.</param>
+    /// <returns>The request limit of the token refresh endpoint.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// If the request limit is not found in the configuration, or it is not a positive integer.
+    /// </exception>
+    public static int GetRateLimitingRefreshPermitLimit(this IConfiguration configuration)
+    {
+        return configuration.GetRequiredPositiveInt32(RateLimiting, RefreshPermitLimit);
+    }
+    
+    #endregion
+    
+    #region GetRateLimitingWindowSeconds
+    
+    /// <summary>
+    /// Gets the length of the rate limiting window in seconds from the configuration.
+    /// </summary>
+    /// <param name="configuration">The configuration instance.</param>
+    /// <returns>The length of the rate limiting window in seconds.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// If the window length is not found in the configuration, or it is not a positive integer.
+    /// </exception>
+    public static int GetRateLimitingWindowSeconds(this IConfiguration configuration)
+    {
+        return configuration.GetRequiredPositiveInt32(RateLimiting, WindowSeconds);
+    }
+    
+    #endregion
+    
     #region GetResendApiKey
     
     /// <summary>
@@ -346,6 +424,42 @@ public static class ConfigurationExtensions
         );
         
         return new(message);
+    }
+    
+    #endregion
+    
+    #region GetRequiredPositiveInt32
+    
+    /// <summary>
+    /// Gets the positive integer value of the given key from the given configuration section.
+    /// </summary>
+    /// <param name="configuration">The configuration instance.</param>
+    /// <param name="sectionName">The name of the section that contains the key.</param>
+    /// <param name="key">The name of the key to read.</param>
+    /// <returns>The value of the configuration key.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// If the key is not found in the configuration, or it is not a positive integer.
+    /// </exception>
+    private static int GetRequiredPositiveInt32(this IConfiguration configuration, string sectionName, string key)
+    {
+        int? value = configuration.GetSection(sectionName).GetValue<int?>(key);
+        
+        if (value is null)
+        {
+            throw CreateInvalidOperationException(sectionName, key);
+        }
+        
+        if (value <= 0)
+        {
+            string message = string.Format(
+                NotPositiveIntegerMessageTemplate,
+                string.Join(Colon, sectionName, key)
+            );
+            
+            throw new InvalidOperationException(message);
+        }
+        
+        return value.Value;
     }
     
     #endregion

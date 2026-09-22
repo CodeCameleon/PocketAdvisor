@@ -58,6 +58,13 @@ builder.Services.AddPocketAdvisorCors(
     builder.Configuration.GetFrontendBaseUrl()
 );
 
+// Adds the rate limiter policies of the endpoints to the container.
+builder.Services.AddPocketAdvisorRateLimiter(
+    builder.Configuration.GetRateLimitingAuthenticationPermitLimit(),
+    builder.Configuration.GetRateLimitingRefreshPermitLimit(),
+    builder.Configuration.GetRateLimitingWindowSeconds()
+);
+
 // Adds the API controllers to the container.
 builder.Services.AddControllers();
 
@@ -92,6 +99,9 @@ app.UseHttpsRedirection();
 
 // Adds the middleware for the global CORS policy.
 app.UseCors(CorsPolicyNames.Global);
+
+// Adds the middleware for rate limiting.
+app.UseRateLimiter();
 
 // Adds the middleware for authentication.
 app.UseAuthentication();
