@@ -32,15 +32,23 @@ All commands below should be run from the `Backend/PocketAdvisor.WebApplication/
 dotnet tool install --global SecureStore.Client
 ```
 
-### 2.2 Create the secrets store
+### 2.2 Obtain the key file (existing store)
+
+The encrypted secrets store (`secrets.bin`) is committed to the repository. Only the decryption key (`secrets.key`) is excluded via `.gitignore`.
+
+If you are joining the existing project, ask the project owner for `secrets.key` through a secure out-of-band channel. Place it next to `secrets.bin` in this directory. The store is then ready to use, so skip to [2.4](#24-run-the-backend).
+
+> **Never commit `secrets.key`.** If the key is ever exposed, rotate every secret in the store. Old ciphertext remains in git history and can be decrypted with the leaked key.
+
+### 2.3 Create your own store (independent setup only)
+
+Follow this step only if you don't have access to the shared key, for example on a fork or a fully independent environment. Creating a new store **overwrites** the committed `secrets.bin`, so do not commit the result back to the shared repository.
 
 ```bash
 SecureStore create ./secrets.bin --keyfile ./secrets.key
 ```
 
-### 2.3 Populate the required secrets
-
-The following secrets are required. The database credentials must match the values in `.env` (or your Docker setup):
+Then populate the required secrets. The database credentials must match the values in `.env` (or your Docker setup):
 
 ```bash
 SecureStore --store ./secrets.bin --keyfile ./secrets.key set "ConnectionStrings:DefaultUsername" "<POSTGRES_USER>"

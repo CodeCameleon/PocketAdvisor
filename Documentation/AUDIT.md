@@ -24,20 +24,6 @@ refreshed silently on page load via the existing `SessionInterceptor` refresh fl
 
 ---
 
-### `secrets.bin` committed to the repository
-
-**File:** `Backend/PocketAdvisor.WebApplication/secrets.bin` (and `secrets.key`)
-
-The encrypted secret store file is tracked by git. Even though the file is encrypted,
-committing it means the ciphertext (and the corresponding key file) travel with the
-repository history permanently.
-
-**Recommendation:** Add both `secrets.bin` and `secrets.key` to `.gitignore`, remove them
-from tracking (`git rm --cached`), and document a setup script that regenerates them from
-environment variables on a clean clone.
-
----
-
 ## High
 
 ### User enumeration in `ForgotPasswordAsync`

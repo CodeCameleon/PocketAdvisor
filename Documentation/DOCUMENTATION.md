@@ -319,7 +319,7 @@ A rejected request receives `429 Too Many Requests` with an RFC 9457 `ProblemDet
 
 ### Secret management
 
-Sensitive values (JWT signing key, HMAC secrets for the three token types, Resend API key) are stored in an encrypted `secrets.bin` file managed by the SecureStore library, with the decryption key in a separate `secrets.key` file. This file is not committed to source control.
+Sensitive values (JWT signing key, HMAC secrets for the three token types, Resend API key) are stored in an encrypted `secrets.bin` file managed by the SecureStore library, with the decryption key in a separate `secrets.key` file. The encrypted `secrets.bin` store is committed to source control, which is SecureStore's intended usage model. The `secrets.key` file is excluded via `.gitignore` (`*.key`) and must be shared only through a secure out-of-band channel. If the key is compromised, every secret in the store must be rotated.
 
 ---
 
