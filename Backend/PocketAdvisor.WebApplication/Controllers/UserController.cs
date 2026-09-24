@@ -44,12 +44,12 @@ public sealed class UserController
     /// <summary>
     /// The unique identifier of the email template used for email verification.
     /// </summary>
-    private static readonly Guid EmailVerificationTemplateId = Guid.Parse("399c5102-326d-4300-88c5-ca6cc194577b");
+    private const string EmailVerificationTemplateId = "399c5102-326d-4300-88c5-ca6cc194577b";
     
     /// <summary>
     /// The unique identifier of the email template used for password reset.
     /// </summary>
-    private static readonly Guid PasswordResetTemplateId = Guid.Parse("4f196197-f7e1-4724-bdf4-7540c27bdaab");
+    private const string PasswordResetTemplateId = "4f196197-f7e1-4724-bdf4-7540c27bdaab";
     
     #endregion
     
