@@ -1,0 +1,26 @@
+﻿# Build results
+**/[Bb]in/
+**/[Oo]bj/
+
+# JetBrains
+**/.idea/
+
+# Visual Studio
+**/.vs/
+
+# Visual Studio Code
+**/.vscode/
+
+# User Specific
+**/*.user
+
+# Secrets should be mounted at runtime, never baked into the image
+**/secrets.bin
+**/*.key
+
+# Docker Environments
+**/.env
+
+# Docker files
+Dockerfile
+.dockerignore
