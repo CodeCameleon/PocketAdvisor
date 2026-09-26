@@ -6,19 +6,33 @@ A personal finance management web app for tracking income, expenses, and transfe
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - [Node.js 20+ and npm 11+](https://nodejs.org)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop) (for the database)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop) (for the database and, optionally, the containerized backend)
 
 ---
 
 ## 1. Database
 
-Start the PostgreSQL container from the root of the repository:
+All commands in this section are run from the root of the repository.
+
+### 1.1 Create the environment file
+
+Docker Compose reads its settings from a `.env` file, which is excluded via `.gitignore`. Create it from the committed template and replace the placeholder values:
 
 ```bash
-docker compose up -d
+cp .env.example .env
 ```
 
-The default credentials are defined in `.env`. The backend connects on `localhost:5432` by default.
+The comments in `.env.example` describe every variable and which other settings they have to match.
+
+### 1.2 Start the database
+
+```bash
+docker compose up -d --wait db
+```
+
+`--wait` returns once the database health check passes. Only the `db` service is started here; `docker compose up` without a service name would also start the containerized backend (see [2.5](#25-run-the-backend-in-docker-alternative-to-24)).
+
+The backend connects on `localhost:5432` by default. The port is published on the loopback interface (`127.0.0.1`) only, so the database is not reachable from other machines on the network.
 
 ---
 
@@ -78,6 +92,38 @@ The API starts on `http://localhost:5078`. Migrations are applied automatically 
 | User | `user@pocketadvisor.dev` | `User123!` |
 
 Swagger UI is available at `http://localhost:5078/swagger`.
+
+### 2.5 Run the backend in Docker (alternative to 2.4)
+
+The backend can also run as a container next to the database. The image is built from `Backend/Dockerfile` and contains no secrets: `secrets.bin` and `secrets.key` (see [2.2](#22-obtain-the-key-file-existing-store) / [2.3](#23-create-your-own-store-independent-setup-only)) are mounted into the container at runtime as Compose secrets, so the key file has to be in place before the first start.
+
+Stop `dotnet run` first, because both use host port `5078`. Then, from the root of the repository:
+
+```bash
+docker compose up -d --build --wait
+docker compose ps
+curl -i http://localhost:5078/health
+```
+
+`--wait` returns once both services report healthy. The API container only starts after the database is healthy, then applies the migrations and, in Development, the seed data exactly as in 2.4.
+
+The following variables in `.env` affect the backend container (all optional):
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `APP_VERSION` | `development` | Image tag (`pocketadvisor-api:<version>`) and the version recorded in the image |
+| `API_PORT` | `5078` | Host port of the API, published on `127.0.0.1` only (the container listens on `8080`). If you change it, update `apiUrl` in the frontend environment as well. |
+| `ASPNETCORE_ENVIRONMENT` | `Development` | `Production` disables Swagger and the data seeding |
+
+The container reaches the database as `db:5432` on the Compose network, and its health check calls `GET /health` from inside the container. The API runs as the non-root `app` user (UID `1654`); on a Linux host, `secrets.key` must be readable by that user, since Compose secrets are bind mounts.
+
+To stop the containers without losing the database data:
+
+```bash
+docker compose down
+```
+
+The data is kept in the `db_data` named volume. `docker compose down -v` would delete it as well.
 
 ---
 

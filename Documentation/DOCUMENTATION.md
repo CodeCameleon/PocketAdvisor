@@ -66,7 +66,7 @@ The application supports two user roles:
 | Concern | Choice | Reasoning |
 |---|---|---|
 | Database | **PostgreSQL 17 (Alpine)** | A robust, open-source relational database. The Alpine image keeps the container footprint small. PostgreSQL's support for `uuid` primary keys, precise `numeric` types, and JSON fits the data model well. |
-| Containerisation | **Docker Compose** | A single `docker-compose.yml` spins up the database with environment-variable-driven credentials and a named volume for data persistence. Health checks ensure the backend only connects once the database is ready. |
+| Containerisation | **Docker Compose** | A single `docker-compose.yml` runs the database and the backend API. Settings come from a git-ignored `.env` file (template: `.env.example`), and the database keeps its data in a named volume. The API image is built by a multi-stage `Backend/Dockerfile`: the .NET SDK is only used in the build stage, and the runtime image runs as a non-root user and contains no secrets. The API only starts once the database health check passes, and its own `GET /health` check lets Compose wait for a usable service. Both ports are published on the loopback interface only. |
 
 ---
 
@@ -215,7 +215,7 @@ The `Quantity` value object stored in `TransactionItem.Amount` is a fully compar
 
 ## 5. API Reference
 
-All endpoints are prefixed with `/api`. Authenticated endpoints require an `Authorization: Bearer <jwt>` header. The application only exposes the Swagger JSON document and UI in the development environment.
+All endpoints are prefixed with `/api`, except the infrastructure health check endpoint (see [Health](#health)). Authenticated endpoints require an `Authorization: Bearer <jwt>` header. The application only exposes the Swagger JSON document and UI in the development environment.
 
 ### Sessions
 
@@ -273,6 +273,14 @@ All endpoints are prefixed with `/api`. Authenticated endpoints require an `Auth
 | DELETE | `/api/transactions/{id}` | User | Delete a transaction and all its items |
 | DELETE | `/api/transactions/{transactionId}/items/{itemId}` | User | Remove a single item from a transaction (not allowed if it is the last item) |
 
+### Health
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| GET | `/health` | None | Runs every registered health check, including database reachability; returns `200 Healthy` or `503 Unhealthy` |
+
+The health check endpoint is intended for infrastructure (the Docker Compose health check), not for the frontend, so it is not part of the Swagger document.
+
 ---
 
 ## 6. Authentication & Security
@@ -319,7 +327,7 @@ A rejected request receives `429 Too Many Requests` with an RFC 9457 `ProblemDet
 
 ### Secret management
 
-Sensitive values (JWT signing key, HMAC secrets for the three token types, Resend API key) are stored in an encrypted `secrets.bin` file managed by the SecureStore library, with the decryption key in a separate `secrets.key` file. The encrypted `secrets.bin` store is committed to source control, which is SecureStore's intended usage model. The `secrets.key` file is excluded via `.gitignore` (`*.key`) and must be shared only through a secure out-of-band channel. If the key is compromised, every secret in the store must be rotated.
+Sensitive values (JWT signing key, HMAC secrets for the three token types, Resend API key) are stored in an encrypted `secrets.bin` file managed by the SecureStore library, with the decryption key in a separate `secrets.key` file. The encrypted `secrets.bin` store is committed to source control, which is SecureStore's intended usage model. The `secrets.key` file is excluded via `.gitignore` (`*.key`) and must be shared only through a secure out-of-band channel. If the key is compromised, every secret in the store must be rotated. When the backend runs in Docker, neither file is part of the image: both are excluded from the build context by `.dockerignore` and mounted into the container at runtime as Compose secrets.
 
 ---
 
@@ -418,6 +426,7 @@ The API is designed to conform to REST principles:
 ### Developer experience
 
 - Automatic EF Core migrations are applied on startup, so the database schema is always in sync with the code after a deployment.
+- The whole backend (database and API) can be started with a single `docker compose up -d --build --wait` command; `.env.example` documents every required setting.
 - In Development mode, a `DataSeeder` populates the database with realistic test data (two users, multiple accounts, categories, items, and 32 transactions) if no data exists, enabling immediate exploration without manual setup.
 - Swagger UI is available in the development environment for API exploration. Outside development neither the UI nor the generated `swagger.json` is served, so the API surface is not published in production.
 - Prettier enforces consistent code formatting across the frontend without developer configuration.
