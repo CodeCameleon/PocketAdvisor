@@ -20,6 +20,11 @@ public static class HealthCheckExtensions
     /// </summary>
     private const string HealthPath = "/health";
     
+    /// <summary>
+    /// The maximum time the database health check may take before it is reported as unhealthy.
+    /// </summary>
+    private static readonly TimeSpan DatabaseCheckTimeout = TimeSpan.FromSeconds(3);
+    
     #endregion
     
     #region AddPocketAdvisorHealthChecks
@@ -32,7 +37,8 @@ public static class HealthCheckExtensions
     {
         services.AddHealthChecks().AddCheck<DatabaseHealthCheck>(
             name: DatabaseCheckName,
-            failureStatus: HealthStatus.Unhealthy
+            failureStatus: HealthStatus.Unhealthy,
+            timeout: DatabaseCheckTimeout
         );
     }
     

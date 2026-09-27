@@ -277,7 +277,7 @@ All endpoints are prefixed with `/api`, except the infrastructure health check e
 
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| GET | `/health` | None | Runs every registered health check, including database reachability; returns `200 Healthy` or `503 Unhealthy` |
+| GET | `/health` | None | Runs every registered health check, including database reachability (with a 3-second timeout); returns `200 Healthy` or `503 Unhealthy` |
 
 The health check endpoint is intended for infrastructure (the Docker Compose health check), not for the frontend, so it is not part of the Swagger document.
 
