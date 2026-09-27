@@ -71,6 +71,9 @@ builder.Services.AddControllers();
 // Adds the Swagger services to the container in the development environment.
 builder.Services.AddPocketAdvisorSwagger(builder.Environment);
 
+// Adds the health checks to the container.
+builder.Services.AddPocketAdvisorHealthChecks();
+
 // Builds the web application.
 WebApplication app = builder.Build();
 
@@ -111,6 +114,9 @@ app.UseAuthorization();
 
 // Adds the endpoints for controller actions.
 app.MapControllers();
+
+// Adds the endpoints for health checks.
+app.MapPocketAdvisorHealthChecks();
 
 // Starts the application.
 app.Run();
