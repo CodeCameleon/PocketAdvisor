@@ -113,7 +113,7 @@ The following variables in `.env` affect the backend container (all optional):
 |---|---|---|
 | `APP_VERSION` | `development` | Image tag (`pocketadvisor-api:<version>`) and the version recorded in the image |
 | `API_PORT` | `5078` | Host port of the API, published on `127.0.0.1` only (the container listens on `8080`). If you change it, update `apiUrl` in the frontend environment as well. |
-| `ASPNETCORE_ENVIRONMENT` | `Development` | `Production` disables Swagger and the data seeding |
+| `ASPNETCORE_ENVIRONMENT` | `Production` | `.env.example` sets `Development` for local work, which enables Swagger, the data seeding (with the publicly known seed credentials) and detailed error messages. Never use it for a deployment. |
 
 The container reaches the database as `db:5432` on the Compose network, and its health check calls `GET /health` from inside the container. The API runs as the non-root `app` user (UID `1654`); on a Linux host, `secrets.key` must be readable by that user, since Compose secrets are bind mounts.
 
