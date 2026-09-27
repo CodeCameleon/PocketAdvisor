@@ -1,4 +1,4 @@
-﻿# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1
 
 # -----------------------------------------------------------------------------
 # Build stage: compiles and publishes the application with the .NET SDK.
