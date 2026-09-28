@@ -1,0 +1,86 @@
+# -----------------------------------------------------------------------------
+# nginx server configuration of the PocketAdvisor frontend container.
+#
+# The entrypoint of the nginx image renders this template into
+# /etc/nginx/conf.d/default.conf at container start and substitutes the
+# API_URL environment variable. nginx's own variables (such as $uri) are left
+# untouched, because only defined environment variables are substituted.
+# -----------------------------------------------------------------------------
+
+# Hashed build output (main-XXXXXXXX.js, chunk-XXXXXXXX.js, styles-XXXXXXXX.css)
+# never changes under the same name, so it can be cached forever. Everything
+# else, most importantly index.html, has to be revalidated on every request,
+# so a new release is picked up immediately.
+map $uri $cache_control {
+    default                           "no-cache";
+    "~-[A-Z0-9]{8}\.(?:js|css)$"      "public, max-age=31536000, immutable";
+}
+
+server {
+    listen 8080;
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Does not reveal the nginx version in the Server header and error pages.
+    server_tokens off;
+
+    gzip on;
+    gzip_comp_level 6;
+    gzip_min_length 1024;
+    gzip_vary on;
+    gzip_types text/plain text/css application/javascript application/json image/svg+xml;
+
+    # Every response header is set on the server level only: an add_header
+    # directive inside a location block would drop all the inherited ones.
+    #
+    # Content-Security-Policy, assembled one directive per line, because an
+    # nginx string cannot span multiple lines without putting the line breaks
+    # into the header value. The first line resets the variable, so an internal
+    # redirect (for example to index.html) does not append the directives twice.
+    # $csp is not an environment variable, so the entrypoint leaves it alone.
+    #   - script-src: the application bundle, Chart.js from jsDelivr, and the
+    #     onload handler Angular emits for the non-critical stylesheet
+    #     (onload="this.media='all'"), allowed by its hash.
+    #   - style-src 'unsafe-inline': Angular injects the component styles and
+    #     the inlined critical CSS as <style> elements.
+    #   - connect-src: the API is the only other origin the application calls.
+    set $csp "default-src 'self'; ";
+    set $csp "${csp}script-src 'self' https://cdn.jsdelivr.net ";
+    set $csp "${csp}'unsafe-hashes' 'sha256-MhtPZXr7+LpJUY5qtMutB+qWfQtMaPccfe7QXtCcEYc='; ";
+    set $csp "${csp}style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; ";
+    set $csp "${csp}font-src 'self' https://fonts.gstatic.com; ";
+    set $csp "${csp}img-src 'self' data:; ";
+    set $csp "${csp}connect-src 'self' ${API_URL}/; ";
+    set $csp "${csp}object-src 'none'; ";
+    set $csp "${csp}base-uri 'self'; ";
+    set $csp "${csp}form-action 'self'; ";
+    set $csp "${csp}frame-ancestors 'none'";
+    add_header Content-Security-Policy $csp always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    # The password reset and email verification links carry their tokens in the URL.
+    add_header Referrer-Policy "no-referrer" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()" always;
+    add_header Cache-Control $cache_control always;
+
+    # Liveness endpoint of the Docker health check.
+    location = /health {
+        access_log off;
+        default_type text/plain;
+        return 200 "Healthy\n";
+    }
+
+    # A missing file (for example a chunk of an older release) is a real 404,
+    # instead of index.html being served in place of a script.
+    location ~ \.[a-zA-Z0-9]+$ {
+        try_files $uri =404;
+    }
+
+    # Client-side routing: every other path is an Angular route, so
+    # /accounts or /auth/login reloaded in the browser still loads the application.
+    location / {
+        try_files $uri /index.html;
+    }
+}
