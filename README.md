@@ -6,7 +6,7 @@ A personal finance management web app for tracking income, expenses, and transfe
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - [Node.js 20+ and npm 11+](https://nodejs.org)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop) (for the database and, optionally, the containerized backend)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop) (for the database and, optionally, the containerized backend and frontend)
 
 ---
 
@@ -30,7 +30,7 @@ The comments in `.env.example` describe every variable and which other settings 
 docker compose up -d --wait db
 ```
 
-`--wait` returns once the database health check passes. Only the `db` service is started here; `docker compose up` without a service name would also start the containerized backend (see [2.5](#25-run-the-backend-in-docker-alternative-to-24)).
+`--wait` returns once the database health check passes. Only the `db` service is started here; `docker compose up` without a service name would also start the containerized backend and frontend (see [2.5](#25-run-the-backend-in-docker-alternative-to-24) and [3.3](#33-run-the-frontend-in-docker-alternative-to-32)).
 
 The backend connects on `localhost:5432` by default. The port is published on the loopback interface (`127.0.0.1`) only, so the database is not reachable from other machines on the network.
 
@@ -100,24 +100,24 @@ The backend can also run as a container next to the database. The image is built
 Stop `dotnet run` first, because both use host port `5078`. Then, from the root of the repository:
 
 ```bash
-docker compose up -d --build --wait
+docker compose up -d --build --wait api
 docker compose ps
 curl -i http://localhost:5078/health
 ```
 
-`--wait` returns once both services report healthy. The API container only starts after the database is healthy, then applies the migrations and, in Development, the seed data exactly as in 2.4.
+`--wait` returns once the database and the API report healthy. The API container only starts after the database is healthy, then applies the migrations and, in Development, the seed data exactly as in 2.4.
 
 The following variables in `.env` affect the backend container (all optional):
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `APP_VERSION` | `development` | Image tag (`pocketadvisor-api:<version>`) and the version recorded in the image |
-| `API_PORT` | `5078` | Host port of the API, published on `127.0.0.1` only (the container listens on `8080`). If you change it, update `apiUrl` in the frontend environment as well. |
+| `APP_VERSION` | `development` | Image tag (`pocketadvisor-api:<version>`, `pocketadvisor-web:<version>`) and the version recorded in the images |
+| `API_PORT` | `5078` | Host port of the API, published on `127.0.0.1` only (the container listens on `8080`). The frontend image picks it up automatically; for `npm start`, update `API_URL` of the development configuration in `Frontend/angular.json` as well. |
 | `ASPNETCORE_ENVIRONMENT` | `Production` | `.env.example` sets `Development` for local work, which enables Swagger, the data seeding (with the publicly known seed credentials) and detailed error messages. Never use it for a deployment. |
 
 The container reaches the database as `db:5432` on the Compose network, and its health check calls `GET /health` from inside the container. The API runs as the non-root `app` user (UID `1654`); on a Linux host, `secrets.key` must be readable by that user, since Compose secrets are bind mounts.
 
-To stop the containers without losing the database data:
+To stop the containers without losing the database data (this also stops the frontend container, if it runs):
 
 ```bash
 docker compose down
@@ -143,4 +143,31 @@ npm install
 npm start
 ```
 
-The app is served at `http://localhost:4200` and will proxy API calls to the backend.
+The app is served at `http://localhost:4200` and calls the backend at `http://localhost:5078/api`.
+
+The API base URL is not hard-coded in the source: `src/environments/environment.ts` reads the `API_URL` constant, which the `define` option of each build configuration in `angular.json` replaces at build time. The development configuration (`npm start`) targets `http://localhost:5078/api`, the production configuration (`npm run build`) targets `https://api.pocketadvisor.codecameleon.com/api`.
+
+### 3.3 Run the frontend in Docker (alternative to 3.2)
+
+The frontend can also run as a container. The image is built from `Frontend/Dockerfile` in two stages: Node.js installs the locked dependencies (`npm ci`) and builds the production bundle, then only the static files are copied into an unprivileged nginx image, so neither Node.js nor the source code or `node_modules` end up in the runtime image.
+
+Stop `npm start` first, because both use host port `4200`. Then, from the root of the repository, start the whole stack (database, API and frontend):
+
+```bash
+docker compose up -d --build --wait
+docker compose ps
+curl -i http://localhost:4200/health
+```
+
+The app is then available at `http://localhost:4200`. The frontend container does not depend on the API container: nginx only serves static files, and it is the browser that calls the API. `docker compose up -d --build --wait web` therefore starts the frontend alone, next to a backend started with `dotnet run`.
+
+The following variables in `.env` affect the frontend container (all optional):
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `WEB_PORT` | `4200` | Host port of the frontend, published on `127.0.0.1` only (the container listens on `8080`). It must match `Frontend:BaseUrl` of the backend, otherwise CORS rejects the API calls. |
+| `API_URL` | `http://localhost:${API_PORT}/api` | The API base URL, without a trailing slash. It is compiled into the bundle, so changing it requires a rebuild (`--build`). |
+
+The API only accepts calls from the configured frontend origin (`Frontend:BaseUrl`), which is `http://localhost:4200` in `appsettings.Development.json`. The containerized frontend therefore works against a backend running in the `Development` environment, as set in `.env.example`.
+
+nginx serves every unknown path with `index.html`, so reloading a deep link such as `/accounts` still loads the app, while a missing `.js` or `.css` file is a real `404`. `index.html` is revalidated on every request and the hashed bundle files are cached for a year, so a new image is picked up on the next page load. Every response carries security headers, including a Content-Security-Policy that only allows scripts from the app itself and jsDelivr (Chart.js), and network calls only to the app and the API.

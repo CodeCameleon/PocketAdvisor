@@ -59,6 +59,7 @@ The application supports two user roles:
 | Reactive state | **Angular Signals** | Used for component-level state (`signal()`, `computed()`) to avoid unnecessary re-renders and make reactivity explicit without introducing a third-party state library. |
 | Session persistence | **`localStorage`** | JWT and refresh tokens are stored in `localStorage` so that sessions survive page refreshes. The session interceptor reads from this store on every request. |
 | Charts | **Chart.js (CDN)** | A lightweight, canvas-based charting library loaded via a CDN `<script>` tag in `index.html`. Avoids bundling Chart.js into the main chunk — reducing initial download size — while still being available globally via `declare const Chart: any`. |
+| Configuration | **Angular `define` build option** | The API base URL is a build-time constant (`API_URL`) defined per build configuration in `angular.json` and overridable from the command line, so the production build no longer silently targets `localhost`, and the Docker image receives the URL as a build argument. |
 | Code formatting | **Prettier** | Enforces a consistent code style across all TypeScript, HTML, and CSS files with no per-developer configuration drift. |
 
 ### 2.3 Infrastructure
@@ -66,7 +67,8 @@ The application supports two user roles:
 | Concern | Choice | Reasoning |
 |---|---|---|
 | Database | **PostgreSQL 17 (Alpine)** | A robust, open-source relational database. The Alpine image keeps the container footprint small. PostgreSQL's support for `uuid` primary keys, precise `numeric` types, and JSON fits the data model well. |
-| Containerisation | **Docker Compose** | A single `docker-compose.yml` runs the database and the backend API. Settings come from a git-ignored `.env` file (template: `.env.example`), and the database keeps its data in a named volume. The API image is built by a multi-stage `Backend/Dockerfile`: the .NET SDK is only used in the build stage, and the runtime image runs as a non-root user and contains no secrets. The API only starts once the database health check passes, and its own `GET /health` check lets Compose wait for a usable service. Both ports are published on the loopback interface only. |
+| Web server | **nginx (unprivileged image)** | Serves the built Angular bundle in the frontend container. It is small, fast at serving static files, and the `nginxinc/nginx-unprivileged` image runs as a non-root user out of the box. The configuration adds the SPA fallback to `index.html`, caching rules for the hashed bundle files, gzip compression, and the security headers. |
+| Containerisation | **Docker Compose** | A single `docker-compose.yml` runs the database, the backend API and the frontend. Settings come from a git-ignored `.env` file (template: `.env.example`), and the database keeps its data in a named volume. The API image is built by a multi-stage `Backend/Dockerfile`: the .NET SDK is only used in the build stage, and the runtime image runs as a non-root user and contains no secrets. The API only starts once the database health check passes, and its own `GET /health` check lets Compose wait for a usable service. The frontend image is built by a multi-stage `Frontend/Dockerfile`: Node.js only exists in the build stage, and the runtime image is an unprivileged nginx serving the static bundle with its own `GET /health` check. All ports are published on the loopback interface only. |
 
 ---
 
@@ -142,6 +144,8 @@ src/app/
 - **Silent token refresh in the interceptor.** `sessionInterceptor` attaches the stored JWT as a `Bearer` token to every outgoing request (except the refresh endpoint itself). On receiving a 401, it automatically calls the refresh endpoint to obtain a new JWT and refresh token, then retries the original request. A shared `Observable` (`shareReplay(1)`) ensures that if multiple requests 401 simultaneously, only one refresh call is made and all callers wait for it.
 
 - **Server-side error mapping via `ApiErrorService`.** The backend returns `ValidationProblemDetails` with a map of property names to error messages. `ApiErrorService.applyErrors` walks that map, resolves both flat keys (`"Email"`) and nested array paths (`"Items[0].ItemId"`) to the matching `AbstractControl`, and calls `setErrors({ serverError: message })` on it. This keeps all validation feedback inside the reactive form without any frontend validators.
+
+- **Build-time API URL.** Services build their URLs from `environment.apiUrl`, which is the `API_URL` constant replaced by the Angular build (`define` option). The development configuration targets the local backend, the production configuration the production API, and the Docker build passes its own value with `ng build --define`.
 
 - **Signals for component state.** Pages use `signal()` for loading flags, data arrays, and selected IDs, and `computed()` for derived values. This makes data flow explicit and avoids `ngOnChanges` boilerplate.
 
@@ -403,6 +407,8 @@ The API is designed to conform to REST principles:
 - All secrets (signing keys, HMAC keys, API keys) are stored in an encrypted file outside the application's configuration JSON.
 - JWTs have a short 15-minute expiry to limit the window of exposure if intercepted.
 - CORS restricts the browser origins that can call the API.
+- The frontend container sends a Content-Security-Policy that only allows scripts from the application itself and jsDelivr (Chart.js), and network calls only to the application and the configured API, which limits what an injected script could load or where it could send data. It also sends `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` (together with `frame-ancestors 'none'` against clickjacking), `Referrer-Policy: no-referrer` (the email verification and password reset links carry their tokens in the URL) and a restrictive `Permissions-Policy`.
+- Both application containers run as non-root users.
 - The anonymous authentication endpoints are rate limited per IP address, so credential brute-forcing, one-time-token guessing and password-reset email flooding are throttled before they reach the service layer.
 
 ### Error handling
@@ -422,11 +428,12 @@ The API is designed to conform to REST principles:
 - The no-tracking default for EF Core queries avoids unnecessary object graph materialization, reducing memory pressure under load.
 - Lazy-loaded frontend modules keep the initial JavaScript payload small, improving time-to-interactive for first-time visitors.
 - Chart.js is loaded from a CDN rather than bundled, further reducing the application bundle size.
+- nginx compresses the text responses with gzip and serves the content-hashed bundle files with a one-year `immutable` cache, so returning visitors only download `index.html` and the files that changed in a new release.
 
 ### Developer experience
 
 - Automatic EF Core migrations are applied on startup, so the database schema is always in sync with the code after a deployment.
-- The whole backend (database and API) can be started with a single `docker compose up -d --build --wait` command; `.env.example` documents every required setting.
+- The whole application (database, API and frontend) can be started with a single `docker compose up -d --build --wait` command; `.env.example` documents every required setting.
 - In Development mode, a `DataSeeder` populates the database with realistic test data (two users, multiple accounts, categories, items, and 32 transactions) if no data exists, enabling immediate exploration without manual setup.
 - Swagger UI is available in the development environment for API exploration. Outside development neither the UI nor the generated `swagger.json` is served, so the API surface is not published in production.
 - Prettier enforces consistent code formatting across the frontend without developer configuration.
