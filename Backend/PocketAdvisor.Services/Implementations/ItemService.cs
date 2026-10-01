@@ -2,6 +2,7 @@ using FluentResults;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
+using PocketAdvisor.DbContexts.Interfaces;
 using PocketAdvisor.Entities;
 using PocketAdvisor.Repositories.Interfaces;
 using PocketAdvisor.Requests.Items;
@@ -16,7 +17,7 @@ namespace PocketAdvisor.Services.Implementations;
 /// Represents the service implementation for performing operations related to items.
 /// </summary>
 public sealed class ItemService
-    : BaseService<ItemService>, IItemService
+    : BaseDatabaseService<ItemService>, IItemService
 {
     #region Constructors
     
@@ -24,18 +25,30 @@ public sealed class ItemService
     /// Initializes a new instance of the <see cref="ItemService" /> class.
     /// </summary>
     /// <param name="logger">The logger for the class.</param>
-    /// <param name="serviceProvider">The service provider for resolving dependencies.</param>
+    /// <param name="transactionManager">The transaction manager of the database.</param>
     /// <param name="itemRepository">The item repository instance.</param>
+    /// <param name="createItemRequestValidator">
+    /// The validator for the <see cref="CreateItemRequest" /> model.
+    /// </param>
+    /// <param name="updateItemNameRequestValidator">
+    /// The validator for the <see cref="UpdateItemNameRequest" /> model.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// If any of the given parameters is <see langword="null" />.
     /// </exception>
-    public ItemService(ILogger<ItemService> logger, IServiceProvider serviceProvider,
-        IItemRepository itemRepository)
-        : base(logger, serviceProvider)
+    public ItemService(ILogger<ItemService> logger, ITransactionManager transactionManager,
+        IItemRepository itemRepository,
+        IValidator<CreateItemRequest> createItemRequestValidator,
+        IValidator<UpdateItemNameRequest> updateItemNameRequestValidator)
+        : base(logger, transactionManager)
     {
         ArgumentNullException.ThrowIfNull(itemRepository);
+        ArgumentNullException.ThrowIfNull(createItemRequestValidator);
+        ArgumentNullException.ThrowIfNull(updateItemNameRequestValidator);
         
         ItemRepository = itemRepository;
+        CreateItemRequestValidator = createItemRequestValidator;
+        UpdateItemNameRequestValidator = updateItemNameRequestValidator;
     }
     
     #endregion
@@ -47,6 +60,16 @@ public sealed class ItemService
     /// </summary>
     private IItemRepository ItemRepository { get; }
     
+    /// <summary>
+    /// The validator for the <see cref="CreateItemRequest" /> model.
+    /// </summary>
+    private IValidator<CreateItemRequest> CreateItemRequestValidator { get; }
+    
+    /// <summary>
+    /// The validator for the <see cref="UpdateItemNameRequest" /> model.
+    /// </summary>
+    private IValidator<UpdateItemNameRequest> UpdateItemNameRequestValidator { get; }
+    
     #endregion
     
     #region CreateItemAsync
@@ -56,8 +79,7 @@ public sealed class ItemService
     {
         Logger.LogInformation("Creating new item...");
         
-        IValidator<CreateItemRequest> validator = GetValidator<CreateItemRequest>();
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await CreateItemRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
@@ -85,7 +107,7 @@ public sealed class ItemService
             );
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         Item item = new()
         {
@@ -95,7 +117,7 @@ public sealed class ItemService
         };
         await ItemRepository.CreateAsync(item);
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         Logger.LogInformation("New item created successfully.");
         return Result.Ok();
@@ -131,11 +153,11 @@ public sealed class ItemService
             return Result.Fail(CreateNotFoundError());
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         ItemRepository.Delete(item);
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         if (Logger.IsEnabled(LogLevel.Information))
         {
@@ -188,8 +210,7 @@ public sealed class ItemService
             Logger.LogInformation("Updating name of item '{ItemId}'...", itemId);
         }
         
-        IValidator<UpdateItemNameRequest> validator = GetValidator<UpdateItemNameRequest>();
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await UpdateItemNameRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
@@ -236,11 +257,11 @@ public sealed class ItemService
             );
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         item.Name = normalizedName;
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         if (Logger.IsEnabled(LogLevel.Information))
         {
