@@ -1,7 +1,6 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using PocketAdvisor.Services.Constants;
 using PocketAdvisor.Services.Interfaces;
@@ -90,8 +89,6 @@ public abstract class BaseController<TService>
     {
         ArgumentNullException.ThrowIfNull(errors);
         
-        ProblemDetailsFactory problemDetailsFactory = HttpContext.RequestServices
-            .GetRequiredService<ProblemDetailsFactory>();
         ModelStateDictionary modelState = new();
         
         foreach (IError error in errors)
@@ -106,7 +103,7 @@ public abstract class BaseController<TService>
             modelState.AddModelError(key, error.Message);
         }
         
-        ValidationProblemDetails validationProblemDetails = problemDetailsFactory.CreateValidationProblemDetails(
+        ValidationProblemDetails validationProblemDetails = ProblemDetailsFactory.CreateValidationProblemDetails(
             HttpContext,
             modelState
         );

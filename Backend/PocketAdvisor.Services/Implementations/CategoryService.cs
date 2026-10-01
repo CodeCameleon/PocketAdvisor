@@ -2,6 +2,7 @@ using FluentResults;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
+using PocketAdvisor.DbContexts.Interfaces;
 using PocketAdvisor.Entities;
 using PocketAdvisor.Repositories.Interfaces;
 using PocketAdvisor.Requests.Categories;
@@ -16,7 +17,7 @@ namespace PocketAdvisor.Services.Implementations;
 /// Represents the service implementation for performing operations related to categories.
 /// </summary>
 public sealed class CategoryService
-    : BaseService<CategoryService>, ICategoryService
+    : BaseDatabaseService<CategoryService>, ICategoryService
 {
     #region Constructors
     
@@ -24,21 +25,33 @@ public sealed class CategoryService
     /// Initializes a new instance of the <see cref="CategoryService" /> class.
     /// </summary>
     /// <param name="logger">The logger for the class.</param>
-    /// <param name="serviceProvider">The service provider for resolving dependencies.</param>
+    /// <param name="transactionManager">The transaction manager of the database.</param>
     /// <param name="categoryRepository">The category repository instance.</param>
     /// <param name="transactionRepository">The transaction repository instance.</param>
+    /// <param name="createCategoryRequestValidator">
+    /// The validator for the <see cref="CreateCategoryRequest" /> model.
+    /// </param>
+    /// <param name="updateCategoryNameRequestValidator">
+    /// The validator for the <see cref="UpdateCategoryNameRequest" /> model.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// If any of the given parameters is <see langword="null" />.
     /// </exception>
-    public CategoryService(ILogger<CategoryService> logger, IServiceProvider serviceProvider,
-        ICategoryRepository categoryRepository, ITransactionRepository transactionRepository)
-        : base(logger, serviceProvider)
+    public CategoryService(ILogger<CategoryService> logger, ITransactionManager transactionManager,
+        ICategoryRepository categoryRepository, ITransactionRepository transactionRepository,
+        IValidator<CreateCategoryRequest> createCategoryRequestValidator,
+        IValidator<UpdateCategoryNameRequest> updateCategoryNameRequestValidator)
+        : base(logger, transactionManager)
     {
         ArgumentNullException.ThrowIfNull(categoryRepository);
         ArgumentNullException.ThrowIfNull(transactionRepository);
+        ArgumentNullException.ThrowIfNull(createCategoryRequestValidator);
+        ArgumentNullException.ThrowIfNull(updateCategoryNameRequestValidator);
         
         CategoryRepository = categoryRepository;
         TransactionRepository = transactionRepository;
+        CreateCategoryRequestValidator = createCategoryRequestValidator;
+        UpdateCategoryNameRequestValidator = updateCategoryNameRequestValidator;
     }
     
     #endregion
@@ -55,6 +68,16 @@ public sealed class CategoryService
     /// </summary>
     private ITransactionRepository TransactionRepository { get; }
     
+    /// <summary>
+    /// The validator for the <see cref="CreateCategoryRequest" /> model.
+    /// </summary>
+    private IValidator<CreateCategoryRequest> CreateCategoryRequestValidator { get; }
+    
+    /// <summary>
+    /// The validator for the <see cref="UpdateCategoryNameRequest" /> model.
+    /// </summary>
+    private IValidator<UpdateCategoryNameRequest> UpdateCategoryNameRequestValidator { get; }
+    
     #endregion
     
     #region CreateGlobalCategoryAsync
@@ -64,8 +87,7 @@ public sealed class CategoryService
     {
         Logger.LogInformation("Creating new global category...");
         
-        IValidator<CreateCategoryRequest> validator = GetValidator<CreateCategoryRequest>();
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await CreateCategoryRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
@@ -93,7 +115,7 @@ public sealed class CategoryService
             );
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         Category globalCategory = new()
         {
@@ -102,7 +124,7 @@ public sealed class CategoryService
         };
         await CategoryRepository.CreateAsync(globalCategory);
         
-        await TransactionManager.Value.SaveChangesAsync();
+        await TransactionManager.SaveChangesAsync();
         
         IReadOnlyList<Category> personalCategories = await CategoryRepository.GetAllAsync(
             c => c.UserId != null && c.Name == normalizedName
@@ -123,7 +145,7 @@ public sealed class CategoryService
             CategoryRepository.Delete(personalCategory);
         }
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         Logger.LogInformation("New global category created successfully.");
         return Result.Ok();
@@ -138,8 +160,7 @@ public sealed class CategoryService
     {
         Logger.LogInformation("Creating new personal category...");
         
-        IValidator<CreateCategoryRequest> validator = GetValidator<CreateCategoryRequest>();
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await CreateCategoryRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
@@ -167,7 +188,7 @@ public sealed class CategoryService
             );
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         Category category = new()
         {
@@ -176,7 +197,7 @@ public sealed class CategoryService
         };
         await CategoryRepository.CreateAsync(category);
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         Logger.LogInformation("New personal category created successfully.");
         return Result.Ok();
@@ -217,11 +238,11 @@ public sealed class CategoryService
             return Result.Fail(ValidationMessages.CategoryHasTransactions);
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         CategoryRepository.Delete(globalCategory);
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         if (Logger.IsEnabled(LogLevel.Information))
         {
@@ -270,11 +291,11 @@ public sealed class CategoryService
             return Result.Fail(ValidationMessages.CategoryHasTransactions);
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         CategoryRepository.Delete(category);
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         if (Logger.IsEnabled(LogLevel.Information))
         {
@@ -327,8 +348,7 @@ public sealed class CategoryService
             Logger.LogInformation("Updating name of global category '{CategoryId}'...", categoryId);
         }
         
-        IValidator<UpdateCategoryNameRequest> validator = GetValidator<UpdateCategoryNameRequest>();
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await UpdateCategoryNameRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
@@ -371,11 +391,11 @@ public sealed class CategoryService
             );
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         globalCategory.Name = normalizedName;
         
-        await TransactionManager.Value.SaveChangesAsync();
+        await TransactionManager.SaveChangesAsync();
         
         IReadOnlyList<Category> personalCategories = await CategoryRepository.GetAllAsync(
             c => c.UserId != null && c.Name == normalizedName
@@ -396,7 +416,7 @@ public sealed class CategoryService
             CategoryRepository.Delete(personalCategory);
         }
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         if (Logger.IsEnabled(LogLevel.Information))
         {
@@ -419,8 +439,7 @@ public sealed class CategoryService
             Logger.LogInformation("Updating name of personal category '{CategoryId}'...", categoryId);
         }
         
-        IValidator<UpdateCategoryNameRequest> validator = GetValidator<UpdateCategoryNameRequest>();
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await UpdateCategoryNameRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
@@ -467,11 +486,11 @@ public sealed class CategoryService
             );
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         category.Name = normalizedName;
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         if (Logger.IsEnabled(LogLevel.Information))
         {

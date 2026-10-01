@@ -3,6 +3,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using PocketAdvisor.DbContexts.Interfaces;
 using PocketAdvisor.Entities;
 using PocketAdvisor.Repositories.Interfaces;
 using PocketAdvisor.Requests.Accounts;
@@ -17,7 +18,7 @@ namespace PocketAdvisor.Services.Implementations;
 /// Represents the service implementation for performing operations related to accounts.
 /// </summary>
 public sealed class AccountService
-    : BaseService<AccountService>, IAccountService
+    : BaseDatabaseService<AccountService>, IAccountService
 {
     #region Constructors
     
@@ -25,18 +26,30 @@ public sealed class AccountService
     /// Initializes a new instance of the <see cref="AccountService" /> class.
     /// </summary>
     /// <param name="logger">The logger for the class.</param>
-    /// <param name="serviceProvider">The service provider for resolving dependencies.</param>
+    /// <param name="transactionManager">The transaction manager of the database.</param>
     /// <param name="accountRepository">The account repository instance.</param>
+    /// <param name="createAccountRequestValidator">
+    /// The validator for the <see cref="CreateAccountRequest" /> model.
+    /// </param>
+    /// <param name="updateAccountNameRequestValidator">
+    /// The validator for the <see cref="UpdateAccountNameRequest" /> model.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// If any of the given parameters is <see langword="null" />.
     /// </exception>
-    public AccountService(ILogger<AccountService> logger, IServiceProvider serviceProvider,
-        IAccountRepository accountRepository)
-        : base(logger, serviceProvider)
+    public AccountService(ILogger<AccountService> logger, ITransactionManager transactionManager,
+        IAccountRepository accountRepository,
+        IValidator<CreateAccountRequest> createAccountRequestValidator,
+        IValidator<UpdateAccountNameRequest> updateAccountNameRequestValidator)
+        : base(logger, transactionManager)
     {
         ArgumentNullException.ThrowIfNull(accountRepository);
+        ArgumentNullException.ThrowIfNull(createAccountRequestValidator);
+        ArgumentNullException.ThrowIfNull(updateAccountNameRequestValidator);
         
         AccountRepository = accountRepository;
+        CreateAccountRequestValidator = createAccountRequestValidator;
+        UpdateAccountNameRequestValidator = updateAccountNameRequestValidator;
     }
     
     #endregion
@@ -48,6 +61,16 @@ public sealed class AccountService
     /// </summary>
     private IAccountRepository AccountRepository { get; }
     
+    /// <summary>
+    /// The validator for the <see cref="CreateAccountRequest" /> model.
+    /// </summary>
+    private IValidator<CreateAccountRequest> CreateAccountRequestValidator { get; }
+    
+    /// <summary>
+    /// The validator for the <see cref="UpdateAccountNameRequest" /> model.
+    /// </summary>
+    private IValidator<UpdateAccountNameRequest> UpdateAccountNameRequestValidator { get; }
+    
     #endregion
     
     #region CreateAccountAsync
@@ -57,8 +80,7 @@ public sealed class AccountService
     {
         Logger.LogInformation("Creating new account...");
         
-        IValidator<CreateAccountRequest> validator = GetValidator<CreateAccountRequest>();
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await CreateAccountRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
@@ -86,7 +108,7 @@ public sealed class AccountService
             );
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         Account account = new()
         {
@@ -97,7 +119,7 @@ public sealed class AccountService
         };
         await AccountRepository.CreateAsync(account);
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         Logger.LogInformation("New account created successfully.");
         return Result.Ok();
@@ -133,11 +155,11 @@ public sealed class AccountService
             return Result.Fail(CreateNotFoundError());
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         AccountRepository.Delete(account);
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         if (Logger.IsEnabled(LogLevel.Information))
         {
@@ -208,8 +230,7 @@ public sealed class AccountService
             Logger.LogInformation("Updating name of account '{AccountId}'...", accountId);
         }
         
-        IValidator<UpdateAccountNameRequest> validator = GetValidator<UpdateAccountNameRequest>();
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await UpdateAccountNameRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
@@ -256,11 +277,11 @@ public sealed class AccountService
             );
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         account.Name = normalizedName;
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         if (Logger.IsEnabled(LogLevel.Information))
         {

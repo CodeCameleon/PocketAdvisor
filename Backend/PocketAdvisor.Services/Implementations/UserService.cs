@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using PocketAdvisor.DbContexts.Interfaces;
 using PocketAdvisor.Entities;
 using PocketAdvisor.Enums;
 using PocketAdvisor.Repositories.Interfaces;
@@ -26,7 +27,7 @@ namespace PocketAdvisor.Services.Implementations;
 /// Represents the service implementation for performing operations related to users.
 /// </summary>
 public sealed class UserService
-    : BaseService<UserService>, IUserService
+    : BaseDatabaseService<UserService>, IUserService
 {
     #region GeneratedToken
     
@@ -54,7 +55,7 @@ public sealed class UserService
     /// Initializes a new instance of the <see cref="UserService" /> class.
     /// </summary>
     /// <param name="logger">The logger for the class.</param>
-    /// <param name="serviceProvider">The service provider for resolving dependencies.</param>
+    /// <param name="transactionManager">The transaction manager of the database.</param>
     /// <param name="jsonWebTokenOptions">
     /// The JSON web token options for accessing the JSON web token configuration values.
     /// </param>
@@ -67,14 +68,33 @@ public sealed class UserService
     /// <param name="passwordHasher">The password hasher for hashing user passwords.</param>
     /// <param name="tokenRepository">The token repository instance.</param>
     /// <param name="userRepository">The user repository instance.</param>
+    /// <param name="createUserRequestValidator">
+    /// The validator for the <see cref="CreateUserRequest" /> model.
+    /// </param>
+    /// <param name="forgotPasswordRequestValidator">
+    /// The validator for the <see cref="ForgotPasswordRequest" /> model.
+    /// </param>
+    /// <param name="loginRequestValidator">The validator for the <see cref="LoginRequest" /> model.</param>
+    /// <param name="refreshRequestValidator">The validator for the <see cref="RefreshRequest" /> model.</param>
+    /// <param name="resetPasswordRequestValidator">
+    /// The validator for the <see cref="ResetPasswordRequest" /> model.
+    /// </param>
+    /// <param name="verifyEmailRequestValidator">
+    /// The validator for the <see cref="VerifyEmailRequest" /> model.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// If any of the given parameters is <see langword="null" />.
     /// </exception>
-    public UserService(ILogger<UserService> logger, IServiceProvider serviceProvider,
+    public UserService(ILogger<UserService> logger, ITransactionManager transactionManager,
         IOptions<JsonWebTokenOptions> jsonWebTokenOptions, IOptions<TokenExpirationsOptions> tokenExpirationsOptions,
         IOptions<TokenSecretsOptions> tokenSecretsOptions, IPasswordHasher<User> passwordHasher,
-        ITokenRepository tokenRepository, IUserRepository userRepository)
-        : base(logger, serviceProvider)
+        ITokenRepository tokenRepository, IUserRepository userRepository,
+        IValidator<CreateUserRequest> createUserRequestValidator,
+        IValidator<ForgotPasswordRequest> forgotPasswordRequestValidator,
+        IValidator<LoginRequest> loginRequestValidator, IValidator<RefreshRequest> refreshRequestValidator,
+        IValidator<ResetPasswordRequest> resetPasswordRequestValidator,
+        IValidator<VerifyEmailRequest> verifyEmailRequestValidator)
+        : base(logger, transactionManager)
     {
         ArgumentNullException.ThrowIfNull(jsonWebTokenOptions);
         ArgumentNullException.ThrowIfNull(tokenExpirationsOptions);
@@ -82,6 +102,12 @@ public sealed class UserService
         ArgumentNullException.ThrowIfNull(passwordHasher);
         ArgumentNullException.ThrowIfNull(tokenRepository);
         ArgumentNullException.ThrowIfNull(userRepository);
+        ArgumentNullException.ThrowIfNull(createUserRequestValidator);
+        ArgumentNullException.ThrowIfNull(forgotPasswordRequestValidator);
+        ArgumentNullException.ThrowIfNull(loginRequestValidator);
+        ArgumentNullException.ThrowIfNull(refreshRequestValidator);
+        ArgumentNullException.ThrowIfNull(resetPasswordRequestValidator);
+        ArgumentNullException.ThrowIfNull(verifyEmailRequestValidator);
         
         JsonWebTokenOptions = jsonWebTokenOptions;
         TokenExpirationsOptions = tokenExpirationsOptions;
@@ -89,6 +115,12 @@ public sealed class UserService
         PasswordHasher = passwordHasher;
         TokenRepository = tokenRepository;
         UserRepository = userRepository;
+        CreateUserRequestValidator = createUserRequestValidator;
+        ForgotPasswordRequestValidator = forgotPasswordRequestValidator;
+        LoginRequestValidator = loginRequestValidator;
+        RefreshRequestValidator = refreshRequestValidator;
+        ResetPasswordRequestValidator = resetPasswordRequestValidator;
+        VerifyEmailRequestValidator = verifyEmailRequestValidator;
     }
     
     #endregion
@@ -125,6 +157,36 @@ public sealed class UserService
     /// </summary>
     private IUserRepository UserRepository { get; }
     
+    /// <summary>
+    /// The validator for the <see cref="CreateUserRequest" /> model.
+    /// </summary>
+    private IValidator<CreateUserRequest> CreateUserRequestValidator { get; }
+    
+    /// <summary>
+    /// The validator for the <see cref="ForgotPasswordRequest" /> model.
+    /// </summary>
+    private IValidator<ForgotPasswordRequest> ForgotPasswordRequestValidator { get; }
+    
+    /// <summary>
+    /// The validator for the <see cref="LoginRequest" /> model.
+    /// </summary>
+    private IValidator<LoginRequest> LoginRequestValidator { get; }
+    
+    /// <summary>
+    /// The validator for the <see cref="RefreshRequest" /> model.
+    /// </summary>
+    private IValidator<RefreshRequest> RefreshRequestValidator { get; }
+    
+    /// <summary>
+    /// The validator for the <see cref="ResetPasswordRequest" /> model.
+    /// </summary>
+    private IValidator<ResetPasswordRequest> ResetPasswordRequestValidator { get; }
+    
+    /// <summary>
+    /// The validator for the <see cref="VerifyEmailRequest" /> model.
+    /// </summary>
+    private IValidator<VerifyEmailRequest> VerifyEmailRequestValidator { get; }
+    
     #endregion
     
     #region GenerateToken
@@ -153,8 +215,7 @@ public sealed class UserService
     {
         Logger.LogInformation("Creating new user...");
         
-        IValidator<CreateUserRequest> validator = GetValidator<CreateUserRequest>();
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await CreateUserRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
@@ -169,7 +230,7 @@ public sealed class UserService
             return Result.Fail(validationResult.Errors.ToErrorList());
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         string normalizedEmail = request.Email!.Trim().ToLowerInvariant();
         bool emailExists = await UserRepository.ExistsAsync(u => u.Email == normalizedEmail);
@@ -191,7 +252,7 @@ public sealed class UserService
         
         await UserRepository.CreateAsync(user);
         
-        await TransactionManager.Value.SaveChangesAsync();
+        await TransactionManager.SaveChangesAsync();
         
         GeneratedToken generatedToken = GenerateToken(TokenSecretsOptions.Value.EmailVerification);
         
@@ -204,7 +265,7 @@ public sealed class UserService
         };
         await TokenRepository.CreateAsync(token);
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         Logger.LogInformation("New user created successfully.");
         return Result.Ok(generatedToken.Plain);
@@ -219,8 +280,7 @@ public sealed class UserService
     {
         Logger.LogInformation("Processing forgot password request...");
         
-        IValidator<ForgotPasswordRequest> validator = GetValidator<ForgotPasswordRequest>();
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await ForgotPasswordRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
@@ -248,7 +308,7 @@ public sealed class UserService
             );
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         GeneratedToken generatedToken = GenerateToken(TokenSecretsOptions.Value.PasswordReset);
         
@@ -261,7 +321,7 @@ public sealed class UserService
         };
         await TokenRepository.CreateAsync(token);
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         Logger.LogInformation("Password reset token generated successfully.");
         return Result.Ok(generatedToken.Plain);
@@ -276,8 +336,7 @@ public sealed class UserService
     {
         Logger.LogInformation("Authenticating user...");
         
-        IValidator<LoginRequest> validator = GetValidator<LoginRequest>();
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await LoginRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
@@ -320,13 +379,13 @@ public sealed class UserService
             );
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         if (passwordResult == PasswordVerificationResult.SuccessRehashNeeded)
         {
             user.PasswordHash = PasswordHasher.HashPassword(user, request.Password!);
             
-            await TransactionManager.Value.SaveChangesAsync();
+            await TransactionManager.SaveChangesAsync();
             
             if (Logger.IsEnabled(LogLevel.Information))
             {
@@ -348,7 +407,7 @@ public sealed class UserService
         };
         await TokenRepository.CreateAsync(refreshToken);
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         Logger.LogInformation("User authenticated successfully.");
         
@@ -368,8 +427,7 @@ public sealed class UserService
     {
         Logger.LogInformation("Refreshing session...");
         
-        IValidator<RefreshRequest> validator = GetValidator<RefreshRequest>();
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await RefreshRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
@@ -400,7 +458,7 @@ public sealed class UserService
             );
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         TokenRepository.Delete(existingToken);
         
@@ -415,7 +473,7 @@ public sealed class UserService
         };
         await TokenRepository.CreateAsync(newRefreshToken);
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         Logger.LogInformation("Session refreshed successfully.");
         
@@ -435,8 +493,7 @@ public sealed class UserService
     {
         Logger.LogInformation("Resetting user password...");
         
-        IValidator<ResetPasswordRequest> validator = GetValidator<ResetPasswordRequest>();
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await ResetPasswordRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
@@ -468,13 +525,13 @@ public sealed class UserService
             );
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         existingToken.User!.PasswordHash = PasswordHasher.HashPassword(existingToken.User, request.Password!);
         
         TokenRepository.Delete(existingToken);
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         Logger.LogInformation("User password reset successfully.");
         return Result.Ok();
@@ -489,8 +546,7 @@ public sealed class UserService
     {
         Logger.LogInformation("Verifying email address...");
         
-        IValidator<VerifyEmailRequest> validator = GetValidator<VerifyEmailRequest>();
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await VerifyEmailRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
@@ -522,13 +578,13 @@ public sealed class UserService
             );
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         existingToken.User!.IsEmailVerified = true;
         
         TokenRepository.Delete(existingToken);
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         Logger.LogInformation("Email address verified successfully.");
         return Result.Ok();

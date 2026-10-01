@@ -3,6 +3,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using PocketAdvisor.DbContexts.Interfaces;
 using PocketAdvisor.Entities;
 using PocketAdvisor.Enums.Extensions;
 using PocketAdvisor.Repositories.Interfaces;
@@ -18,7 +19,7 @@ namespace PocketAdvisor.Services.Implementations;
 /// Represents the service implementation for performing operations related to transactions.
 /// </summary>
 public sealed class TransactionService
-    : BaseService<TransactionService>, ITransactionService
+    : BaseDatabaseService<TransactionService>, ITransactionService
 {
     #region Constructors
     
@@ -26,32 +27,38 @@ public sealed class TransactionService
     /// Initializes a new instance of the <see cref="TransactionService" /> class.
     /// </summary>
     /// <param name="logger">The logger for the class.</param>
-    /// <param name="serviceProvider">The service provider for resolving dependencies.</param>
+    /// <param name="transactionManager">The transaction manager of the database.</param>
     /// <param name="accountRepository">The account repository instance.</param>
     /// <param name="categoryRepository">The category repository instance.</param>
     /// <param name="itemRepository">The item repository instance.</param>
     /// <param name="transactionItemRepository">The transaction item repository instance.</param>
     /// <param name="transactionRepository">The transaction repository instance.</param>
+    /// <param name="createTransactionRequestValidator">
+    /// The validator for the <see cref="CreateTransactionRequest" /> model.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// If any of the given parameters is <see langword="null" />.
     /// </exception>
-    public TransactionService(ILogger<TransactionService> logger, IServiceProvider serviceProvider,
+    public TransactionService(ILogger<TransactionService> logger, ITransactionManager transactionManager,
         IAccountRepository accountRepository, ICategoryRepository categoryRepository,
         IItemRepository itemRepository, ITransactionItemRepository transactionItemRepository,
-        ITransactionRepository transactionRepository)
-        : base(logger, serviceProvider)
+        ITransactionRepository transactionRepository,
+        IValidator<CreateTransactionRequest> createTransactionRequestValidator)
+        : base(logger, transactionManager)
     {
         ArgumentNullException.ThrowIfNull(accountRepository);
         ArgumentNullException.ThrowIfNull(categoryRepository);
         ArgumentNullException.ThrowIfNull(itemRepository);
         ArgumentNullException.ThrowIfNull(transactionItemRepository);
         ArgumentNullException.ThrowIfNull(transactionRepository);
+        ArgumentNullException.ThrowIfNull(createTransactionRequestValidator);
         
         AccountRepository = accountRepository;
         CategoryRepository = categoryRepository;
         ItemRepository = itemRepository;
         TransactionItemRepository = transactionItemRepository;
         TransactionRepository = transactionRepository;
+        CreateTransactionRequestValidator = createTransactionRequestValidator;
     }
     
     #endregion
@@ -83,6 +90,11 @@ public sealed class TransactionService
     /// </summary>
     private ITransactionRepository TransactionRepository { get; }
     
+    /// <summary>
+    /// The validator for the <see cref="CreateTransactionRequest" /> model.
+    /// </summary>
+    private IValidator<CreateTransactionRequest> CreateTransactionRequestValidator { get; }
+    
     #endregion
     
     #region CreateTransactionAsync
@@ -92,8 +104,7 @@ public sealed class TransactionService
     {
         Logger.LogInformation("Creating new transaction...");
         
-        IValidator<CreateTransactionRequest> validator = GetValidator<CreateTransactionRequest>();
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await CreateTransactionRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
@@ -205,7 +216,7 @@ public sealed class TransactionService
             }
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         Transaction transaction = new()
         {
@@ -216,7 +227,7 @@ public sealed class TransactionService
         };
         await TransactionRepository.CreateAsync(transaction);
         
-        await TransactionManager.Value.SaveChangesAsync();
+        await TransactionManager.SaveChangesAsync();
         
         foreach (CreateTransactionItemRequest itemRequest in request.Items!)
         {
@@ -230,7 +241,7 @@ public sealed class TransactionService
             await TransactionItemRepository.CreateAsync(transactionItem);
         }
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         Logger.LogInformation("New transaction created successfully.");
         return Result.Ok();
@@ -269,11 +280,11 @@ public sealed class TransactionService
             return Result.Fail(CreateNotFoundError());
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         TransactionRepository.Delete(transaction);
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         if (Logger.IsEnabled(LogLevel.Information))
         {
@@ -356,11 +367,11 @@ public sealed class TransactionService
             return Result.Fail(CreateConflictError());
         }
         
-        await TransactionManager.Value.BeginTransactionAsync();
+        await TransactionManager.BeginTransactionAsync();
         
         TransactionItemRepository.Delete(transactionItem);
         
-        await TransactionManager.Value.CommitTransactionAsync();
+        await TransactionManager.CommitTransactionAsync();
         
         if (Logger.IsEnabled(LogLevel.Information))
         {

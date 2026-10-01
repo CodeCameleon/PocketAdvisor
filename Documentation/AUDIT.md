@@ -84,19 +84,6 @@ ON "Categories" ("Name", "UserId") NULLS NOT DISTINCT;
 
 ---
 
-### `BaseService` uses the service locator antipattern
-
-**File:** `Backend/PocketAdvisor.Domain/Services/BaseService.cs`
-
-`BaseService` takes `IServiceProvider` and resolves dependencies by calling
-`GetRequiredService<T>()`. This hides dependencies, makes unit testing harder, and bypasses
-the DI container's lifetime validation.
-
-**Recommendation:** Replace `IServiceProvider` with explicit constructor parameters for
-each dependency.
-
----
-
 ### Cross-currency transfers not validated
 
 **File:** Transaction creation logic
