@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PocketAdvisor.Services.Clients.Implementations;
+using PocketAdvisor.Services.Clients.Interfaces;
 using PocketAdvisor.Services.Configurations;
 using PocketAdvisor.Services.Implementations;
 using PocketAdvisor.Services.Interfaces;
@@ -24,6 +26,8 @@ public static class ServiceCollectionExtensions
         services.AddOptions<JsonWebTokenOptions>(configuration);
         services.AddOptions<TokenExpirationsOptions>(configuration);
         services.AddOptions<TokenSecretsOptions>(configuration);
+        
+        services.AddScoped<IEmailClient, ResendEmailClient>();
         
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<ICategoryService, CategoryService>();
