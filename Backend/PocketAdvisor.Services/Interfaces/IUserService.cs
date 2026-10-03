@@ -11,26 +11,25 @@ public interface IUserService
     : IBaseService
 {
     /// <summary>
-    /// Creates a new user in the system asynchronously.
+    /// Creates a new user in the system and sends out the email verification email asynchronously.
     /// </summary>
     /// <param name="request">The data of the user to create.</param>
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains a
-    /// <see cref="Result{TValue}" /> indicating the success or failure of the operation.
-    /// If successful, the result contains the email verification token of the new user.
+    /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
-    Task<Result<string>> CreateUserAsync(CreateUserRequest request);
+    Task<Result> CreateUserAsync(CreateUserRequest request);
     
     /// <summary>
-    /// Generates a password reset token for the given email address and returns it asynchronously.
+    /// Generates a password reset token for the given email address and sends out
+    /// the password reset email asynchronously.
     /// </summary>
     /// <param name="request">The email address of the user requesting a password reset.</param>
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains a
-    /// <see cref="Result{TValue}" /> indicating the success or failure of the operation.
-    /// If successful, the result contains the plain-text password reset token.
+    /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
-    Task<Result<string>> ForgotPasswordAsync(ForgotPasswordRequest request);
+    Task<Result> ForgotPasswordAsync(ForgotPasswordRequest request);
     
     /// <summary>
     /// Authenticates a user and issues a JSON Web Token and refresh token asynchronously.

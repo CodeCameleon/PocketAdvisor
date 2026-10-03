@@ -9,7 +9,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
     <PackageReference Include="Microsoft.OpenApi" />
-    <PackageReference Include="Resend" />
     <PackageReference Include="SecureStore" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>

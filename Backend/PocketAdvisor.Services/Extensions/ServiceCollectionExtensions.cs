@@ -1,8 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PocketAdvisor.Services.Clients.Implementations;
+using PocketAdvisor.Services.Clients.Interfaces;
 using PocketAdvisor.Services.Configurations;
 using PocketAdvisor.Services.Implementations;
 using PocketAdvisor.Services.Interfaces;
+using Resend;
 
 namespace PocketAdvisor.Services.Extensions;
 
@@ -25,11 +28,32 @@ public static class ServiceCollectionExtensions
         services.AddOptions<TokenExpirationsOptions>(configuration);
         services.AddOptions<TokenSecretsOptions>(configuration);
         
+        services.AddScoped<IEmailClient, ResendEmailClient>();
+        
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IItemService, ItemService>();
         services.AddScoped<ITransactionService, TransactionService>();
         services.AddScoped<IUserService, UserService>();
+    }
+    
+    #endregion
+    
+    #region AddResendClient
+    
+    /// <summary>
+    /// Adds the Resend client to the service collection.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="apiKey">The api key for the Resend email service.</param>
+    public static void AddResendClient(this IServiceCollection services, string apiKey)
+    {
+        services.AddHttpClient<ResendClient>();
+        services.Configure<ResendClientOptions>(options =>
+        {
+            options.ApiToken = apiKey;
+        });
+        services.AddTransient<IResend, ResendClient>();
     }
     
     #endregion

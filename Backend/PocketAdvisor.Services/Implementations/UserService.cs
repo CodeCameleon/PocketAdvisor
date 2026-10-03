@@ -16,6 +16,7 @@ using PocketAdvisor.Enums;
 using PocketAdvisor.Repositories.Interfaces;
 using PocketAdvisor.Requests.Users;
 using PocketAdvisor.Responses.Users;
+using PocketAdvisor.Services.Clients.Interfaces;
 using PocketAdvisor.Services.Configurations;
 using PocketAdvisor.Services.Extensions;
 using PocketAdvisor.Services.Interfaces;
@@ -66,6 +67,7 @@ public sealed class UserService
     /// The token secrets options for accessing the token secrets configuration values.
     /// </param>
     /// <param name="passwordHasher">The password hasher for hashing user passwords.</param>
+    /// <param name="emailClient">The email client for sending out emails.</param>
     /// <param name="tokenRepository">The token repository instance.</param>
     /// <param name="userRepository">The user repository instance.</param>
     /// <param name="createUserRequestValidator">
@@ -88,7 +90,7 @@ public sealed class UserService
     public UserService(ILogger<UserService> logger, ITransactionManager transactionManager,
         IOptions<JsonWebTokenOptions> jsonWebTokenOptions, IOptions<TokenExpirationsOptions> tokenExpirationsOptions,
         IOptions<TokenSecretsOptions> tokenSecretsOptions, IPasswordHasher<User> passwordHasher,
-        ITokenRepository tokenRepository, IUserRepository userRepository,
+        IEmailClient emailClient, ITokenRepository tokenRepository, IUserRepository userRepository,
         IValidator<CreateUserRequest> createUserRequestValidator,
         IValidator<ForgotPasswordRequest> forgotPasswordRequestValidator,
         IValidator<LoginRequest> loginRequestValidator, IValidator<RefreshRequest> refreshRequestValidator,
@@ -100,6 +102,7 @@ public sealed class UserService
         ArgumentNullException.ThrowIfNull(tokenExpirationsOptions);
         ArgumentNullException.ThrowIfNull(tokenSecretsOptions);
         ArgumentNullException.ThrowIfNull(passwordHasher);
+        ArgumentNullException.ThrowIfNull(emailClient);
         ArgumentNullException.ThrowIfNull(tokenRepository);
         ArgumentNullException.ThrowIfNull(userRepository);
         ArgumentNullException.ThrowIfNull(createUserRequestValidator);
@@ -113,6 +116,7 @@ public sealed class UserService
         TokenExpirationsOptions = tokenExpirationsOptions;
         TokenSecretsOptions = tokenSecretsOptions;
         PasswordHasher = passwordHasher;
+        EmailClient = emailClient;
         TokenRepository = tokenRepository;
         UserRepository = userRepository;
         CreateUserRequestValidator = createUserRequestValidator;
@@ -146,6 +150,11 @@ public sealed class UserService
     /// The password hasher for hashing user passwords.
     /// </summary>
     private IPasswordHasher<User> PasswordHasher { get; }
+    
+    /// <summary>
+    /// The email client for sending out emails.
+    /// </summary>
+    private IEmailClient EmailClient { get; }
     
     /// <summary>
     /// The token repository instance.
@@ -211,7 +220,7 @@ public sealed class UserService
     #region CreateUserAsync
     
     /// <inheritdoc />
-    public async Task<Result<string>> CreateUserAsync(CreateUserRequest request)
+    public async Task<Result> CreateUserAsync(CreateUserRequest request)
     {
         Logger.LogInformation("Creating new user...");
         
@@ -268,7 +277,10 @@ public sealed class UserService
         await TransactionManager.CommitTransactionAsync();
         
         Logger.LogInformation("New user created successfully.");
-        return Result.Ok(generatedToken.Plain);
+        
+        await EmailClient.SendEmailVerificationAsync(user.Email, generatedToken.Plain);
+        
+        return Result.Ok();
     }
     
     #endregion
@@ -276,7 +288,7 @@ public sealed class UserService
     #region ForgotPasswordAsync
     
     /// <inheritdoc />
-    public async Task<Result<string>> ForgotPasswordAsync(ForgotPasswordRequest request)
+    public async Task<Result> ForgotPasswordAsync(ForgotPasswordRequest request)
     {
         Logger.LogInformation("Processing forgot password request...");
         
@@ -324,7 +336,10 @@ public sealed class UserService
         await TransactionManager.CommitTransactionAsync();
         
         Logger.LogInformation("Password reset token generated successfully.");
-        return Result.Ok(generatedToken.Plain);
+        
+        await EmailClient.SendPasswordResetAsync(user.Email, generatedToken.Plain);
+        
+        return Result.Ok();
     }
     
     #endregion
