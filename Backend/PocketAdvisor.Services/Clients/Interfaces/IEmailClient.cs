@@ -11,8 +11,8 @@ public interface IEmailClient
     /// <param name="email">The email address to send the email to.</param>
     /// <param name="token">The plain-text email verification token to embed in the link.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    /// <exception cref="ArgumentNullException">
-    /// If any of the given parameters is <see langword="null" />.
+    /// <exception cref="ArgumentException">
+    /// If any of the given parameters is empty or consists only of white-space characters.
     /// </exception>
     Task SendEmailVerificationAsync(string email, string token);
     
@@ -22,8 +22,8 @@ public interface IEmailClient
     /// <param name="email">The email address to send the email to.</param>
     /// <param name="token">The plain-text password reset token to embed in the link.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    /// <exception cref="ArgumentNullException">
-    /// If any of the given parameters is <see langword="null" />.
+    /// <exception cref="ArgumentException">
+    /// If any of the given parameters is empty or consists only of white-space characters.
     /// </exception>
     Task SendPasswordResetAsync(string email, string token);
 }

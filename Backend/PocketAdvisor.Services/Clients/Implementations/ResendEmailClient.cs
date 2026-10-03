@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using PocketAdvisor.Services.Configurations;
 using PocketAdvisor.Services.Clients.Interfaces;
+using PocketAdvisor.Services.Configurations;
 using Resend;
 
 namespace PocketAdvisor.Services.Clients.Implementations;

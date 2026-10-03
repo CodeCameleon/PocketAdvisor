@@ -5,6 +5,7 @@ using PocketAdvisor.Services.Clients.Interfaces;
 using PocketAdvisor.Services.Configurations;
 using PocketAdvisor.Services.Implementations;
 using PocketAdvisor.Services.Interfaces;
+using Resend;
 
 namespace PocketAdvisor.Services.Extensions;
 
@@ -34,6 +35,25 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IItemService, ItemService>();
         services.AddScoped<ITransactionService, TransactionService>();
         services.AddScoped<IUserService, UserService>();
+    }
+    
+    #endregion
+    
+    #region AddResendClient
+    
+    /// <summary>
+    /// Adds the Resend client to the service collection.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="apiKey">The api key for the Resend email service.</param>
+    public static void AddResendClient(this IServiceCollection services, string apiKey)
+    {
+        services.AddHttpClient<ResendClient>();
+        services.Configure<ResendClientOptions>(options =>
+        {
+            options.ApiToken = apiKey;
+        });
+        services.AddTransient<IResend, ResendClient>();
     }
     
     #endregion

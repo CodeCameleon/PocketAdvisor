@@ -16,11 +16,11 @@ using PocketAdvisor.Enums;
 using PocketAdvisor.Repositories.Interfaces;
 using PocketAdvisor.Requests.Users;
 using PocketAdvisor.Responses.Users;
+using PocketAdvisor.Services.Clients.Interfaces;
 using PocketAdvisor.Services.Configurations;
 using PocketAdvisor.Services.Extensions;
 using PocketAdvisor.Services.Interfaces;
 using PocketAdvisor.Services.Resources;
-using PocketAdvisor.Services.Clients.Interfaces;
 
 namespace PocketAdvisor.Services.Implementations;
 
@@ -276,9 +276,10 @@ public sealed class UserService
         
         await TransactionManager.CommitTransactionAsync();
         
+        Logger.LogInformation("New user created successfully.");
+        
         await EmailClient.SendEmailVerificationAsync(user.Email, generatedToken.Plain);
         
-        Logger.LogInformation("New user created successfully.");
         return Result.Ok();
     }
     
@@ -334,9 +335,10 @@ public sealed class UserService
         
         await TransactionManager.CommitTransactionAsync();
         
+        Logger.LogInformation("Password reset token generated successfully.");
+        
         await EmailClient.SendPasswordResetAsync(user.Email, generatedToken.Plain);
         
-        Logger.LogInformation("Password reset token generated successfully.");
         return Result.Ok();
     }
     
