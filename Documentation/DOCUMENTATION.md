@@ -80,7 +80,7 @@ The backend follows a layered architecture organized into six separate C# projec
 PocketAdvisor.WebApplication       ← HTTP entry point (controllers, middleware, DI wiring)
          │
          ▼
-PocketAdvisor.Services             ← Business logic, validation, JWT generation, token management
+PocketAdvisor.Services             ← Business logic, validation, JWT generation, token management, email dispatch
          │
          ▼
 PocketAdvisor.Repositories         ← Data access abstraction (generic CRUD over EF Core)
@@ -104,6 +104,8 @@ PocketAdvisor.Responses            ← Outbound DTO records returned to clients
 - **Unit-of-Work via `TransactionManager`.** Database transactions are managed by `ITransactionManager`, which wraps `IDbContextTransaction`. Services call `BeginTransactionAsync`, `SaveChangesAsync` (for intermediate saves within a transaction), and `CommitTransactionAsync`. If anything throws, the manager rolls back automatically. This prevents partial writes.
 
 - **FluentResults for business errors.** Controllers never throw for expected error conditions. Services return `Result` or `Result<T>`, and the `BaseController.HandleFailure` method inspects error metadata keys (`NotFound`, `Conflict`) to choose the right HTTP status code without duplicate branching logic.
+
+- **Infrastructure behind service interfaces.** Controllers only translate between HTTP and service calls. Outgoing email is sent by `ResendEmailClient`, which wraps the Resend SDK and builds the verification and password-reset links from the frontend options. Clients are gateways to external systems, not business services: they do not inherit `BaseService` or implement `IBaseService`, so they cannot be exposed through a controller. `UserService` depends on `IEmailClient` like it depends on a repository, and dispatches the email after the token is committed, so plain one-time tokens never leave the service layer.
 
 - **Centralised exception middleware.** `ExceptionHandlingMiddleware` sits at the top of the pipeline and catches any unhandled exception, logging it and returning a structured `ProblemDetails` JSON response with status 500. In Development mode the actual exception message is included; in production a generic message is used.
 
