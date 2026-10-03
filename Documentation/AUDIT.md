@@ -39,19 +39,6 @@ link has been sent" message, regardless of whether the user was found.
 
 ---
 
-### Email sending in controller layer
-
-**File:** `Backend/PocketAdvisor.WebApplication/Controllers/UserController.cs`
-
-`UserController` calls the Resend email API directly. Infrastructure concerns (sending email)
-belong in the service layer or a dedicated infrastructure service, not in the presentation
-layer. This violates the layered architecture used everywhere else in the project.
-
-**Recommendation:** Move email dispatch into `UserService` (or a dedicated `IEmailService`),
-keeping the controller responsible only for HTTP concerns.
-
----
-
 ## Medium
 
 ### `GetAccountsAsync` loads all transactions into memory
