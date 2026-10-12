@@ -12,9 +12,10 @@ COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm ci --no-audit --no-fund
 
-ARG API_URL=https://api.pocketadvisor.codecameleon.com/api
+ARG BUILD_CONFIGURATION=production
 COPY . .
-RUN npx ng build --configuration production --define "API_URL='${API_URL}'"
+RUN npx ng build --configuration $BUILD_CONFIGURATION \
+ && node --no-warnings nginx/render-config.mjs $BUILD_CONFIGURATION /src/default.conf
 
 # -----------------------------------------------------------------------------
 # Runtime stage: only nginx and the built static files.
@@ -23,14 +24,13 @@ RUN npx ng build --configuration production --define "API_URL='${API_URL}'"
 FROM nginxinc/nginx-unprivileged:1.30-alpine AS runtime
 
 ARG APP_VERSION=development
-ARG API_URL=https://api.pocketadvisor.codecameleon.com/api
 LABEL org.opencontainers.image.title="PocketAdvisor Web" \
       org.opencontainers.image.version=$APP_VERSION \
       org.opencontainers.image.source="https://github.com/CodeCameleon/PocketAdvisor"
-ENV APP_VERSION=$APP_VERSION \
-    API_URL=$API_URL
+ENV APP_VERSION=$APP_VERSION
 
-COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
+# Rendered in the build stage with the API URL of the bundle (see nginx/render-config.mjs).
+COPY --from=build /src/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /src/dist/PocketAdvisor.Client/browser /usr/share/nginx/html
 
 EXPOSE 8080

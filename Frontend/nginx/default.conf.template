@@ -1,10 +1,11 @@
 # -----------------------------------------------------------------------------
 # nginx server configuration of the PocketAdvisor frontend container.
 #
-# The entrypoint of the nginx image renders this template into
-# /etc/nginx/conf.d/default.conf at container start and substitutes the
-# API_URL environment variable. nginx's own variables (such as $uri) are left
-# untouched, because only defined environment variables are substituted.
+# nginx/render-config.mjs renders this template in the build stage of the
+# Dockerfile: it replaces ${API_URL} with the apiUrl of the environment file
+# the bundle was built with, so the Content-Security-Policy always allows
+# exactly the API the application calls. nginx's own variables (such as $uri)
+# are left untouched.
 # -----------------------------------------------------------------------------
 
 # Hashed build output (main-XXXXXXXX.js, chunk-XXXXXXXX.js, styles-XXXXXXXX.css)

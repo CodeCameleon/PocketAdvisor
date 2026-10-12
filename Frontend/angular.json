@@ -44,17 +44,17 @@
                 }
               ],
               "outputHashing": "all",
-              "define": {
-                "API_URL": "'https://api.pocketadvisor.codecameleon.com/api'"
-              }
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true,
-              "define": {
-                "API_URL": "'http://localhost:5078/api'"
-              }
+              "sourceMap": true
             }
           },
           "defaultConfiguration": "production"

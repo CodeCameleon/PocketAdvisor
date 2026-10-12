@@ -50,7 +50,7 @@ services:
       context: ./Frontend
       args:
         APP_VERSION: ${APP_VERSION:-development}
-        API_URL: ${API_URL:-http://localhost:${API_PORT:-5078}/api}
+        BUILD_CONFIGURATION: ${ANGULAR_CONFIGURATION:-production}
     image: pocketadvisor-web:${APP_VERSION:-development}
     restart: unless-stopped
     ports:
