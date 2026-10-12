@@ -112,7 +112,7 @@ The following variables in `.env` affect the backend container (all optional):
 | Variable | Default | Purpose |
 |---|---|---|
 | `APP_VERSION` | `development` | Image tag (`pocketadvisor-api:<version>`, `pocketadvisor-web:<version>`) and the version recorded in the images |
-| `API_PORT` | `5078` | Host port of the API, published on `127.0.0.1` only (the container listens on `8080`). The frontend image picks it up automatically; for `npm start`, update `API_URL` of the development configuration in `Frontend/angular.json` as well. |
+| `API_PORT` | `5078` | Host port of the API, published on `127.0.0.1` only (the container listens on `8080`). If you change it, update `apiUrl` in `Frontend/src/environments/environment.ts` as well. |
 | `ASPNETCORE_ENVIRONMENT` | `Production` | `.env.example` sets `Development` for local work, which enables Swagger, the data seeding (with the publicly known seed credentials) and detailed error messages. Never use it for a deployment. |
 
 The container reaches the database as `db:5432` on the Compose network, and its health check calls `GET /health` from inside the container. The API runs as the non-root `app` user (UID `1654`); on a Linux host, `secrets.key` must be readable by that user, since Compose secrets are bind mounts.
@@ -145,11 +145,11 @@ npm start
 
 The app is served at `http://localhost:4200` and calls the backend at `http://localhost:5078/api`.
 
-The API base URL is not hard-coded in the source: `src/environments/environment.ts` reads the `API_URL` constant, which the `define` option of each build configuration in `angular.json` replaces at build time. The development configuration (`npm start`) targets `http://localhost:5078/api`, the production configuration (`npm run build`) targets `https://api.pocketadvisor.codecameleon.com/api`.
+The API base URL comes from the environment files in `src/environments/`. `environment.ts` targets the local backend (`http://localhost:5078/api`) and is used by the development configuration (`npm start`). The production configuration (`npm run build`) replaces it with `environment.prod.ts` (`fileReplacements` in `angular.json`), which targets `https://api.pocketadvisor.codecameleon.com/api`.
 
 ### 3.3 Run the frontend in Docker (alternative to 3.2)
 
-The frontend can also run as a container. The image is built from `Frontend/Dockerfile` in two stages: Node.js installs the locked dependencies (`npm ci`) and builds the production bundle, then only the static files are copied into an unprivileged nginx image, so neither Node.js nor the source code or `node_modules` end up in the runtime image.
+The frontend can also run as a container. The image is built from `Frontend/Dockerfile` in two stages: Node.js installs the locked dependencies (`npm ci`) and builds the bundle with the selected Angular configuration, then only the static files are copied into an unprivileged nginx image, so neither Node.js nor the source code or `node_modules` end up in the runtime image.
 
 Stop `npm start` first, because both use host port `4200`. Then, from the root of the repository, start the whole stack (database, API and frontend):
 
@@ -166,8 +166,10 @@ The following variables in `.env` affect the frontend container (all optional):
 | Variable | Default | Purpose |
 |---|---|---|
 | `WEB_PORT` | `4200` | Host port of the frontend, published on `127.0.0.1` only (the container listens on `8080`). It must match `Frontend:BaseUrl` of the backend, otherwise CORS rejects the API calls. |
-| `API_URL` | `http://localhost:${API_PORT}/api` | The API base URL, without a trailing slash. It is compiled into the bundle, so changing it requires a rebuild (`--build`). |
+| `ANGULAR_CONFIGURATION` | `production` | The Angular build configuration, which selects the environment file and therefore the API URL compiled into the bundle. `.env.example` sets `development`, which targets the local API (`environment.ts`); `production` targets the production API (`environment.prod.ts`). The Content-Security-Policy of the container follows the same environment file, so it always allows exactly the API the bundle calls. Changing it requires a rebuild (`--build`). |
 
 The API only accepts calls from the configured frontend origin (`Frontend:BaseUrl`), which is `http://localhost:4200` in `appsettings.Development.json`. The containerized frontend therefore works against a backend running in the `Development` environment, as set in `.env.example`.
+
+> **Open the app at `http://localhost:4200`, not at `http://127.0.0.1:4200`.** The browser treats the two addresses as different origins, so CORS rejects every API call from `127.0.0.1` and the login fails with a CORS error in the browser console. The port link of the container in Docker Desktop opens `127.0.0.1`, because the port is published on the loopback interface only.
 
 nginx serves every unknown path with `index.html`, so reloading a deep link such as `/accounts` still loads the app, while a missing `.js` or `.css` file is a real `404`. `index.html` is revalidated on every request and the hashed bundle files are cached for a year, so a new image is picked up on the next page load. Every response carries security headers, including a Content-Security-Policy that only allows scripts from the app itself and jsDelivr (Chart.js), and network calls only to the app and the API.
