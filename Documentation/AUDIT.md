@@ -95,18 +95,6 @@ address and issues a new token, with rate limiting to prevent abuse.
 
 ## Low
 
-### No production environment file in Angular
-
-**File:** `Frontend/src/environments/`
-
-`environment.ts` exists but `environment.prod.ts` does not. The API base URL is
-hardcoded to `http://localhost:5078/api`, so a production build silently targets localhost.
-
-**Recommendation:** Add `environment.prod.ts` with the production API URL and reference it
-in the Angular build configuration under `fileReplacements`.
-
----
-
 ### SSR remnants in `package.json`
 
 **File:** `Frontend/package.json`

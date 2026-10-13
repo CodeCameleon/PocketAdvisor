@@ -45,6 +45,23 @@ services:
       retries: 5
       start_period: 30s
 
+  web:
+    build:
+      context: ./Frontend
+      args:
+        APP_VERSION: ${APP_VERSION:-development}
+        BUILD_CONFIGURATION: ${ANGULAR_CONFIGURATION:-production}
+    image: pocketadvisor-web:${APP_VERSION:-development}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${WEB_PORT:-4200}:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
 volumes:
   db_data:
 
