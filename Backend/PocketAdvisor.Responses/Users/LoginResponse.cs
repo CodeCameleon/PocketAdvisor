@@ -1,7 +1,7 @@
 namespace PocketAdvisor.Responses.Users;
 
 /// <summary>
-/// The response model returned after a successful user login.
+/// The response model returned after a successful user login or session refresh.
 /// </summary>
 public sealed class LoginResponse
 {
@@ -9,9 +9,4 @@ public sealed class LoginResponse
     /// The plain-text JSON Web Token to use for authenticated requests.
     /// </summary>
     public required string JsonWebToken { get; init; }
-    
-    /// <summary>
-    /// The plain-text refresh token to use for obtaining a new JSON Web Token.
-    /// </summary>
-    public required string RefreshToken { get; init; }
 }
