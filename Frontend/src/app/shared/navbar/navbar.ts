@@ -46,7 +46,6 @@ export class Navbar {
   });
 
   logout(): void {
-    this.sessionService.logout();
-    this.router.navigate(['/auth/login']);
+    this.sessionService.logout().subscribe(() => this.router.navigate(['/auth/login']));
   }
 }
