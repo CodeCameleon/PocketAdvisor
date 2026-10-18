@@ -57,7 +57,7 @@ The application supports two user roles:
 | UI component library | **Angular Material 21** | Google's officially supported Material Design component library for Angular. Provides accessible, polished components (dialogs, tables, form fields, buttons, icons) that accelerate development and enforce visual consistency. Chosen because it integrates natively with Angular's change detection, animations, and CDK. |
 | HTTP client | **Angular `HttpClient` with Fetch API** | The native Angular HTTP client, configured with `withFetch()` to use the modern browser Fetch API instead of `XMLHttpRequest`, giving better streaming and abort support. |
 | Reactive state | **Angular Signals** | Used for component-level state (`signal()`, `computed()`) to avoid unnecessary re-renders and make reactivity explicit without introducing a third-party state library. |
-| Session persistence | **`localStorage`** | JWT and refresh tokens are stored in `localStorage` so that sessions survive page refreshes. The session interceptor reads from this store on every request. |
+| Session persistence | **In-memory JWT + `HttpOnly` refresh token cookie** | The JWT is held only in a signal in memory, and the refresh token is set by the backend as an `HttpOnly; Secure; SameSite=Strict` cookie, so neither token can be read from any storage by an injected script. Sessions survive page reloads because an app initializer exchanges the cookie for a new JWT on startup. |
 | Charts | **Chart.js (CDN)** | A lightweight, canvas-based charting library loaded via a CDN `<script>` tag in `index.html`. Avoids bundling Chart.js into the main chunk — reducing initial download size — while still being available globally via `declare const Chart: any`. |
 | Configuration | **Angular environment files** | The API base URL lives in `src/environments/environment.ts` (local backend) and `environment.prod.ts` (production API). The production build configuration swaps them with `fileReplacements`, so the production build no longer silently targets `localhost`, and the Docker image selects the configuration with a build argument. |
 | Code formatting | **Prettier** | Enforces a consistent code style across all TypeScript, HTML, and CSS files with no per-developer configuration drift. |
@@ -141,9 +141,9 @@ src/app/
 
 - **Lazy-loaded feature modules.** Each feature area is a separate Angular module loaded on demand via `loadChildren`. This keeps the initial bundle small; the router only downloads a module's code when the user navigates to it.
 
-- **Route guards for access control.** `authGuard` checks whether a JWT is stored before allowing access to any authenticated route. `adminGuard` additionally decodes the JWT payload client-side and checks the role claim, redirecting non-admins to the login page. `noAuthGuard` prevents already-authenticated users from seeing the auth pages.
+- **Route guards for access control.** `authGuard` checks whether a JWT is held in memory (restored from the refresh token cookie by an app initializer before the first navigation) before allowing access to any authenticated route. `adminGuard` additionally decodes the JWT payload client-side and checks the role claim, redirecting non-admins to the login page. `noAuthGuard` prevents already-authenticated users from seeing the auth pages.
 
-- **Silent token refresh in the interceptor.** `sessionInterceptor` attaches the stored JWT as a `Bearer` token to every outgoing request (except the refresh endpoint itself). On receiving a 401, it automatically calls the refresh endpoint to obtain a new JWT and refresh token, then retries the original request. A shared `Observable` (`shareReplay(1)`) ensures that if multiple requests 401 simultaneously, only one refresh call is made and all callers wait for it.
+- **Silent token refresh in the interceptor.** `sessionInterceptor` attaches the in-memory JWT as a `Bearer` token to every outgoing request (except the `/sessions` endpoints, which authenticate with the refresh token cookie). On receiving a 401, it calls `SessionService.refresh()`, which sends the `HttpOnly` refresh token cookie (`withCredentials`) and receives a new JWT and a rotated cookie, then retries the original request. `SessionService` shares the in-flight refresh (`shareReplay(1)`), so if multiple requests 401 simultaneously, or the startup restore is still running, only one refresh call is made and all callers wait for it. This matters because each refresh token is single-use.
 
 - **Server-side error mapping via `ApiErrorService`.** The backend returns `ValidationProblemDetails` with a map of property names to error messages. `ApiErrorService.applyErrors` walks that map, resolves both flat keys (`"Email"`) and nested array paths (`"Items[0].ItemId"`) to the matching `AbstractControl`, and calls `setErrors({ serverError: message })` on it. This keeps all validation feedback inside the reactive form without any frontend validators.
 
@@ -227,8 +227,11 @@ All endpoints are prefixed with `/api`, except the infrastructure health check e
 
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| POST | `/api/sessions/login` | None | Authenticate; returns JWT + refresh token |
-| POST | `/api/sessions/refresh` | None | Rotate refresh token; returns new JWT + refresh token |
+| POST | `/api/sessions/login` | None | Authenticate; returns the JWT in the body and sets the refresh token cookie |
+| POST | `/api/sessions/refresh` | Refresh token cookie | Rotate the refresh token cookie; returns a new JWT in the body |
+| POST | `/api/sessions/logout` | Refresh token cookie (optional) | Revoke the refresh token and clear its cookie; always `204 No Content` |
+
+The refresh token never appears in a request or response body. It is exchanged only through the `PocketAdvisor.RefreshToken` cookie (`HttpOnly; Secure; SameSite=Strict; Path=/api/sessions`), so the browser sends it to the session endpoints only, and the frontend must call them with `withCredentials: true`.
 
 ### Users
 
@@ -293,10 +296,11 @@ The health check endpoint is intended for infrastructure (the Docker Compose hea
 
 ### Token lifecycle
 
-1. On **login**, the backend issues a short-lived JWT (15 minutes) and a long-lived refresh token (14 days).
-2. The refresh token is stored only as an HMACSHA256 hash in the `Tokens` table. The plain value is sent to the client once and never stored server-side.
-3. When the JWT expires, the Angular interceptor transparently calls `POST /api/sessions/refresh`. The old refresh token is deleted and a new one is issued (token rotation). If the refresh token is also expired or absent, the user is logged out.
-4. Password reset and email verification tokens follow the same hash-only storage pattern, each with its own HMAC secret to prevent cross-type forgery.
+1. On **login**, the backend issues a short-lived JWT (15 minutes), returned in the response body, and a long-lived refresh token (14 days), set as an `HttpOnly; Secure; SameSite=Strict` cookie scoped to `/api/sessions` and expiring together with the token.
+2. The refresh token is stored only as an HMACSHA256 hash in the `Tokens` table. The plain value is sent to the client once, in the cookie, and never stored server-side. The frontend keeps the JWT only in memory and never sees the refresh token, so an XSS payload can read neither from browser storage.
+3. When the application starts (including after a page reload), and whenever the JWT expires, the frontend calls `POST /api/sessions/refresh`. The old refresh token is deleted and a new one is issued in a new cookie (token rotation). If the refresh token is expired, unknown or absent, the endpoint returns `400` and clears the cookie, and the user is logged out.
+4. On **logout**, `POST /api/sessions/logout` deletes the refresh token from the database and clears the cookie. This has to happen on the server, because JavaScript cannot remove an `HttpOnly` cookie.
+5. Password reset and email verification tokens follow the same hash-only storage pattern, each with its own HMAC secret to prevent cross-type forgery.
 
 ### JWT claims
 
@@ -323,7 +327,7 @@ The anonymous authentication endpoints are protected by the ASP.NET Core rate li
 | Policy | Endpoints | Default limit |
 |---|---|---|
 | `PocketAdvisorAuthenticationRateLimiterPolicy` | `POST /api/sessions/login`, and every `/api/users` endpoint (register, verify-email, forgot-password, reset-password) | 5 requests / 60 s |
-| `PocketAdvisorRefreshRateLimiterPolicy` | `POST /api/sessions/refresh` | 30 requests / 60 s |
+| `PocketAdvisorRefreshRateLimiterPolicy` | `POST /api/sessions/refresh`, `POST /api/sessions/logout` | 30 requests / 60 s |
 
 The refresh endpoint is more permissive because the Angular interceptor calls it automatically whenever a JWT expires, so several users sharing a single NAT address would otherwise exhaust a strict limit through normal use. The limits are read from the `RateLimiting` section of `appsettings.json` at startup, where a missing or non-positive value aborts startup. The window is divided into six segments, and queueing is disabled so that excess requests are rejected immediately rather than delayed.
 
@@ -408,6 +412,7 @@ The API is designed to conform to REST principles:
 - Sensitive tokens (refresh, email verification, password reset) are stored only as HMAC hashes; the plain values are transmitted once and immediately discarded server-side.
 - All secrets (signing keys, HMAC keys, API keys) are stored in an encrypted file outside the application's configuration JSON.
 - JWTs have a short 15-minute expiry to limit the window of exposure if intercepted.
+- Neither token is persisted in browser storage: the JWT lives only in memory, and the refresh token is an `HttpOnly; Secure; SameSite=Strict` cookie scoped to `/api/sessions`. An injected script therefore cannot exfiltrate the long-lived refresh token, and `SameSite=Strict` keeps cross-site requests from using the cookie (CSRF).
 - CORS restricts the browser origins that can call the API.
 - The frontend container sends a Content-Security-Policy that only allows scripts from the application itself and jsDelivr (Chart.js), and network calls only to the application and the API (rendered into the nginx configuration at build time from the same environment file as the bundle, so the two cannot diverge), which limits what an injected script could load or where it could send data. It also sends `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` (together with `frame-ancestors 'none'` against clickjacking), `Referrer-Policy: no-referrer` (the email verification and password reset links carry their tokens in the URL) and a restrictive `Permissions-Policy`.
 - Both application containers run as non-root users.
