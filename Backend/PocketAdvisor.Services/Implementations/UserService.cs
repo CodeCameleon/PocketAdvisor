@@ -347,7 +347,7 @@ public sealed class UserService
     #region LoginAsync
     
     /// <inheritdoc />
-    public async Task<Result<LoginResponse>> LoginAsync(LoginRequest request)
+    public async Task<Result<SessionResponse>> LoginAsync(LoginRequest request)
     {
         Logger.LogInformation("Authenticating user...");
         
@@ -426,11 +426,54 @@ public sealed class UserService
         
         Logger.LogInformation("User authenticated successfully.");
         
-        return Result.Ok(new LoginResponse
+        return Result.Ok(new SessionResponse
         {
             JsonWebToken = GenerateJsonWebToken(user),
-            RefreshToken = generatedRefreshToken.Plain
+            RefreshToken = generatedRefreshToken.Plain,
+            RefreshTokenExpiryAt = refreshToken.ExpiryAt
         });
+    }
+    
+    #endregion
+    
+    #region LogoutAsync
+    
+    /// <inheritdoc />
+    public async Task<Result> LogoutAsync(RefreshRequest request)
+    {
+        Logger.LogInformation("Ending session...");
+        
+        ValidationResult validationResult = await RefreshRequestValidator.ValidateAsync(request);
+        
+        if (!validationResult.IsValid)
+        {
+            Logger.LogInformation("No valid refresh token was presented, there is no session to end.");
+            return Result.Ok();
+        }
+        
+        using HMACSHA256 hmacSha256 = new(Encoding.UTF8.GetBytes(TokenSecretsOptions.Value.Refresh));
+        byte[] hashBytes = hmacSha256.ComputeHash(Encoding.UTF8.GetBytes(request.RefreshToken!));
+        string incomingHash = Convert.ToBase64String(hashBytes);
+        
+        Token? existingToken = await TokenRepository.GetSingleOrDefaultAsync(
+            t => t.Hash == incomingHash && t.Type == ETokenType.Refresh
+        );
+        
+        if (existingToken is null)
+        {
+            Logger.LogInformation("The refresh token was not found, there is no session to end.");
+            return Result.Ok();
+        }
+        
+        await TransactionManager.BeginTransactionAsync();
+        
+        TokenRepository.Delete(existingToken);
+        
+        await TransactionManager.CommitTransactionAsync();
+        
+        Logger.LogInformation("Session ended successfully.");
+        
+        return Result.Ok();
     }
     
     #endregion
@@ -438,7 +481,7 @@ public sealed class UserService
     #region RefreshAsync
     
     /// <inheritdoc />
-    public async Task<Result<LoginResponse>> RefreshAsync(RefreshRequest request)
+    public async Task<Result<SessionResponse>> RefreshAsync(RefreshRequest request)
     {
         Logger.LogInformation("Refreshing session...");
         
@@ -492,10 +535,11 @@ public sealed class UserService
         
         Logger.LogInformation("Session refreshed successfully.");
         
-        return Result.Ok(new LoginResponse
+        return Result.Ok(new SessionResponse
         {
             JsonWebToken = GenerateJsonWebToken(existingToken.User!),
-            RefreshToken = generatedRefreshToken.Plain
+            RefreshToken = generatedRefreshToken.Plain,
+            RefreshTokenExpiryAt = newRefreshToken.ExpiryAt
         });
     }
     

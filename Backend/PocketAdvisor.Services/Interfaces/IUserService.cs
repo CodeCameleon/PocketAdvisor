@@ -38,9 +38,19 @@ public interface IUserService
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains a
     /// <see cref="Result{TValue}" /> indicating the success or failure of the operation.
-    /// If successful, the result contains a <see cref="LoginResponse" /> with the issued tokens.
+    /// If successful, the result contains the issued <see cref="SessionResponse" />.
     /// </returns>
-    Task<Result<LoginResponse>> LoginAsync(LoginRequest request);
+    Task<Result<SessionResponse>> LoginAsync(LoginRequest request);
+    
+    /// <summary>
+    /// Revokes the given refresh token, ending the session it belongs asynchronously.
+    /// </summary>
+    /// <param name="request">The refresh token presented by the client.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a
+    /// <see cref="Result" />, which is always successful. Regardless if the refresh token was valid or not.
+    /// </returns>
+    Task<Result> LogoutAsync(RefreshRequest request);
     
     /// <summary>
     /// Validates a refresh token, rotates it, and issues a new JSON Web Token and refresh token asynchronously.
@@ -49,9 +59,9 @@ public interface IUserService
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains a
     /// <see cref="Result{TValue}" /> indicating the success or failure of the operation.
-    /// If successful, the result contains a <see cref="LoginResponse" /> with the newly issued tokens.
+    /// If successful, the result contains the newly issued <see cref="SessionResponse" />.
     /// </returns>
-    Task<Result<LoginResponse>> RefreshAsync(RefreshRequest request);
+    Task<Result<SessionResponse>> RefreshAsync(RefreshRequest request);
     
     /// <summary>
     /// Resets the password of a user using the supplied password reset token asynchronously.

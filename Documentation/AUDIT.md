@@ -7,23 +7,6 @@ before the hardening sprint. Issues are grouped by severity and area.
 
 ---
 
-## Critical
-
-### JWT + refresh token stored in `localStorage`
-
-**File:** `Frontend/src/app/core/services/session.service.ts`
-
-Both the JWT access token and the refresh token are persisted in `localStorage`.
-`localStorage` is readable by any JavaScript running on the same origin, making both tokens
-trivially exfiltrable via an XSS payload. The risk is compounded by the fact that a stolen
-refresh token is valid for 14 days.
-
-**Recommendation:** Store the refresh token in an `HttpOnly; Secure; SameSite=Strict` cookie
-so JavaScript cannot read it. The access token can remain in memory (a reactive signal) and be
-refreshed silently on page load via the existing `SessionInterceptor` refresh flow.
-
----
-
 ## High
 
 ### User enumeration in `ForgotPasswordAsync`

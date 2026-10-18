@@ -1,65 +1,72 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable, tap } from 'rxjs';
+import { catchError, finalize, map, Observable, of, shareReplay, tap } from 'rxjs';
 
 import { LoginRequest } from '../models/login-request';
 import { LoginResponse } from '../models/login-response';
-import { RefreshRequest } from '../models/refresh-request';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SessionService {
-  private static readonly JsonWebTokenKey = 'jsonWebToken';
-  private static readonly RefreshTokenKey = 'refreshToken';
-
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/sessions`;
 
-  private readonly _jwt = signal<string | null>(
-    localStorage.getItem(SessionService.JsonWebTokenKey)
-  );
+  private readonly _jwt = signal<string | null>(null);
 
-  /** Signal that is true when a JWT is currently stored. */
+  /** The in-flight refresh request, shared by every concurrent caller. */
+  private refresh$: Observable<void> | null = null;
+
+  /** Signal that is true when a JWT is currently held in memory. */
   readonly isLoggedIn = computed(() => this._jwt() !== null);
 
-  /** Authenticates a user and stores the returned tokens. */
+  /** Restores the session from the refresh token cookie, if there is a valid one. Never fails. */
+  restore(): Observable<void> {
+    return this.refresh().pipe(catchError(() => of(void 0)));
+  }
+
+  /** Authenticates a user. The backend sets the refresh token cookie. */
   login(request: LoginRequest): Observable<void> {
-    return this.http.post<LoginResponse>(`${this.base}/login`, request).pipe(
-      tap(response => this.storeTokens(response)),
+    return this.http.post<LoginResponse>(`${this.base}/login`, request, { withCredentials: true }).pipe(
+      tap(response => this._jwt.set(response.jsonWebToken)),
       map(() => void 0)
     );
   }
 
-  /** Rotates the refresh token and stores the new tokens. */
-  refresh(request: RefreshRequest): Observable<void> {
-    return this.http.post<LoginResponse>(`${this.base}/refresh`, request).pipe(
-      tap(response => this.storeTokens(response)),
-      map(() => void 0)
+  /**
+   * Rotates the refresh token cookie and stores the new JWT. The refresh token
+   * is single-use, so concurrent callers share one request instead of racing.
+   */
+  refresh(): Observable<void> {
+    this.refresh$ ??= this.http.post<LoginResponse>(`${this.base}/refresh`, null, { withCredentials: true }).pipe(
+      tap(response => this._jwt.set(response.jsonWebToken)),
+      map(() => void 0),
+      finalize(() => (this.refresh$ = null)),
+      shareReplay(1)
+    );
+
+    return this.refresh$;
+  }
+
+  /**
+   * Revokes the refresh token and clears its cookie on the backend, then ends
+   * the local session. The local session ends even if the backend is unreachable.
+   */
+  logout(): Observable<void> {
+    return this.http.post<void>(`${this.base}/logout`, null, { withCredentials: true }).pipe(
+      catchError(() => of(void 0)),
+      map(() => this.clear())
     );
   }
 
-  /** Removes the stored tokens, ending the local session. */
-  logout(): void {
-    localStorage.removeItem(SessionService.JsonWebTokenKey);
-    localStorage.removeItem(SessionService.RefreshTokenKey);
+  /** Ends the local session without contacting the backend. */
+  clear(): void {
     this._jwt.set(null);
   }
 
-  /** Returns the stored json web token, or null if not present. */
+  /** Returns the JWT held in memory, or null if not present. */
   getJwt(): string | null {
     return this._jwt();
-  }
-
-  /** Returns the stored refresh token, or null if not present. */
-  getRefreshToken(): string | null {
-    return localStorage.getItem(SessionService.RefreshTokenKey);
-  }
-
-  private storeTokens(response: LoginResponse): void {
-    localStorage.setItem(SessionService.JsonWebTokenKey, response.jsonWebToken);
-    localStorage.setItem(SessionService.RefreshTokenKey, response.refreshToken);
-    this._jwt.set(response.jsonWebToken);
   }
 }

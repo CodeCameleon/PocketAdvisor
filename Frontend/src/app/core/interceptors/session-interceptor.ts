@@ -1,17 +1,19 @@
 import { inject } from '@angular/core';
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { catchError, finalize, Observable, shareReplay, switchMap, throwError } from 'rxjs';
+import { catchError, switchMap, throwError } from 'rxjs';
 
 import { SessionService } from '../services/session';
+import { environment } from '../../../environments/environment';
 
-let refresh$: Observable<void> | null = null;
+/** The session endpoints authenticate with the refresh token cookie, not the JWT. */
+const sessionsUrl = `${environment.apiUrl}/sessions/`;
 
 export const sessionInterceptor: HttpInterceptorFn = (req, next) => {
   const sessionService = inject(SessionService);
   const router = inject(Router);
 
-  if (req.url.includes('/sessions/refresh')) {
+  if (req.url.startsWith(sessionsUrl)) {
     return next(req);
   }
 
@@ -24,19 +26,7 @@ export const sessionInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => error);
       }
 
-      const refreshToken = sessionService.getRefreshToken();
-      if (!refreshToken) {
-        sessionService.logout();
-        router.navigate(['/auth/login']);
-        return throwError(() => error);
-      }
-
-      refresh$ ??= sessionService.refresh({ refreshToken }).pipe(
-        shareReplay(1),
-        finalize(() => (refresh$ = null))
-      );
-
-      return refresh$.pipe(
+      return sessionService.refresh().pipe(
         switchMap(() => {
           const retryReq = req.clone({
             headers: req.headers.set('Authorization', `Bearer ${sessionService.getJwt()!}`)
@@ -44,7 +34,7 @@ export const sessionInterceptor: HttpInterceptorFn = (req, next) => {
           return next(retryReq);
         }),
         catchError(refreshError => {
-          sessionService.logout();
+          sessionService.clear();
           router.navigate(['/auth/login']);
           return throwError(() => refreshError);
         })
