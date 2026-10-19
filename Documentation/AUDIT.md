@@ -78,18 +78,6 @@ address and issues a new token, with rate limiting to prevent abuse.
 
 ## Low
 
-### SSR remnants in `package.json`
-
-**File:** `Frontend/package.json`
-
-A `serve:ssr` script is present, but `@angular/ssr` is not listed as a dependency and no
-SSR entry point exists. The script will always fail.
-
-**Recommendation:** Remove the `serve:ssr` script, or add `@angular/ssr` and configure it
-properly if SSR is actually intended.
-
----
-
 ### Zero automated tests
 
 No `.spec.ts` files exist in the Angular project and no xUnit/NUnit test project exists
