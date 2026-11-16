@@ -9,7 +9,7 @@ ARG TARGETARCH
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-COPY Directory.Build.props Directory.Packages.props ./
+COPY nuget.config Directory.Build.props Directory.Packages.props ./
 COPY PocketAdvisor.DbContexts/PocketAdvisor.DbContexts.csproj PocketAdvisor.DbContexts/
 COPY PocketAdvisor.Entities/PocketAdvisor.Entities.csproj PocketAdvisor.Entities/
 COPY PocketAdvisor.Enums/PocketAdvisor.Enums.csproj PocketAdvisor.Enums/
