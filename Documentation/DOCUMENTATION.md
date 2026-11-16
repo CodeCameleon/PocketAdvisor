@@ -47,6 +47,8 @@ The application supports two user roles:
 | Email delivery | **Resend SDK** | Resend offers template-based transactional email with a minimal SDK. Templates for email-verification and password-reset are maintained in the Resend dashboard and referenced by GUID, keeping HTML out of source control. |
 | Secrets management | **SecureStore** | Sensitive configuration values (JWT signing key, token HMAC secrets, Resend API key) are stored in an encrypted `secrets.bin` file rather than plain `appsettings.json` or environment variables, reducing accidental exposure. |
 | API documentation | **Swashbuckle / Swagger** | Auto-generates an OpenAPI spec from controller attributes, giving developers a browsable, testable API surface with zero extra effort. |
+| Static analysis | **.NET analyzers + `.editorconfig` + `dotnet format`** | The built-in .NET analyzers run on every build with the recommended rule set of the latest analysis level, and `EnforceCodeStyleInBuild` makes the compiler enforce the C# code style and naming rules of the root `.editorconfig` too, so the IDE, `dotnet build` and `dotnet format --verify-no-changes` report the same findings. Every warning is treated as an error, locally as well as in CI, so a build with any finding fails. No third-party analyzer package is needed. |
+| Reproducible builds | **`global.json` + `nuget.config` + NuGet lock files** | `Backend/global.json` pins the SDK to the .NET 10 line, and every project commits a `packages.lock.json` with the exact direct and transitive package versions and their hashes. `Backend/nuget.config` clears the machine-level package sources and maps every package to nuget.org, so local and CI restores use the same single source. On GitHub Actions the restore runs in locked mode, so a changed dependency graph fails the build instead of slipping in silently. NuGet audit checks all packages, transitive ones included, for known vulnerabilities. |
 
 ### 2.2 Frontend
 
@@ -445,3 +447,4 @@ The API is designed to conform to REST principles:
 - Swagger UI is available in the development environment for API exploration. Outside development neither the UI nor the generated `swagger.json` is served, so the API surface is not published in production.
 - Prettier enforces consistent code formatting across the frontend without developer configuration.
 - Central package version management (`Directory.Packages.props`) ensures all backend projects use identical dependency versions.
+- Shared build settings in `Backend/Directory.Build.props` turn on the .NET analyzers, enforce the `.editorconfig` code style during the build, and enable NuGet lock files and vulnerability audit for every backend project, so a new project inherits the static checks automatically.

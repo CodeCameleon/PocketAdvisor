@@ -125,6 +125,18 @@ docker compose down
 
 The data is kept in the `db_data` named volume. `docker compose down -v` would delete it as well.
 
+### 2.6 Static checks
+
+Run these from the `Backend/` directory. The planned CI pipeline will run the same commands, so a change that passes them locally will also pass its static-check stage. Every warning is treated as an error, so the build fails on any analyser or code style finding.
+
+```bash
+dotnet restore --locked-mode
+dotnet format --verify-no-changes --no-restore
+dotnet build --no-restore -c Release
+```
+
+`dotnet format` without `--verify-no-changes` fixes the findings it can. After adding, removing or updating a package in `Directory.Packages.props`, run a plain `dotnet restore` to update the lock files and commit them together with the change.
+
 ---
 
 ## 3. Frontend
