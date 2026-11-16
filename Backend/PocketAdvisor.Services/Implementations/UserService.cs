@@ -27,7 +27,7 @@ namespace PocketAdvisor.Services.Implementations;
 /// <summary>
 /// Represents the service implementation for performing operations related to users.
 /// </summary>
-public sealed class UserService
+public sealed partial class UserService
     : BaseDatabaseService<UserService>, IUserService
 {
     #region GeneratedToken
@@ -37,7 +37,7 @@ public sealed class UserService
     /// </summary>
     /// <param name="Plain">The plain value of the token to send back.</param>
     /// <param name="Hash">The hash value of the token to store.</param>
-    private record GeneratedToken(string Plain, string Hash);
+    private sealed record GeneratedToken(string Plain, string Hash);
     
     #endregion
     
@@ -198,6 +198,191 @@ public sealed class UserService
     
     #endregion
     
+    #region LogMessages
+    
+    /// <summary>
+    /// Logs that a new user is being created.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "Creating new user...")]
+    private static partial void LogCreatingUser(ILogger logger);
+    
+    /// <summary>
+    /// Logs that the create user request failed validation.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="errors">The validation errors of the request.</param>
+    [LoggerMessage(EventId = 2, Level = LogLevel.Warning,
+        Message = "Validation failed for CreateUserRequest: {Errors}")]
+    private static partial void LogCreateUserRequestInvalid(ILogger logger,
+        IEnumerable<FluentValidation.Results.ValidationFailure> errors);
+    
+    /// <summary>
+    /// Logs that the new user was created.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 3, Level = LogLevel.Information, Message = "New user created successfully.")]
+    private static partial void LogUserCreated(ILogger logger);
+    
+    /// <summary>
+    /// Logs that a forgot password request is being processed.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 4, Level = LogLevel.Information, Message = "Processing forgot password request...")]
+    private static partial void LogProcessingForgotPassword(ILogger logger);
+    
+    /// <summary>
+    /// Logs that the forgot password request failed validation.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="errors">The validation errors of the request.</param>
+    [LoggerMessage(EventId = 5, Level = LogLevel.Warning,
+        Message = "Validation failed for ForgotPasswordRequest: {Errors}")]
+    private static partial void LogForgotPasswordRequestInvalid(ILogger logger,
+        IEnumerable<FluentValidation.Results.ValidationFailure> errors);
+    
+    /// <summary>
+    /// Logs that the password reset token was generated.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 6, Level = LogLevel.Information, Message = "Password reset token generated successfully.")]
+    private static partial void LogPasswordResetTokenGenerated(ILogger logger);
+    
+    /// <summary>
+    /// Logs that a user is being authenticated.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 7, Level = LogLevel.Information, Message = "Authenticating user...")]
+    private static partial void LogAuthenticatingUser(ILogger logger);
+    
+    /// <summary>
+    /// Logs that the login request failed validation.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="errors">The validation errors of the request.</param>
+    [LoggerMessage(EventId = 8, Level = LogLevel.Warning, Message = "Validation failed for LoginRequest: {Errors}")]
+    private static partial void LogLoginRequestInvalid(ILogger logger,
+        IEnumerable<FluentValidation.Results.ValidationFailure> errors);
+    
+    /// <summary>
+    /// Logs that the password hash of the user was upgraded.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="userId">The ID of the user.</param>
+    [LoggerMessage(EventId = 9, Level = LogLevel.Information,
+        Message = "Password hash for user '{UserId}' was upgraded successfully.")]
+    private static partial void LogPasswordHashUpgraded(ILogger logger, Guid userId);
+    
+    /// <summary>
+    /// Logs that the user was authenticated.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 10, Level = LogLevel.Information, Message = "User authenticated successfully.")]
+    private static partial void LogUserAuthenticated(ILogger logger);
+    
+    /// <summary>
+    /// Logs that a session is being ended.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 11, Level = LogLevel.Information, Message = "Ending session...")]
+    private static partial void LogEndingSession(ILogger logger);
+    
+    /// <summary>
+    /// Logs that no valid refresh token was presented, so there is no session to end.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 12, Level = LogLevel.Information,
+        Message = "No valid refresh token was presented, there is no session to end.")]
+    private static partial void LogNoRefreshTokenPresented(ILogger logger);
+    
+    /// <summary>
+    /// Logs that the refresh token was not found, so there is no session to end.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 13, Level = LogLevel.Information,
+        Message = "The refresh token was not found, there is no session to end.")]
+    private static partial void LogRefreshTokenNotFound(ILogger logger);
+    
+    /// <summary>
+    /// Logs that the session was ended.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 14, Level = LogLevel.Information, Message = "Session ended successfully.")]
+    private static partial void LogSessionEnded(ILogger logger);
+    
+    /// <summary>
+    /// Logs that a session is being refreshed.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 15, Level = LogLevel.Information, Message = "Refreshing session...")]
+    private static partial void LogRefreshingSession(ILogger logger);
+    
+    /// <summary>
+    /// Logs that the refresh request failed validation.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="errors">The validation errors of the request.</param>
+    [LoggerMessage(EventId = 16, Level = LogLevel.Warning, Message = "Validation failed for RefreshRequest: {Errors}")]
+    private static partial void LogRefreshRequestInvalid(ILogger logger,
+        IEnumerable<FluentValidation.Results.ValidationFailure> errors);
+    
+    /// <summary>
+    /// Logs that the session was refreshed.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 17, Level = LogLevel.Information, Message = "Session refreshed successfully.")]
+    private static partial void LogSessionRefreshed(ILogger logger);
+    
+    /// <summary>
+    /// Logs that the password of a user is being reset.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 18, Level = LogLevel.Information, Message = "Resetting user password...")]
+    private static partial void LogResettingPassword(ILogger logger);
+    
+    /// <summary>
+    /// Logs that the reset password request failed validation.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="errors">The validation errors of the request.</param>
+    [LoggerMessage(EventId = 19, Level = LogLevel.Warning,
+        Message = "Validation failed for ResetPasswordRequest: {Errors}")]
+    private static partial void LogResetPasswordRequestInvalid(ILogger logger,
+        IEnumerable<FluentValidation.Results.ValidationFailure> errors);
+    
+    /// <summary>
+    /// Logs that the password of the user was reset.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 20, Level = LogLevel.Information, Message = "User password reset successfully.")]
+    private static partial void LogPasswordReset(ILogger logger);
+    
+    /// <summary>
+    /// Logs that an email address is being verified.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 21, Level = LogLevel.Information, Message = "Verifying email address...")]
+    private static partial void LogVerifyingEmail(ILogger logger);
+    
+    /// <summary>
+    /// Logs that the verify email request failed validation.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="errors">The validation errors of the request.</param>
+    [LoggerMessage(EventId = 22, Level = LogLevel.Warning,
+        Message = "Validation failed for VerifyEmailRequest: {Errors}")]
+    private static partial void LogVerifyEmailRequestInvalid(ILogger logger,
+        IEnumerable<FluentValidation.Results.ValidationFailure> errors);
+    
+    /// <summary>
+    /// Logs that the email address was verified.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 23, Level = LogLevel.Information, Message = "Email address verified successfully.")]
+    private static partial void LogEmailVerified(ILogger logger);
+    
+    #endregion
+    
     #region GenerateToken
     
     /// <summary>
@@ -222,19 +407,13 @@ public sealed class UserService
     /// <inheritdoc />
     public async Task<Result> CreateUserAsync(CreateUserRequest request)
     {
-        Logger.LogInformation("Creating new user...");
+        LogCreatingUser(Logger);
         
         ValidationResult validationResult = await CreateUserRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Validation failed for CreateUserRequest: {Errors}",
-                    validationResult.Errors
-                );
-            }
+            LogCreateUserRequestInvalid(Logger, validationResult.Errors);
             
             return Result.Fail(validationResult.Errors.ToErrorList());
         }
@@ -276,7 +455,7 @@ public sealed class UserService
         
         await TransactionManager.CommitTransactionAsync();
         
-        Logger.LogInformation("New user created successfully.");
+        LogUserCreated(Logger);
         
         await EmailClient.SendEmailVerificationAsync(user.Email, generatedToken.Plain);
         
@@ -290,19 +469,13 @@ public sealed class UserService
     /// <inheritdoc />
     public async Task<Result> ForgotPasswordAsync(ForgotPasswordRequest request)
     {
-        Logger.LogInformation("Processing forgot password request...");
+        LogProcessingForgotPassword(Logger);
         
         ValidationResult validationResult = await ForgotPasswordRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Validation failed for ForgotPasswordRequest: {Errors}",
-                    validationResult.Errors
-                );
-            }
+            LogForgotPasswordRequestInvalid(Logger, validationResult.Errors);
             
             return Result.Fail(validationResult.Errors.ToErrorList());
         }
@@ -335,7 +508,7 @@ public sealed class UserService
         
         await TransactionManager.CommitTransactionAsync();
         
-        Logger.LogInformation("Password reset token generated successfully.");
+        LogPasswordResetTokenGenerated(Logger);
         
         await EmailClient.SendPasswordResetAsync(user.Email, generatedToken.Plain);
         
@@ -349,19 +522,13 @@ public sealed class UserService
     /// <inheritdoc />
     public async Task<Result<SessionResponse>> LoginAsync(LoginRequest request)
     {
-        Logger.LogInformation("Authenticating user...");
+        LogAuthenticatingUser(Logger);
         
         ValidationResult validationResult = await LoginRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Validation failed for LoginRequest: {Errors}",
-                    validationResult.Errors
-                );
-            }
+            LogLoginRequestInvalid(Logger, validationResult.Errors);
             
             return Result.Fail(validationResult.Errors.ToErrorList());
         }
@@ -402,13 +569,7 @@ public sealed class UserService
             
             await TransactionManager.SaveChangesAsync();
             
-            if (Logger.IsEnabled(LogLevel.Information))
-            {
-                Logger.LogInformation(
-                    "Password hash for user '{UserId}' was upgraded successfully.",
-                    user.Id
-                );
-            }
+            LogPasswordHashUpgraded(Logger, user.Id);
         }
         
         GeneratedToken generatedRefreshToken = GenerateToken(TokenSecretsOptions.Value.Refresh);
@@ -424,7 +585,7 @@ public sealed class UserService
         
         await TransactionManager.CommitTransactionAsync();
         
-        Logger.LogInformation("User authenticated successfully.");
+        LogUserAuthenticated(Logger);
         
         return Result.Ok(new SessionResponse
         {
@@ -441,13 +602,13 @@ public sealed class UserService
     /// <inheritdoc />
     public async Task<Result> LogoutAsync(RefreshRequest request)
     {
-        Logger.LogInformation("Ending session...");
+        LogEndingSession(Logger);
         
         ValidationResult validationResult = await RefreshRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
-            Logger.LogInformation("No valid refresh token was presented, there is no session to end.");
+            LogNoRefreshTokenPresented(Logger);
             return Result.Ok();
         }
         
@@ -461,7 +622,7 @@ public sealed class UserService
         
         if (existingToken is null)
         {
-            Logger.LogInformation("The refresh token was not found, there is no session to end.");
+            LogRefreshTokenNotFound(Logger);
             return Result.Ok();
         }
         
@@ -471,7 +632,7 @@ public sealed class UserService
         
         await TransactionManager.CommitTransactionAsync();
         
-        Logger.LogInformation("Session ended successfully.");
+        LogSessionEnded(Logger);
         
         return Result.Ok();
     }
@@ -483,19 +644,13 @@ public sealed class UserService
     /// <inheritdoc />
     public async Task<Result<SessionResponse>> RefreshAsync(RefreshRequest request)
     {
-        Logger.LogInformation("Refreshing session...");
+        LogRefreshingSession(Logger);
         
         ValidationResult validationResult = await RefreshRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Validation failed for RefreshRequest: {Errors}",
-                    validationResult.Errors
-                );
-            }
+            LogRefreshRequestInvalid(Logger, validationResult.Errors);
             
             return Result.Fail(validationResult.Errors.ToErrorList());
         }
@@ -533,7 +688,7 @@ public sealed class UserService
         
         await TransactionManager.CommitTransactionAsync();
         
-        Logger.LogInformation("Session refreshed successfully.");
+        LogSessionRefreshed(Logger);
         
         return Result.Ok(new SessionResponse
         {
@@ -550,19 +705,13 @@ public sealed class UserService
     /// <inheritdoc />
     public async Task<Result> ResetPasswordAsync(ResetPasswordRequest request)
     {
-        Logger.LogInformation("Resetting user password...");
+        LogResettingPassword(Logger);
         
         ValidationResult validationResult = await ResetPasswordRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Validation failed for ResetPasswordRequest: {Errors}",
-                    validationResult.Errors
-                );
-            }
+            LogResetPasswordRequestInvalid(Logger, validationResult.Errors);
             
             return Result.Fail(validationResult.Errors.ToErrorList());
         }
@@ -592,7 +741,7 @@ public sealed class UserService
         
         await TransactionManager.CommitTransactionAsync();
         
-        Logger.LogInformation("User password reset successfully.");
+        LogPasswordReset(Logger);
         return Result.Ok();
     }
     
@@ -603,19 +752,13 @@ public sealed class UserService
     /// <inheritdoc />
     public async Task<Result> VerifyEmailAsync(VerifyEmailRequest request)
     {
-        Logger.LogInformation("Verifying email address...");
+        LogVerifyingEmail(Logger);
         
         ValidationResult validationResult = await VerifyEmailRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Validation failed for VerifyEmailRequest: {Errors}",
-                    validationResult.Errors
-                );
-            }
+            LogVerifyEmailRequestInvalid(Logger, validationResult.Errors);
             
             return Result.Fail(validationResult.Errors.ToErrorList());
         }
@@ -645,7 +788,7 @@ public sealed class UserService
         
         await TransactionManager.CommitTransactionAsync();
         
-        Logger.LogInformation("Email address verified successfully.");
+        LogEmailVerified(Logger);
         return Result.Ok();
     }
     

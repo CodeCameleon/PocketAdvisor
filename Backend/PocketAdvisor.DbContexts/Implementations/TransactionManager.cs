@@ -7,7 +7,7 @@ namespace PocketAdvisor.DbContexts.Implementations;
 /// <summary>
 /// Represents the implementation for managing database transactions.
 /// </summary>
-public sealed class TransactionManager
+public sealed partial class TransactionManager
     : ITransactionManager
 {
     #region Constants
@@ -73,6 +73,57 @@ public sealed class TransactionManager
     
     #endregion
     
+    #region LogMessages
+    
+    /// <summary>
+    /// Logs that a new transaction was started.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="transactionId">The ID of the transaction.</param>
+    [LoggerMessage(EventId = 1, Level = LogLevel.Information,
+        Message = "Started a new transaction with ID '{TransactionId}'.")]
+    private static partial void LogTransactionStarted(ILogger logger, Guid transactionId);
+    
+    /// <summary>
+    /// Logs that the transaction was committed.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="transactionId">The ID of the transaction.</param>
+    [LoggerMessage(EventId = 2, Level = LogLevel.Information,
+        Message = "Committed the transaction with ID '{TransactionId}'.")]
+    private static partial void LogTransactionCommitted(ILogger logger, Guid transactionId);
+    
+    /// <summary>
+    /// Logs that committing the transaction failed.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="exception">The exception that caused the failure.</param>
+    /// <param name="transactionId">The ID of the transaction.</param>
+    [LoggerMessage(EventId = 3, Level = LogLevel.Error,
+        Message = "An error occurred while committing the transaction with ID '{TransactionId}'.")]
+    private static partial void LogTransactionCommitFailed(ILogger logger, Exception exception, Guid transactionId);
+    
+    /// <summary>
+    /// Logs that the changes were saved in the transaction.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="transactionId">The ID of the transaction.</param>
+    [LoggerMessage(EventId = 4, Level = LogLevel.Information,
+        Message = "Changes saved in the transaction with ID '{TransactionId}'.")]
+    private static partial void LogChangesSaved(ILogger logger, Guid transactionId);
+    
+    /// <summary>
+    /// Logs that saving the changes in the transaction failed.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="exception">The exception that caused the failure.</param>
+    /// <param name="transactionId">The ID of the transaction.</param>
+    [LoggerMessage(EventId = 5, Level = LogLevel.Error,
+        Message = "An error occurred while saving changes in the transaction with ID '{TransactionId}'.")]
+    private static partial void LogSaveChangesFailed(ILogger logger, Exception exception, Guid transactionId);
+    
+    #endregion
+    
     #region BeginTransactionAsync
     
     /// <inheritdoc />
@@ -87,13 +138,7 @@ public sealed class TransactionManager
         
         _transaction = await Context.Database.BeginTransactionAsync(cancellationToken);
         
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation(
-                "Started a new transaction with ID '{TransactionId}'.",
-                _transaction.TransactionId
-            );
-        }
+        LogTransactionStarted(Logger, _transaction.TransactionId);
     }
     
     #endregion
@@ -115,24 +160,11 @@ public sealed class TransactionManager
             await Context.SaveChangesAsync(cancellationToken);
             await _transaction.CommitAsync(cancellationToken);
             
-            if (Logger.IsEnabled(LogLevel.Information))
-            {
-                Logger.LogInformation(
-                    "Committed the transaction with ID '{TransactionId}'.",
-                    _transaction.TransactionId
-                );
-            }
+            LogTransactionCommitted(Logger, _transaction.TransactionId);
         }
         catch (Exception exception)
         {
-            if (Logger.IsEnabled(LogLevel.Error))
-            {
-                Logger.LogError(
-                    exception,
-                    "An error occurred while committing the transaction with ID '{TransactionId}'.",
-                    _transaction.TransactionId
-                );
-            }
+            LogTransactionCommitFailed(Logger, exception, _transaction.TransactionId);
             
             await _transaction.RollbackAsync(cancellationToken);
             throw;
@@ -185,14 +217,7 @@ public sealed class TransactionManager
         }
         catch (Exception exception)
         {
-            if (Logger.IsEnabled(LogLevel.Error))
-            {
-                Logger.LogError(
-                    exception,
-                    "An error occurred while saving changes in the transaction with ID '{TransactionId}'.",
-                    _transaction.TransactionId
-                );
-            }
+            LogSaveChangesFailed(Logger, exception, _transaction.TransactionId);
             
             await _transaction.RollbackAsync(cancellationToken);
             
@@ -202,13 +227,7 @@ public sealed class TransactionManager
             throw;
         }
         
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation(
-                "Changes saved in the transaction with ID '{TransactionId}'.",
-                _transaction.TransactionId
-            );
-        }
+        LogChangesSaved(Logger, _transaction.TransactionId);
     }
     
     #endregion

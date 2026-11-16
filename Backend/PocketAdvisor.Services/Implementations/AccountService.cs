@@ -17,7 +17,7 @@ namespace PocketAdvisor.Services.Implementations;
 /// <summary>
 /// Represents the service implementation for performing operations related to accounts.
 /// </summary>
-public sealed class AccountService
+public sealed partial class AccountService
     : BaseDatabaseService<AccountService>, IAccountService
 {
     #region Constructors
@@ -73,24 +73,116 @@ public sealed class AccountService
     
     #endregion
     
+    #region LogMessages
+    
+    /// <summary>
+    /// Logs that a new account is being created.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "Creating new account...")]
+    private static partial void LogCreatingAccount(ILogger logger);
+    
+    /// <summary>
+    /// Logs that the create account request failed validation.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="errors">The validation errors of the request.</param>
+    [LoggerMessage(EventId = 2, Level = LogLevel.Warning,
+        Message = "Validation failed for CreateAccountRequest: {Errors}")]
+    private static partial void LogCreateAccountRequestInvalid(ILogger logger, IEnumerable<ValidationFailure> errors);
+    
+    /// <summary>
+    /// Logs that the new account was created.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 3, Level = LogLevel.Information, Message = "New account created successfully.")]
+    private static partial void LogAccountCreated(ILogger logger);
+    
+    /// <summary>
+    /// Logs that an account is being deleted.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="accountId">The ID of the account.</param>
+    [LoggerMessage(EventId = 4, Level = LogLevel.Information, Message = "Deleting account '{AccountId}'...")]
+    private static partial void LogDeletingAccount(ILogger logger, Guid accountId);
+    
+    /// <summary>
+    /// Logs that the account was not found for the user.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="accountId">The ID of the account.</param>
+    /// <param name="userId">The ID of the user.</param>
+    [LoggerMessage(EventId = 5, Level = LogLevel.Warning,
+        Message = "Account '{AccountId}' was not found for user '{UserId}'.")]
+    private static partial void LogAccountNotFound(ILogger logger, Guid accountId, Guid userId);
+    
+    /// <summary>
+    /// Logs that the account was deleted.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="accountId">The ID of the account.</param>
+    [LoggerMessage(EventId = 6, Level = LogLevel.Information, Message = "Account '{AccountId}' deleted successfully.")]
+    private static partial void LogAccountDeleted(ILogger logger, Guid accountId);
+    
+    /// <summary>
+    /// Logs that the accounts of the user are being retrieved.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="userId">The ID of the user.</param>
+    [LoggerMessage(EventId = 7, Level = LogLevel.Information, Message = "Retrieving accounts for user '{UserId}'...")]
+    private static partial void LogRetrievingAccounts(ILogger logger, Guid userId);
+    
+    /// <summary>
+    /// Logs the number of retrieved accounts.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="count">The number of retrieved accounts.</param>
+    /// <param name="userId">The ID of the user.</param>
+    [LoggerMessage(EventId = 8, Level = LogLevel.Information,
+        Message = "Retrieved {Count} accounts for user '{UserId}'.")]
+    private static partial void LogAccountsRetrieved(ILogger logger, int count, Guid userId);
+    
+    /// <summary>
+    /// Logs that the name of an account is being updated.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="accountId">The ID of the account.</param>
+    [LoggerMessage(EventId = 9, Level = LogLevel.Information, Message = "Updating name of account '{AccountId}'...")]
+    private static partial void LogUpdatingAccountName(ILogger logger, Guid accountId);
+    
+    /// <summary>
+    /// Logs that the update account name request failed validation.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="errors">The validation errors of the request.</param>
+    [LoggerMessage(EventId = 10, Level = LogLevel.Warning,
+        Message = "Validation failed for UpdateAccountNameRequest: {Errors}")]
+    private static partial void LogUpdateAccountNameRequestInvalid(ILogger logger,
+        IEnumerable<ValidationFailure> errors);
+    
+    /// <summary>
+    /// Logs that the name of the account was updated.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="accountId">The ID of the account.</param>
+    [LoggerMessage(EventId = 11, Level = LogLevel.Information,
+        Message = "Account '{AccountId}' name updated successfully.")]
+    private static partial void LogAccountNameUpdated(ILogger logger, Guid accountId);
+    
+    #endregion
+    
     #region CreateAccountAsync
     
     /// <inheritdoc />
     public async Task<Result> CreateAccountAsync(CreateAccountRequest request, Guid userId)
     {
-        Logger.LogInformation("Creating new account...");
+        LogCreatingAccount(Logger);
         
         ValidationResult validationResult = await CreateAccountRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Validation failed for CreateAccountRequest: {Errors}",
-                    validationResult.Errors
-                );
-            }
+            LogCreateAccountRequestInvalid(Logger, validationResult.Errors);
             
             return Result.Fail(validationResult.Errors.ToErrorList());
         }
@@ -121,7 +213,7 @@ public sealed class AccountService
         
         await TransactionManager.CommitTransactionAsync();
         
-        Logger.LogInformation("New account created successfully.");
+        LogAccountCreated(Logger);
         return Result.Ok();
     }
     
@@ -132,10 +224,7 @@ public sealed class AccountService
     /// <inheritdoc />
     public async Task<Result> DeleteAccountAsync(Guid accountId, Guid userId)
     {
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation("Deleting account '{AccountId}'...", accountId);
-        }
+        LogDeletingAccount(Logger, accountId);
         
         Account? account = await AccountRepository.GetSingleOrDefaultAsync(
             a => a.Id == accountId && a.UserId == userId
@@ -143,14 +232,7 @@ public sealed class AccountService
         
         if (account is null)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Account '{AccountId}' was not found for user '{UserId}'.",
-                    accountId,
-                    userId
-                );
-            }
+            LogAccountNotFound(Logger, accountId, userId);
             
             return Result.Fail(CreateNotFoundError());
         }
@@ -161,10 +243,7 @@ public sealed class AccountService
         
         await TransactionManager.CommitTransactionAsync();
         
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation("Account '{AccountId}' deleted successfully.", accountId);
-        }
+        LogAccountDeleted(Logger, accountId);
         
         return Result.Ok();
     }
@@ -176,10 +255,7 @@ public sealed class AccountService
     /// <inheritdoc />
     public async Task<IReadOnlyList<AccountResponse>> GetAccountsAsync(Guid userId)
     {
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation("Retrieving accounts for user '{UserId}'...", userId);
-        }
+        LogRetrievingAccounts(Logger, userId);
         
         IReadOnlyList<Account> accounts = await AccountRepository.GetAllAsync(
             a => a.UserId == userId,
@@ -210,10 +286,7 @@ public sealed class AccountService
             };
         }).ToList();
         
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation("Retrieved {Count} accounts for user '{UserId}'.", response.Count, userId);
-        }
+        LogAccountsRetrieved(Logger, response.Count, userId);
         
         return response;
     }
@@ -225,22 +298,13 @@ public sealed class AccountService
     /// <inheritdoc />
     public async Task<Result> UpdateAccountNameAsync(Guid accountId, UpdateAccountNameRequest request, Guid userId)
     {
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation("Updating name of account '{AccountId}'...", accountId);
-        }
+        LogUpdatingAccountName(Logger, accountId);
         
         ValidationResult validationResult = await UpdateAccountNameRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Validation failed for UpdateAccountNameRequest: {Errors}",
-                    validationResult.Errors
-                );
-            }
+            LogUpdateAccountNameRequestInvalid(Logger, validationResult.Errors);
             
             return Result.Fail(validationResult.Errors.ToErrorList());
         }
@@ -254,14 +318,7 @@ public sealed class AccountService
         
         if (account is null)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Account '{AccountId}' was not found for user '{UserId}'.",
-                    accountId,
-                    userId
-                );
-            }
+            LogAccountNotFound(Logger, accountId, userId);
             
             return Result.Fail(CreateNotFoundError());
         }
@@ -283,10 +340,7 @@ public sealed class AccountService
         
         await TransactionManager.CommitTransactionAsync();
         
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation("Account '{AccountId}' name updated successfully.", accountId);
-        }
+        LogAccountNameUpdated(Logger, accountId);
         
         return Result.Ok();
     }

@@ -18,7 +18,7 @@ namespace PocketAdvisor.Services.Implementations;
 /// <summary>
 /// Represents the service implementation for performing operations related to transactions.
 /// </summary>
-public sealed class TransactionService
+public sealed partial class TransactionService
     : BaseDatabaseService<TransactionService>, ITransactionService
 {
     #region Constructors
@@ -97,24 +97,192 @@ public sealed class TransactionService
     
     #endregion
     
+    #region LogMessages
+    
+    /// <summary>
+    /// Logs that a new transaction is being created.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "Creating new transaction...")]
+    private static partial void LogCreatingTransaction(ILogger logger);
+    
+    /// <summary>
+    /// Logs that the create transaction request failed validation.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="errors">The validation errors of the request.</param>
+    [LoggerMessage(EventId = 2, Level = LogLevel.Warning,
+        Message = "Validation failed for CreateTransactionRequest: {Errors}")]
+    private static partial void LogCreateTransactionRequestInvalid(ILogger logger,
+        IEnumerable<ValidationFailure> errors);
+    
+    /// <summary>
+    /// Logs that the category of the transaction was not found for the user.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="categoryId">The ID of the category.</param>
+    /// <param name="userId">The ID of the user.</param>
+    [LoggerMessage(EventId = 3, Level = LogLevel.Warning,
+        Message = "Category '{CategoryId}' was not found for user '{UserId}'.")]
+    private static partial void LogCategoryNotFound(ILogger logger, Guid? categoryId, Guid userId);
+    
+    /// <summary>
+    /// Logs that the source account of the transaction was not found for the user.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="accountId">The ID of the account.</param>
+    /// <param name="userId">The ID of the user.</param>
+    [LoggerMessage(EventId = 4, Level = LogLevel.Warning,
+        Message = "Source account '{AccountId}' was not found for user '{UserId}'.")]
+    private static partial void LogSourceAccountNotFound(ILogger logger, Guid? accountId, Guid userId);
+    
+    /// <summary>
+    /// Logs that the destination account of the transaction was not found for the user.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="accountId">The ID of the account.</param>
+    /// <param name="userId">The ID of the user.</param>
+    [LoggerMessage(EventId = 5, Level = LogLevel.Warning,
+        Message = "Destination account '{AccountId}' was not found for user '{UserId}'.")]
+    private static partial void LogDestinationAccountNotFound(ILogger logger, Guid? accountId, Guid userId);
+    
+    /// <summary>
+    /// Logs that one or more items of the transaction were not found for the user.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="userId">The ID of the user.</param>
+    [LoggerMessage(EventId = 6, Level = LogLevel.Warning,
+        Message = "One or more items were not found for user '{UserId}'.")]
+    private static partial void LogItemsNotFound(ILogger logger, Guid userId);
+    
+    /// <summary>
+    /// Logs that the new transaction was created.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 7, Level = LogLevel.Information, Message = "New transaction created successfully.")]
+    private static partial void LogTransactionCreated(ILogger logger);
+    
+    /// <summary>
+    /// Logs that a transaction is being deleted.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="transactionId">The ID of the transaction.</param>
+    [LoggerMessage(EventId = 8, Level = LogLevel.Information, Message = "Deleting transaction '{TransactionId}'...")]
+    private static partial void LogDeletingTransaction(ILogger logger, Guid transactionId);
+    
+    /// <summary>
+    /// Logs that the transaction was not found for the user.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="transactionId">The ID of the transaction.</param>
+    /// <param name="userId">The ID of the user.</param>
+    [LoggerMessage(EventId = 9, Level = LogLevel.Warning,
+        Message = "Transaction '{TransactionId}' was not found for user '{UserId}'.")]
+    private static partial void LogTransactionNotFound(ILogger logger, Guid transactionId, Guid userId);
+    
+    /// <summary>
+    /// Logs that the transaction was deleted.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="transactionId">The ID of the transaction.</param>
+    [LoggerMessage(EventId = 10, Level = LogLevel.Information,
+        Message = "Transaction '{TransactionId}' deleted successfully.")]
+    private static partial void LogTransactionDeleted(ILogger logger, Guid transactionId);
+    
+    /// <summary>
+    /// Logs that an item is being deleted from a transaction.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="itemId">The ID of the item.</param>
+    /// <param name="transactionId">The ID of the transaction.</param>
+    [LoggerMessage(EventId = 11, Level = LogLevel.Information,
+        Message = "Deleting item '{ItemId}' from transaction '{TransactionId}'...")]
+    private static partial void LogDeletingTransactionItem(ILogger logger, Guid itemId, Guid transactionId);
+    
+    /// <summary>
+    /// Logs that the item was not found on the transaction.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="itemId">The ID of the item.</param>
+    /// <param name="transactionId">The ID of the transaction.</param>
+    [LoggerMessage(EventId = 12, Level = LogLevel.Warning,
+        Message = "Item '{ItemId}' was not found on transaction '{TransactionId}'.")]
+    private static partial void LogTransactionItemNotFound(ILogger logger, Guid itemId, Guid transactionId);
+    
+    /// <summary>
+    /// Logs that the item cannot be deleted because it is the last item of the transaction.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="itemId">The ID of the item.</param>
+    /// <param name="transactionId">The ID of the transaction.</param>
+    [LoggerMessage(EventId = 13, Level = LogLevel.Warning,
+        Message = "Cannot delete item '{ItemId}' from transaction '{TransactionId}' as it is the last item.")]
+    private static partial void LogLastTransactionItemNotDeletable(ILogger logger, Guid itemId, Guid transactionId);
+    
+    /// <summary>
+    /// Logs that the item was deleted from the transaction.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="itemId">The ID of the item.</param>
+    /// <param name="transactionId">The ID of the transaction.</param>
+    [LoggerMessage(EventId = 14, Level = LogLevel.Information,
+        Message = "Item '{ItemId}' deleted from transaction '{TransactionId}' successfully.")]
+    private static partial void LogTransactionItemDeleted(ILogger logger, Guid itemId, Guid transactionId);
+    
+    /// <summary>
+    /// Logs that the transactions of an account are being retrieved.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="accountId">The ID of the account.</param>
+    /// <param name="userId">The ID of the user.</param>
+    [LoggerMessage(EventId = 15, Level = LogLevel.Information,
+        Message = "Retrieving transactions for account '{AccountId}' and user '{UserId}'...")]
+    private static partial void LogRetrievingAccountTransactions(ILogger logger, Guid accountId, Guid userId);
+    
+    /// <summary>
+    /// Logs the number of retrieved transactions of the account.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="count">The number of retrieved transactions.</param>
+    /// <param name="accountId">The ID of the account.</param>
+    [LoggerMessage(EventId = 16, Level = LogLevel.Information,
+        Message = "Retrieved {Count} transactions for account '{AccountId}'.")]
+    private static partial void LogAccountTransactionsRetrieved(ILogger logger, int count, Guid accountId);
+    
+    /// <summary>
+    /// Logs that the transactions of an item are being retrieved.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="itemId">The ID of the item.</param>
+    /// <param name="userId">The ID of the user.</param>
+    [LoggerMessage(EventId = 17, Level = LogLevel.Information,
+        Message = "Retrieving transactions for item '{ItemId}' and user '{UserId}'...")]
+    private static partial void LogRetrievingItemTransactions(ILogger logger, Guid itemId, Guid userId);
+    
+    /// <summary>
+    /// Logs the number of retrieved transactions of the item.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="count">The number of retrieved transactions.</param>
+    /// <param name="itemId">The ID of the item.</param>
+    [LoggerMessage(EventId = 18, Level = LogLevel.Information,
+        Message = "Retrieved {Count} transactions for item '{ItemId}'.")]
+    private static partial void LogItemTransactionsRetrieved(ILogger logger, int count, Guid itemId);
+    
+    #endregion
+    
     #region CreateTransactionAsync
     
     /// <inheritdoc />
     public async Task<Result> CreateTransactionAsync(CreateTransactionRequest request, Guid userId)
     {
-        Logger.LogInformation("Creating new transaction...");
+        LogCreatingTransaction(Logger);
         
         ValidationResult validationResult = await CreateTransactionRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Validation failed for CreateTransactionRequest: {Errors}",
-                    validationResult.Errors
-                );
-            }
+            LogCreateTransactionRequestInvalid(Logger, validationResult.Errors);
             
             return Result.Fail(validationResult.Errors.ToErrorList());
         }
@@ -125,14 +293,7 @@ public sealed class TransactionService
         
         if (!categoryExists)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Category '{CategoryId}' was not found for user '{UserId}'.",
-                    request.CategoryId,
-                    userId
-                );
-            }
+            LogCategoryNotFound(Logger, request.CategoryId, userId);
             
             return Result.Fail(CreateNotFoundError());
         }
@@ -145,14 +306,7 @@ public sealed class TransactionService
             
             if (!fromAccountExists)
             {
-                if (Logger.IsEnabled(LogLevel.Warning))
-                {
-                    Logger.LogWarning(
-                        "Source account '{AccountId}' was not found for user '{UserId}'.",
-                        request.FromAccountId,
-                        userId
-                    );
-                }
+                LogSourceAccountNotFound(Logger, request.FromAccountId, userId);
                 
                 return Result.Fail(CreateNotFoundError());
             }
@@ -166,14 +320,7 @@ public sealed class TransactionService
             
             if (!toAccountExists)
             {
-                if (Logger.IsEnabled(LogLevel.Warning))
-                {
-                    Logger.LogWarning(
-                        "Destination account '{AccountId}' was not found for user '{UserId}'.",
-                        request.ToAccountId,
-                        userId
-                    );
-                }
+                LogDestinationAccountNotFound(Logger, request.ToAccountId, userId);
                 
                 return Result.Fail(CreateNotFoundError());
             }
@@ -189,13 +336,7 @@ public sealed class TransactionService
         
         if (items.Count != itemIds.Count)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "One or more items were not found for user '{UserId}'.",
-                    userId
-                );
-            }
+            LogItemsNotFound(Logger, userId);
             
             return Result.Fail(CreateNotFoundError());
         }
@@ -243,7 +384,7 @@ public sealed class TransactionService
         
         await TransactionManager.CommitTransactionAsync();
         
-        Logger.LogInformation("New transaction created successfully.");
+        LogTransactionCreated(Logger);
         return Result.Ok();
     }
     
@@ -254,10 +395,7 @@ public sealed class TransactionService
     /// <inheritdoc />
     public async Task<Result> DeleteTransactionAsync(Guid transactionId, Guid userId)
     {
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation("Deleting transaction '{TransactionId}'...", transactionId);
-        }
+        LogDeletingTransaction(Logger, transactionId);
         
         Transaction? transaction = await TransactionRepository.GetSingleOrDefaultAsync(t =>
             t.Id == transactionId && (
@@ -268,14 +406,7 @@ public sealed class TransactionService
         
         if (transaction is null)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Transaction '{TransactionId}' was not found for user '{UserId}'.",
-                    transactionId,
-                    userId
-                );
-            }
+            LogTransactionNotFound(Logger, transactionId, userId);
             
             return Result.Fail(CreateNotFoundError());
         }
@@ -286,10 +417,7 @@ public sealed class TransactionService
         
         await TransactionManager.CommitTransactionAsync();
         
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation("Transaction '{TransactionId}' deleted successfully.", transactionId);
-        }
+        LogTransactionDeleted(Logger, transactionId);
         
         return Result.Ok();
     }
@@ -301,14 +429,7 @@ public sealed class TransactionService
     /// <inheritdoc />
     public async Task<Result> DeleteTransactionItemAsync(Guid transactionId, Guid itemId, Guid userId)
     {
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation(
-                "Deleting item '{ItemId}' from transaction '{TransactionId}'...",
-                itemId,
-                transactionId
-            );
-        }
+        LogDeletingTransactionItem(Logger, itemId, transactionId);
         
         Transaction? transaction = await TransactionRepository.GetSingleOrDefaultAsync(t =>
             t.Id == transactionId && (
@@ -319,14 +440,7 @@ public sealed class TransactionService
         
         if (transaction is null)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Transaction '{TransactionId}' was not found for user '{UserId}'.",
-                    transactionId,
-                    userId
-                );
-            }
+            LogTransactionNotFound(Logger, transactionId, userId);
             
             return Result.Fail(CreateNotFoundError());
         }
@@ -337,14 +451,7 @@ public sealed class TransactionService
         
         if (transactionItem is null)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Item '{ItemId}' was not found on transaction '{TransactionId}'.",
-                    itemId,
-                    transactionId
-                );
-            }
+            LogTransactionItemNotFound(Logger, itemId, transactionId);
             
             return Result.Fail(CreateNotFoundError());
         }
@@ -355,14 +462,7 @@ public sealed class TransactionService
         
         if (!hasOtherItems)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Cannot delete item '{ItemId}' from transaction '{TransactionId}' as it is the last item.",
-                    itemId,
-                    transactionId
-                );
-            }
+            LogLastTransactionItemNotDeletable(Logger, itemId, transactionId);
             
             return Result.Fail(CreateConflictError());
         }
@@ -373,14 +473,7 @@ public sealed class TransactionService
         
         await TransactionManager.CommitTransactionAsync();
         
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation(
-                "Item '{ItemId}' deleted from transaction '{TransactionId}' successfully.",
-                itemId,
-                transactionId
-            );
-        }
+        LogTransactionItemDeleted(Logger, itemId, transactionId);
         
         return Result.Ok();
     }
@@ -392,14 +485,7 @@ public sealed class TransactionService
     /// <inheritdoc />
     public async Task<IReadOnlyList<TransactionResponse>> GetTransactionsAsync(Guid accountId, Guid userId)
     {
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation(
-                "Retrieving transactions for account '{AccountId}' and user '{UserId}'...",
-                accountId,
-                userId
-            );
-        }
+        LogRetrievingAccountTransactions(Logger, accountId, userId);
         
         IReadOnlyList<Transaction> transactions = await TransactionRepository.GetAllAsync(
             t => (t.FromAccountId == accountId || t.ToAccountId == accountId) && (
@@ -425,14 +511,7 @@ public sealed class TransactionService
             }).ToList()
         }).ToList();
         
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation(
-                "Retrieved {Count} transactions for account '{AccountId}'.",
-                response.Count,
-                accountId
-            );
-        }
+        LogAccountTransactionsRetrieved(Logger, response.Count, accountId);
         
         return response;
     }
@@ -444,14 +523,7 @@ public sealed class TransactionService
     /// <inheritdoc />
     public async Task<IReadOnlyList<TransactionResponse>> GetTransactionsByItemAsync(Guid itemId, Guid userId)
     {
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation(
-                "Retrieving transactions for item '{ItemId}' and user '{UserId}'...",
-                itemId,
-                userId
-            );
-        }
+        LogRetrievingItemTransactions(Logger, itemId, userId);
         
         IReadOnlyList<Transaction> transactions = await TransactionRepository.GetAllAsync(
             t => t.TransactionItems!.Any(ti => ti.ItemId == itemId) && (
@@ -477,14 +549,7 @@ public sealed class TransactionService
             }).ToList()
         }).ToList();
         
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation(
-                "Retrieved {Count} transactions for item '{ItemId}'.",
-                response.Count,
-                itemId
-            );
-        }
+        LogItemTransactionsRetrieved(Logger, response.Count, itemId);
         
         return response;
     }

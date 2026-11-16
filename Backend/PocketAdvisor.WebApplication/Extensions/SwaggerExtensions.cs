@@ -1,4 +1,6 @@
-﻿using Microsoft.OpenApi;
+﻿using System.Globalization;
+using System.Text;
+using Microsoft.OpenApi;
 
 namespace PocketAdvisor.WebApplication.Extensions;
 
@@ -50,9 +52,9 @@ public static class SwaggerExtensions
     private const string SwaggerVersion = "v1";
     
     /// <summary>
-    /// The template used for the generated XML documentation files.
+    /// The template used for the generated XML documentation files, parsed once for repeated use.
     /// </summary>
-    private const string XmlFileTemplate = "PocketAdvisor.{0}.xml";
+    private static readonly CompositeFormat XmlFileTemplate = CompositeFormat.Parse("PocketAdvisor.{0}.xml");
     
     /// <summary>
     /// The list of XML documentation files to include in the Swagger documentation.
@@ -155,7 +157,7 @@ public static class SwaggerExtensions
         {
             string path = Path.Combine(
                 AppContext.BaseDirectory,
-                string.Format(XmlFileTemplate, file)
+                string.Format(CultureInfo.InvariantCulture, XmlFileTemplate, file)
             );
             
             if (File.Exists(path))

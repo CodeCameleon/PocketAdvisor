@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text;
 using Microsoft.EntityFrameworkCore;
 using PocketAdvisor.Enums;
 using PocketAdvisor.Enums.Extensions;
@@ -20,11 +21,6 @@ public sealed class Quantity
     private const string CategoryMismatchMessage = "Units must belong to the same category.";
     
     /// <summary>
-    /// The template used to stringify the object.
-    /// </summary>
-    private const string FormatTemplate = "{0} {1}";
-    
-    /// <summary>
     /// When the comparison is not possible because one of the units belongs to the uncategorized category.
     /// </summary>
     private const string UncategorizedMessage = "Uncategorized units cannot be compared.";
@@ -33,6 +29,11 @@ public sealed class Quantity
     /// The number of decimal places used when normalizing values for comparison and hashing.
     /// </summary>
     private const int Scale = 6;
+    
+    /// <summary>
+    /// The template used to stringify the object, parsed once for repeated use.
+    /// </summary>
+    private static readonly CompositeFormat FormatTemplate = CompositeFormat.Parse("{0} {1}");
     
     #endregion
     

@@ -16,7 +16,7 @@ namespace PocketAdvisor.Services.Implementations;
 /// <summary>
 /// Represents the service implementation for performing operations related to items.
 /// </summary>
-public sealed class ItemService
+public sealed partial class ItemService
     : BaseDatabaseService<ItemService>, IItemService
 {
     #region Constructors
@@ -72,24 +72,113 @@ public sealed class ItemService
     
     #endregion
     
+    #region LogMessages
+    
+    /// <summary>
+    /// Logs that a new item is being created.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "Creating new item...")]
+    private static partial void LogCreatingItem(ILogger logger);
+    
+    /// <summary>
+    /// Logs that the create item request failed validation.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="errors">The validation errors of the request.</param>
+    [LoggerMessage(EventId = 2, Level = LogLevel.Warning,
+        Message = "Validation failed for CreateItemRequest: {Errors}")]
+    private static partial void LogCreateItemRequestInvalid(ILogger logger, IEnumerable<ValidationFailure> errors);
+    
+    /// <summary>
+    /// Logs that the new item was created.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 3, Level = LogLevel.Information, Message = "New item created successfully.")]
+    private static partial void LogItemCreated(ILogger logger);
+    
+    /// <summary>
+    /// Logs that an item is being deleted.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="itemId">The ID of the item.</param>
+    [LoggerMessage(EventId = 4, Level = LogLevel.Information, Message = "Deleting item '{ItemId}'...")]
+    private static partial void LogDeletingItem(ILogger logger, Guid itemId);
+    
+    /// <summary>
+    /// Logs that the item was not found for the user.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="itemId">The ID of the item.</param>
+    /// <param name="userId">The ID of the user.</param>
+    [LoggerMessage(EventId = 5, Level = LogLevel.Warning,
+        Message = "Item '{ItemId}' was not found for user '{UserId}'.")]
+    private static partial void LogItemNotFound(ILogger logger, Guid itemId, Guid userId);
+    
+    /// <summary>
+    /// Logs that the item was deleted.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="itemId">The ID of the item.</param>
+    [LoggerMessage(EventId = 6, Level = LogLevel.Information, Message = "Item '{ItemId}' deleted successfully.")]
+    private static partial void LogItemDeleted(ILogger logger, Guid itemId);
+    
+    /// <summary>
+    /// Logs that the items of the user are being retrieved.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="userId">The ID of the user.</param>
+    [LoggerMessage(EventId = 7, Level = LogLevel.Information, Message = "Retrieving items for user '{UserId}'...")]
+    private static partial void LogRetrievingItems(ILogger logger, Guid userId);
+    
+    /// <summary>
+    /// Logs the number of retrieved items.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="count">The number of retrieved items.</param>
+    /// <param name="userId">The ID of the user.</param>
+    [LoggerMessage(EventId = 8, Level = LogLevel.Information, Message = "Retrieved {Count} items for user '{UserId}'.")]
+    private static partial void LogItemsRetrieved(ILogger logger, int count, Guid userId);
+    
+    /// <summary>
+    /// Logs that the name of an item is being updated.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="itemId">The ID of the item.</param>
+    [LoggerMessage(EventId = 9, Level = LogLevel.Information, Message = "Updating name of item '{ItemId}'...")]
+    private static partial void LogUpdatingItemName(ILogger logger, Guid itemId);
+    
+    /// <summary>
+    /// Logs that the update item name request failed validation.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="errors">The validation errors of the request.</param>
+    [LoggerMessage(EventId = 10, Level = LogLevel.Warning,
+        Message = "Validation failed for UpdateItemNameRequest: {Errors}")]
+    private static partial void LogUpdateItemNameRequestInvalid(ILogger logger, IEnumerable<ValidationFailure> errors);
+    
+    /// <summary>
+    /// Logs that the name of the item was updated.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="itemId">The ID of the item.</param>
+    [LoggerMessage(EventId = 11, Level = LogLevel.Information, Message = "Item '{ItemId}' name updated successfully.")]
+    private static partial void LogItemNameUpdated(ILogger logger, Guid itemId);
+    
+    #endregion
+    
     #region CreateItemAsync
     
     /// <inheritdoc />
     public async Task<Result> CreateItemAsync(CreateItemRequest request, Guid userId)
     {
-        Logger.LogInformation("Creating new item...");
+        LogCreatingItem(Logger);
         
         ValidationResult validationResult = await CreateItemRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Validation failed for CreateItemRequest: {Errors}",
-                    validationResult.Errors
-                );
-            }
+            LogCreateItemRequestInvalid(Logger, validationResult.Errors);
             
             return Result.Fail(validationResult.Errors.ToErrorList());
         }
@@ -119,7 +208,7 @@ public sealed class ItemService
         
         await TransactionManager.CommitTransactionAsync();
         
-        Logger.LogInformation("New item created successfully.");
+        LogItemCreated(Logger);
         return Result.Ok();
     }
     
@@ -130,10 +219,7 @@ public sealed class ItemService
     /// <inheritdoc />
     public async Task<Result> DeleteItemAsync(Guid itemId, Guid userId)
     {
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation("Deleting item '{ItemId}'...", itemId);
-        }
+        LogDeletingItem(Logger, itemId);
         
         Item? item = await ItemRepository.GetSingleOrDefaultAsync(
             i => i.Id == itemId && i.UserId == userId
@@ -141,14 +227,7 @@ public sealed class ItemService
         
         if (item is null)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Item '{ItemId}' was not found for user '{UserId}'.",
-                    itemId,
-                    userId
-                );
-            }
+            LogItemNotFound(Logger, itemId, userId);
             
             return Result.Fail(CreateNotFoundError());
         }
@@ -159,10 +238,7 @@ public sealed class ItemService
         
         await TransactionManager.CommitTransactionAsync();
         
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation("Item '{ItemId}' deleted successfully.", itemId);
-        }
+        LogItemDeleted(Logger, itemId);
         
         return Result.Ok();
     }
@@ -174,10 +250,7 @@ public sealed class ItemService
     /// <inheritdoc />
     public async Task<IReadOnlyList<ItemResponse>> GetItemsAsync(Guid userId)
     {
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation("Retrieving items for user '{UserId}'...", userId);
-        }
+        LogRetrievingItems(Logger, userId);
         
         IReadOnlyList<Item> items = await ItemRepository.GetAllAsync(
             i => i.UserId == userId
@@ -190,10 +263,7 @@ public sealed class ItemService
             UnitCategory = i.UnitCategory
         }).ToList();
         
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation("Retrieved {Count} items for user '{UserId}'.", response.Count, userId);
-        }
+        LogItemsRetrieved(Logger, response.Count, userId);
         
         return response;
     }
@@ -205,22 +275,13 @@ public sealed class ItemService
     /// <inheritdoc />
     public async Task<Result> UpdateItemNameAsync(Guid itemId, UpdateItemNameRequest request, Guid userId)
     {
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation("Updating name of item '{ItemId}'...", itemId);
-        }
+        LogUpdatingItemName(Logger, itemId);
         
         ValidationResult validationResult = await UpdateItemNameRequestValidator.ValidateAsync(request);
         
         if (!validationResult.IsValid)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Validation failed for UpdateItemNameRequest: {Errors}",
-                    validationResult.Errors
-                );
-            }
+            LogUpdateItemNameRequestInvalid(Logger, validationResult.Errors);
             
             return Result.Fail(validationResult.Errors.ToErrorList());
         }
@@ -234,14 +295,7 @@ public sealed class ItemService
         
         if (item is null)
         {
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(
-                    "Item '{ItemId}' was not found for user '{UserId}'.",
-                    itemId,
-                    userId
-                );
-            }
+            LogItemNotFound(Logger, itemId, userId);
             
             return Result.Fail(CreateNotFoundError());
         }
@@ -263,10 +317,7 @@ public sealed class ItemService
         
         await TransactionManager.CommitTransactionAsync();
         
-        if (Logger.IsEnabled(LogLevel.Information))
-        {
-            Logger.LogInformation("Item '{ItemId}' name updated successfully.", itemId);
-        }
+        LogItemNameUpdated(Logger, itemId);
         
         return Result.Ok();
     }

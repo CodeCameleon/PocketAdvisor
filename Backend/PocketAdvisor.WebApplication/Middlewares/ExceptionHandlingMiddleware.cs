@@ -9,7 +9,7 @@ namespace PocketAdvisor.WebApplication.Middlewares;
 /// Represents the middleware that catches unhandled exceptions and returns a
 /// structured <see cref="ProblemDetails" /> response.
 /// </summary>
-public sealed class ExceptionHandlingMiddleware
+public sealed partial class ExceptionHandlingMiddleware
 {
     #region Constants
     
@@ -74,6 +74,20 @@ public sealed class ExceptionHandlingMiddleware
     
     #endregion
     
+    #region LogMessages
+    
+    /// <summary>
+    /// Logs that an unhandled exception occurred while processing the request.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="exception">The unhandled exception.</param>
+    /// <param name="traceId">The trace identifier of the request.</param>
+    [LoggerMessage(EventId = 1, Level = LogLevel.Error,
+        Message = "An unhandled exception occurred while processing the request. TraceId: {TraceId}")]
+    private static partial void LogUnhandledException(ILogger logger, Exception exception, string traceId);
+    
+    #endregion
+    
     #region InvokeAsync
     
     /// <summary>
@@ -103,14 +117,7 @@ public sealed class ExceptionHandlingMiddleware
     /// <param name="exception">The exception to handle.</param>
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        if (Logger.IsEnabled(LogLevel.Error))
-        {
-            Logger.LogError(
-                exception,
-                "An unhandled exception occurred while processing the request. TraceId: {TraceId}",
-                context.TraceIdentifier
-            );
-        }
+        LogUnhandledException(Logger, exception, context.TraceIdentifier);
         
         string detail = DefaultErrorMessage;
         if (Environment.IsDevelopment())

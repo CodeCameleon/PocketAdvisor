@@ -1,4 +1,7 @@
-﻿namespace PocketAdvisor.WebApplication.Extensions;
+﻿using System.Globalization;
+using System.Text;
+
+namespace PocketAdvisor.WebApplication.Extensions;
 
 /// <summary>
 /// The extension methods for the <see cref="IConfiguration" /> interface.
@@ -36,11 +39,6 @@ public static class ConfigurationExtensions
     /// The name of the section that contains database connection strings in the configuration.
     /// </summary>
     private const string ConnectionStrings = "ConnectionStrings";
-    
-    /// <summary>
-    /// The template for the database connection string.
-    /// </summary>
-    private const string ConnectionStringTemplate = "Host={0};Port={1};Database={2};Username={3};Password={4}";
     
     /// <summary>
     /// The name of the default database name in the configuration.
@@ -93,16 +91,6 @@ public static class ConfigurationExtensions
     private const string KeyFilePath = "KeyFilePath";
     
     /// <summary>
-    /// The message template used for missing configuration keys.
-    /// </summary>
-    private const string KeyNotFoundMessageTemplate = "The required configuration key '{0}' is missing or empty.";
-    
-    /// <summary>
-    /// The message template used for configuration keys whose value is not a positive integer.
-    /// </summary>
-    private const string NotPositiveIntegerMessageTemplate = "The configuration key '{0}' must be a positive integer.";
-    
-    /// <summary>
     /// The name of the section that contains the rate limiting settings in the configuration.
     /// </summary>
     private const string RateLimiting = "RateLimiting";
@@ -136,6 +124,28 @@ public static class ConfigurationExtensions
     /// The name of the length of the rate limiting window in the configuration.
     /// </summary>
     private const string WindowSeconds = "WindowSeconds";
+    
+    /// <summary>
+    /// The template for the database connection string, parsed once for repeated use.
+    /// </summary>
+    private static readonly CompositeFormat ConnectionStringTemplate = CompositeFormat.Parse(
+        "Host={0};Port={1};Database={2};Username={3};Password={4}"
+    );
+    
+    /// <summary>
+    /// The message template used for missing configuration keys, parsed once for repeated use.
+    /// </summary>
+    private static readonly CompositeFormat KeyNotFoundMessageTemplate = CompositeFormat.Parse(
+        "The required configuration key '{0}' is missing or empty."
+    );
+    
+    /// <summary>
+    /// The message template used for configuration keys whose value is not a positive integer,
+    /// parsed once for repeated use.
+    /// </summary>
+    private static readonly CompositeFormat NotPositiveIntegerMessageTemplate = CompositeFormat.Parse(
+        "The configuration key '{0}' must be a positive integer."
+    );
     
     #endregion
     
@@ -183,7 +193,15 @@ public static class ConfigurationExtensions
             throw CreateInvalidOperationException(ConnectionStrings, DefaultPassword);
         }
         
-        return string.Format(ConnectionStringTemplate, host, port, database, username, password);
+        return string.Format(
+            CultureInfo.InvariantCulture,
+            ConnectionStringTemplate,
+            host,
+            port,
+            database,
+            username,
+            password
+        );
     }
     
     #endregion
@@ -419,6 +437,7 @@ public static class ConfigurationExtensions
     private static InvalidOperationException CreateInvalidOperationException(params string[] keys)
     {
         string message = string.Format(
+            CultureInfo.InvariantCulture,
             KeyNotFoundMessageTemplate,
             string.Join(Colon, keys)
         );
@@ -452,6 +471,7 @@ public static class ConfigurationExtensions
         if (value <= 0)
         {
             string message = string.Format(
+                CultureInfo.InvariantCulture,
                 NotPositiveIntegerMessageTemplate,
                 string.Join(Colon, sectionName, key)
             );
