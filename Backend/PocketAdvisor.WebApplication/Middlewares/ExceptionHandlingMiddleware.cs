@@ -12,21 +12,21 @@ namespace PocketAdvisor.WebApplication.Middlewares;
 public sealed partial class ExceptionHandlingMiddleware
 {
     #region Constants
-    
+
     /// <summary>
     /// The default error message returned in production when an unhandled exception occurs.
     /// </summary>
     private const string DefaultErrorMessage = "An unexpected error occurred. Please try again later.";
-    
+
     /// <summary>
     /// The JSON serializer options used to serialize the problem details response.
     /// </summary>
     private static readonly JsonSerializerOptions JsonSerializerOptions = new(JsonSerializerDefaults.Web);
-    
+
     #endregion
-    
+
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ExceptionHandlingMiddleware" /> class.
     /// </summary>
@@ -41,41 +41,41 @@ public sealed partial class ExceptionHandlingMiddleware
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
         ArgumentNullException.ThrowIfNull(environment, nameof(environment));
         ArgumentNullException.ThrowIfNull(problemDetailsFactory, nameof(problemDetailsFactory));
-        
+
         Environment = environment;
         Logger = logger;
         Next = next;
         ProblemDetailsFactory = problemDetailsFactory;
     }
-    
+
     #endregion
-    
+
     #region Properties
-    
+
     /// <summary>
     /// The host environment used to determine the current mode.
     /// </summary>
     private IHostEnvironment Environment { get; }
-    
+
     /// <summary>
     /// The logger used to record exceptions.
     /// </summary>
     private ILogger<ExceptionHandlingMiddleware> Logger { get; }
-    
+
     /// <summary>
     /// The next middleware delegate in the pipeline.
     /// </summary>
     private RequestDelegate Next { get; }
-    
+
     /// <summary>
     /// The factory used to create problem details responses.
     /// </summary>
     private ProblemDetailsFactory ProblemDetailsFactory { get; }
-    
+
     #endregion
-    
+
     #region LogMessages
-    
+
     /// <summary>
     /// Logs that an unhandled exception occurred while processing the request.
     /// </summary>
@@ -85,11 +85,11 @@ public sealed partial class ExceptionHandlingMiddleware
     [LoggerMessage(EventId = 1, Level = LogLevel.Error,
         Message = "An unhandled exception occurred while processing the request. TraceId: {TraceId}")]
     private static partial void LogUnhandledException(ILogger logger, Exception exception, string traceId);
-    
+
     #endregion
-    
+
     #region InvokeAsync
-    
+
     /// <summary>
     /// Invokes the middleware, catching any unhandled exception thrown further down the pipeline.
     /// </summary>
@@ -105,11 +105,11 @@ public sealed partial class ExceptionHandlingMiddleware
             await HandleExceptionAsync(context, exception);
         }
     }
-    
+
     #endregion
-    
+
     #region HandleExceptionAsync
-    
+
     /// <summary>
     /// Handles the given exception based on the host environment.
     /// </summary>
@@ -118,25 +118,25 @@ public sealed partial class ExceptionHandlingMiddleware
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         LogUnhandledException(Logger, exception, context.TraceIdentifier);
-        
+
         string detail = DefaultErrorMessage;
         if (Environment.IsDevelopment())
         {
             detail = exception.Message;
         }
-        
+
         ProblemDetails problemDetails = ProblemDetailsFactory.CreateProblemDetails(
             context,
             detail: detail
         );
-        
+
         string json = JsonSerializer.Serialize(problemDetails, JsonSerializerOptions);
-        
+
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
         context.Response.ContentType = MediaTypeNames.Application.ProblemJson;
-        
+
         await context.Response.WriteAsync(json);
     }
-    
+
     #endregion
 }

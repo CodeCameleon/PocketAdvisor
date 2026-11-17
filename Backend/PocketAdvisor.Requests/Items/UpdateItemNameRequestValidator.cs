@@ -10,7 +10,7 @@ public sealed class UpdateItemNameRequestValidator
     : AbstractValidator<UpdateItemNameRequest>
 {
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateItemNameRequestValidator" /> class.
     /// </summary>
@@ -20,6 +20,6 @@ public sealed class UpdateItemNameRequestValidator
             .NotEmpty().WithMessage(ValidationMessages.ItemNameRequired)
             .MaximumLength(100).WithMessage(ValidationMessages.ItemNameTooLong);
     }
-    
+
     #endregion
 }

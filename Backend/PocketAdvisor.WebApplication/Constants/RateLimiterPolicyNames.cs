@@ -1,4 +1,4 @@
-﻿namespace PocketAdvisor.WebApplication.Constants;
+namespace PocketAdvisor.WebApplication.Constants;
 
 /// <summary>
 /// Represents the rate limiter policy names used in the application.
@@ -9,7 +9,7 @@ public static class RateLimiterPolicyNames
     /// The name of the rate limiter policy applied to the authentication endpoints.
     /// </summary>
     public const string Authentication = "PocketAdvisorAuthenticationRateLimiterPolicy";
-    
+
     /// <summary>
     /// The name of the rate limiter policy applied to the token refresh endpoint.
     /// </summary>

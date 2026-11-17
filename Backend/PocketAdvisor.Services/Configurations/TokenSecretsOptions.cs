@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace PocketAdvisor.Services.Configurations;
 
@@ -12,25 +12,25 @@ public sealed class TokenSecretsOptions
     /// The name of the configuration section that contains token secrets.
     /// </summary>
     public static string SectionName => "TokenSecrets";
-    
+
     /// <summary>
     /// The secret used for email verification tokens.
     /// </summary>
     [Required]
     public required string EmailVerification { get; init; }
-    
+
     /// <summary>
     /// The secret used for JSON Web Tokens (JWT).
     /// </summary>
     [Required]
     public required string JsonWeb { get; init; }
-    
+
     /// <summary>
     /// The secret used for password reset tokens.
     /// </summary>
     [Required]
     public required string PasswordReset { get; init; }
-    
+
     /// <summary>
     /// The secret used for refresh tokens.
     /// </summary>

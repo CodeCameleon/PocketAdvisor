@@ -20,7 +20,7 @@ public interface ITransactionService
     /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
     Task<Result> CreateTransactionAsync(CreateTransactionRequest request, Guid userId);
-    
+
     /// <summary>
     /// Deletes the specified transaction and all of its items asynchronously.
     /// </summary>
@@ -31,7 +31,7 @@ public interface ITransactionService
     /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
     Task<Result> DeleteTransactionAsync(Guid transactionId, Guid userId);
-    
+
     /// <summary>
     /// Deletes a single item from the specified transaction asynchronously.
     /// </summary>
@@ -43,7 +43,7 @@ public interface ITransactionService
     /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
     Task<Result> DeleteTransactionItemAsync(Guid transactionId, Guid itemId, Guid userId);
-    
+
     /// <summary>
     /// Retrieves all transactions associated with the specified account asynchronously.
     /// </summary>
@@ -54,7 +54,7 @@ public interface ITransactionService
     /// read-only list of <see cref="TransactionResponse" /> objects.
     /// </returns>
     Task<IReadOnlyList<TransactionResponse>> GetTransactionsAsync(Guid accountId, Guid userId);
-    
+
     /// <summary>
     /// Retrieves all transactions that contain the specified item across all accounts.
     /// </summary>

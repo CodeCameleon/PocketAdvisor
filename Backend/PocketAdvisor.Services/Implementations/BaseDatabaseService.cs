@@ -13,7 +13,7 @@ public abstract class BaseDatabaseService<TService>
     where TService : class, IBaseService
 {
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="BaseDatabaseService{TService}" /> class.
     /// </summary>
@@ -26,18 +26,18 @@ public abstract class BaseDatabaseService<TService>
         : base(logger)
     {
         ArgumentNullException.ThrowIfNull(transactionManager);
-        
+
         TransactionManager = transactionManager;
     }
-    
+
     #endregion
-    
+
     #region Properties
-    
+
     /// <summary>
     /// The transaction manager of the database.
     /// </summary>
     protected ITransactionManager TransactionManager { get; }
-    
+
     #endregion
 }

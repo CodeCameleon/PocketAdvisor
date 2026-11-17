@@ -15,7 +15,7 @@ public interface IEmailClient
     /// If any of the given parameters is empty or consists only of white-space characters.
     /// </exception>
     Task SendEmailVerificationAsync(string email, string token);
-    
+
     /// <summary>
     /// Sends a password reset email to the given email address asynchronously.
     /// </summary>

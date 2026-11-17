@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 
 namespace PocketAdvisor.Repositories.Interfaces;
 
@@ -19,7 +19,7 @@ public interface IBaseRepository<TEntity>
     /// If the entity parameter is <see langword="null" />.
     /// </exception>
     Task CreateAsync(TEntity entity, CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Determines whether any entity matches the specified predicate asynchronously.
     /// </summary>
@@ -34,7 +34,7 @@ public interface IBaseRepository<TEntity>
     /// </exception>
     Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate,
         CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Retrieves a single entity that matches the specified predicate asynchronously.
     /// </summary>
@@ -57,7 +57,7 @@ public interface IBaseRepository<TEntity>
     Task<TEntity?> GetSingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate,
         bool asTracking = false, Func<IQueryable<TEntity>, IQueryable<TEntity>>? includes = null,
         CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Retrieves all entities that match the specified predicate asynchronously.
     /// </summary>
@@ -80,7 +80,7 @@ public interface IBaseRepository<TEntity>
     Task<IReadOnlyList<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate,
         bool asSplitQuery = false, Func<IQueryable<TEntity>, IQueryable<TEntity>>? includes = null,
         CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Updates an existing entity in the database.
     /// </summary>
@@ -89,7 +89,7 @@ public interface IBaseRepository<TEntity>
     /// If the entity parameter is <see langword="null" />.
     /// </exception>
     void Update(TEntity entity);
-    
+
     /// <summary>
     /// Deletes an existing entity from the database.
     /// </summary>

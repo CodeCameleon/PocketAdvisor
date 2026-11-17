@@ -10,7 +10,7 @@ public sealed class UpdateAccountNameRequestValidator
     : AbstractValidator<UpdateAccountNameRequest>
 {
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateAccountNameRequestValidator" /> class.
     /// </summary>
@@ -20,6 +20,6 @@ public sealed class UpdateAccountNameRequestValidator
             .NotEmpty().WithMessage(ValidationMessages.AccountNameRequired)
             .MaximumLength(100).WithMessage(ValidationMessages.AccountNameTooLong);
     }
-    
+
     #endregion
 }

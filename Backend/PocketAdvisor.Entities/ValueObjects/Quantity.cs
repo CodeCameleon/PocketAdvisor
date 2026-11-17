@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
@@ -14,31 +14,31 @@ public sealed class Quantity
     : IComparable<Quantity>, IEquatable<Quantity>
 {
     #region Constants
-    
+
     /// <summary>
     /// When the comparison is not possible because the units belong to different categories.
     /// </summary>
     private const string CategoryMismatchMessage = "Units must belong to the same category.";
-    
+
     /// <summary>
     /// When the comparison is not possible because one of the units belongs to the uncategorized category.
     /// </summary>
     private const string UncategorizedMessage = "Uncategorized units cannot be compared.";
-    
+
     /// <summary>
     /// The number of decimal places used when normalizing values for comparison and hashing.
     /// </summary>
     private const int Scale = 6;
-    
+
     /// <summary>
     /// The template used to stringify the object, parsed once for repeated use.
     /// </summary>
     private static readonly CompositeFormat FormatTemplate = CompositeFormat.Parse("{0} {1}");
-    
+
     #endregion
-    
+
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="Quantity" /> class,
     /// with the given value and unit.
@@ -50,26 +50,26 @@ public sealed class Quantity
         Value = value;
         Unit = unit;
     }
-    
+
     #endregion
-    
+
     #region Properties
-    
+
     /// <summary>
     /// The value of the quantity.
     /// </summary>
     [Precision(18, Scale)]
     public decimal Value { get; }
-    
+
     /// <summary>
     /// The unit of the quantity.
     /// </summary>
     public EUnit Unit { get; }
-    
+
     #endregion
-    
+
     #region Operators
-    
+
     /// <summary>
     /// Checks if the first quantity is less than the second quantity.
     /// </summary>
@@ -85,10 +85,10 @@ public sealed class Quantity
         {
             return right is not null;
         }
-        
+
         return left.CompareTo(right) < 0;
     }
-    
+
     /// <summary>
     /// Checks if the first quantity is greater than the second quantity.
     /// </summary>
@@ -104,10 +104,10 @@ public sealed class Quantity
         {
             return false;
         }
-        
+
         return left.CompareTo(right) > 0;
     }
-    
+
     /// <summary>
     /// Checks if the first quantity is less than or equal to the second quantity.
     /// </summary>
@@ -118,7 +118,7 @@ public sealed class Quantity
     /// equal to the second quantity, <see langword="false" /> otherwise.
     /// </returns>
     public static bool operator <=(Quantity? left, Quantity? right) => !(left > right);
-    
+
     /// <summary>
     /// Checks if the first quantity is greater than or equal to the second quantity.
     /// </summary>
@@ -129,7 +129,7 @@ public sealed class Quantity
     /// equal to the second quantity, <see langword="false" /> otherwise.
     /// </returns>
     public static bool operator >=(Quantity? left, Quantity? right) => !(left < right);
-    
+
     /// <summary>
     /// Checks if two quantities are equal.
     /// </summary>
@@ -142,10 +142,10 @@ public sealed class Quantity
         {
             return right is null;
         }
-        
+
         return left.Equals(right);
     }
-    
+
     /// <summary>
     /// Checks if two quantities are not equal.
     /// </summary>
@@ -153,11 +153,11 @@ public sealed class Quantity
     /// <param name="right">The second quantity.</param>
     /// <returns><see langword="true" />, if they are not equal, <see langword="false" /> otherwise.</returns>
     public static bool operator !=(Quantity? left, Quantity? right) => !(left == right);
-    
+
     #endregion
-    
+
     #region CompareTo
-    
+
     /// <inheritdoc />
     /// <exception cref="InvalidOperationException">
     /// If the units belong to different categories or<br />
@@ -169,33 +169,33 @@ public sealed class Quantity
         {
             return 1;
         }
-        
+
         if (Unit == other.Unit)
         {
             return Value.CompareTo(other.Value);
         }
-        
+
         EUnitCategory category = Unit.GetUnitCategory();
         EUnitCategory otherCategory = other.Unit.GetUnitCategory();
-        
+
         if (category == EUnitCategory.Uncategorized || otherCategory == EUnitCategory.Uncategorized)
         {
             throw new InvalidOperationException(UncategorizedMessage);
         }
-        
+
         if (category != otherCategory)
         {
             throw new InvalidOperationException(CategoryMismatchMessage);
         }
-        
+
         decimal factor = Unit.GetUnitFactor(other.Unit);
         return (Value * factor).CompareTo(other.Value);
     }
-    
+
     #endregion
-    
+
     #region Equals
-    
+
     /// <inheritdoc />
     public bool Equals(Quantity? other)
     {
@@ -203,70 +203,70 @@ public sealed class Quantity
         {
             return false;
         }
-        
+
         if (Unit == other.Unit)
         {
             return Value == other.Value;
         }
-        
+
         EUnitCategory category = Unit.GetUnitCategory();
         EUnitCategory otherCategory = other.Unit.GetUnitCategory();
-        
+
         if (category == EUnitCategory.Uncategorized ||
             otherCategory == EUnitCategory.Uncategorized ||
             category != otherCategory)
         {
             return false;
         }
-        
+
         decimal factor = Unit.GetUnitFactor(other.Unit);
         decimal normalized = Math.Round(Value * factor, Scale);
         decimal otherValue = Math.Round(other.Value, Scale);
-        
+
         return normalized == otherValue;
     }
-    
+
     /// <inheritdoc />
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is Quantity other && Equals(other);
     }
-    
+
     #endregion
-    
+
     #region GetHashCode
-    
+
     /// <inheritdoc />
     public override int GetHashCode()
     {
         EUnitCategory category = Unit.GetUnitCategory();
-        
+
         if (category == EUnitCategory.Uncategorized)
         {
             return HashCode.Combine(Value, Unit);
         }
-        
+
         EUnit baseUnit = category.GetBaseUnit();
-        
+
         if (Unit == baseUnit)
         {
             return HashCode.Combine(Value, Unit);
         }
-        
+
         decimal factor = Unit.GetUnitFactor(baseUnit);
         decimal normalized = Math.Round(Value * factor, Scale);
         return HashCode.Combine(normalized, baseUnit);
     }
-    
+
     #endregion
-    
+
     #region ToString
-    
+
     /// <inheritdoc />
     public override string ToString()
     {
         return string.Format(CultureInfo.InvariantCulture, FormatTemplate, Value, Unit);
     }
-    
+
     #endregion
 }

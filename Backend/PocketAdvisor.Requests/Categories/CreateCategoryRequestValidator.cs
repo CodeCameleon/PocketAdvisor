@@ -10,7 +10,7 @@ public sealed class CreateCategoryRequestValidator
     : AbstractValidator<CreateCategoryRequest>
 {
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="CreateCategoryRequestValidator" /> class.
     /// </summary>
@@ -20,6 +20,6 @@ public sealed class CreateCategoryRequestValidator
             .NotEmpty().WithMessage(ValidationMessages.CategoryNameRequired)
             .MaximumLength(100).WithMessage(ValidationMessages.CategoryNameTooLong);
     }
-    
+
     #endregion
 }

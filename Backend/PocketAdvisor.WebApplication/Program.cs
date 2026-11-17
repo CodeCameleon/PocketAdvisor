@@ -83,7 +83,7 @@ using (IServiceScope scope = app.Services.CreateScope())
     IServiceProvider serviceProvider = scope.ServiceProvider;
     PocketAdvisorDbContext context = serviceProvider.GetRequiredService<PocketAdvisorDbContext>();
     await context.Database.MigrateAsync();
-    
+
     if (app.Environment.IsDevelopment())
     {
         IDataSeeder seeder = serviceProvider.GetRequiredService<IDataSeeder>();

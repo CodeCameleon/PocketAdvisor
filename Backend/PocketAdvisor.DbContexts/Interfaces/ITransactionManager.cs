@@ -1,4 +1,4 @@
-﻿namespace PocketAdvisor.DbContexts.Interfaces;
+namespace PocketAdvisor.DbContexts.Interfaces;
 
 /// <summary>
 /// Defines the interface for managing database transactions.
@@ -18,7 +18,7 @@ public interface ITransactionManager
     /// If the manager has already been disposed of.
     /// </exception>
     Task BeginTransactionAsync(CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Commits the current database transaction asynchronously.
     /// If it fails, the transaction is rolled back automatically.
@@ -32,7 +32,7 @@ public interface ITransactionManager
     /// If the manager has already been disposed of.
     /// </exception>
     Task CommitTransactionAsync(CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Saves all changes made in the current database transaction asynchronously.
     /// If it fails, the transaction is rolled back automatically.

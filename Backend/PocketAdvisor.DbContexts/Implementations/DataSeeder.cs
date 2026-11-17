@@ -13,7 +13,7 @@ public sealed class DataSeeder
     : IDataSeeder
 {
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="DataSeeder" /> class.
     /// </summary>
@@ -26,29 +26,29 @@ public sealed class DataSeeder
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(passwordHasher);
-        
+
         Context = context;
         PasswordHasher = passwordHasher;
     }
-    
+
     #endregion
-    
+
     #region Properties
-    
+
     /// <summary>
     /// The database context instance.
     /// </summary>
     private PocketAdvisorDbContext Context { get; }
-    
+
     /// <summary>
     /// The password hasher for hashing user passwords.
     /// </summary>
     private IPasswordHasher<User> PasswordHasher { get; }
-    
+
     #endregion
-    
+
     #region SeedAsync
-    
+
     /// <inheritdoc />
     public async Task SeedAsync(CancellationToken cancellationToken = default)
     {
@@ -56,19 +56,19 @@ public sealed class DataSeeder
         {
             return;
         }
-        
+
         User adminUser = CreateUser("admin@pocketadvisor.dev", "Admin12!", EUserRole.Administrator);
         User regularUser = CreateUser("user@pocketadvisor.dev", "User123!", EUserRole.User);
-        
+
         await Context.Users.AddRangeAsync(adminUser, regularUser);
         await Context.SaveChangesAsync(cancellationToken);
-        
+
         Account bankAccount = CreateAccount("Bank", 350_000.00m, ECurrencyCode.Huf, regularUser);
         Account cashAccount = CreateAccount("Wallet", 15_000.00m, ECurrencyCode.Huf, regularUser);
-        
+
         await Context.Accounts.AddRangeAsync(bankAccount, cashAccount);
         await Context.SaveChangesAsync(cancellationToken);
-        
+
         List<Category> globalCategories =
         [
             CreateCategory("Clothing", null),
@@ -81,7 +81,7 @@ public sealed class DataSeeder
             CreateCategory("Transfers", null),
             CreateCategory("Transportation", null)
         ];
-        
+
         Category clothing = globalCategories[0];
         Category diningOut = globalCategories[1];
         Category entertainment = globalCategories[3];
@@ -89,20 +89,20 @@ public sealed class DataSeeder
         Category housing = globalCategories[6];
         Category transfers = globalCategories[7];
         Category transport = globalCategories[8];
-        
+
         List<Category> personalCategories =
         [
             CreateCategory("Gym & Sports", regularUser),
             CreateCategory("Side Projects", regularUser),
             CreateCategory("Subscriptions", regularUser)
         ];
-        
+
         Category gymSports = personalCategories[0];
         Category subscriptions = personalCategories[2];
-        
+
         await Context.Categories.AddRangeAsync([.. globalCategories, .. personalCategories]);
         await Context.SaveChangesAsync(cancellationToken);
-        
+
         List<Item> items =
         [
             CreateItem("Bread", EUnitCategory.Mass, regularUser),
@@ -123,7 +123,7 @@ public sealed class DataSeeder
             CreateItem("Streaming Service", EUnitCategory.Time, regularUser),
             CreateItem("Transfer", EUnitCategory.Uncategorized, regularUser)
         ];
-        
+
         Item bread = items[0];
         Item busTicket = items[1];
         Item chicken = items[2];
@@ -141,12 +141,12 @@ public sealed class DataSeeder
         Item rice = items[14];
         Item streaming = items[15];
         Item transfer = items[16];
-        
+
         await Context.Items.AddRangeAsync(items, cancellationToken);
         await Context.SaveChangesAsync(cancellationToken);
-        
+
         DateTime now = DateTime.UtcNow;
-        
+
         List<Transaction> transactions =
         [
             // 1 – Weekly grocery run
@@ -214,10 +214,10 @@ public sealed class DataSeeder
             // 32 – Grocery run yesterday
             CreateTransaction(Day(1), groceries, bankAccount, null),
         ];
-        
+
         await Context.Transactions.AddRangeAsync(transactions, cancellationToken);
         await Context.SaveChangesAsync(cancellationToken);
-        
+
         List<TransactionItem> transactionItems =
         [
             // 1 – Weekly grocery run
@@ -304,19 +304,19 @@ public sealed class DataSeeder
             CreateTransactionItem(transactions[31], oliveOil, 520m, 0.500m, EUnit.Liter),
             CreateTransactionItem(transactions[31], rice, 560m, 2_000m, EUnit.Gram),
         ];
-        
+
         await Context.TransactionItems.AddRangeAsync(transactionItems, cancellationToken);
         await Context.SaveChangesAsync(cancellationToken);
-        
+
         return;
-        
+
         DateTime Day(int daysAgo) => now.AddDays(-daysAgo);
     }
-    
+
     #endregion
-    
+
     #region CreateAccount
-    
+
     /// <summary>
     /// Creates a new account entity with the given parameters.
     /// </summary>
@@ -334,14 +334,14 @@ public sealed class DataSeeder
             CurrencyCode = currencyCode,
             UserId = user.Id,
         };
-        
+
         return account;
     }
-    
+
     #endregion
-    
+
     #region CreateCategory
-    
+
     /// <summary>
     /// Creates a new category entity with the given parameters.
     /// </summary>
@@ -357,14 +357,14 @@ public sealed class DataSeeder
             Name = name,
             UserId = user?.Id,
         };
-        
+
         return category;
     }
-    
+
     #endregion
-    
+
     #region CreateItem
-    
+
     /// <summary>
     /// Creates a new item entity with the given parameters.
     /// </summary>
@@ -380,14 +380,14 @@ public sealed class DataSeeder
             UnitCategory = unitCategory,
             UserId = user.Id,
         };
-        
+
         return item;
     }
-    
+
     #endregion
-    
+
     #region CreateTransaction
-    
+
     /// <summary>
     /// Create a new transaction entity with the given parameters.
     /// </summary>
@@ -406,14 +406,14 @@ public sealed class DataSeeder
             FromAccountId = fromAccount?.Id,
             ToAccountId = toAccount?.Id
         };
-        
+
         return transaction;
     }
-    
+
     #endregion
-    
+
     #region CreateTransactionItem
-    
+
     /// <summary>
     /// Create a new transaction item entity with the given parameters.
     /// </summary>
@@ -433,14 +433,14 @@ public sealed class DataSeeder
             TotalPrice = totalPrice,
             Amount = new(amount, unit),
         };
-        
+
         return transactionItem;
     }
-    
+
     #endregion
-    
+
     #region CreateUser
-    
+
     /// <summary>
     /// Create a new user entity with the given parameters.
     /// </summary>
@@ -458,9 +458,9 @@ public sealed class DataSeeder
             Role = role,
         };
         user.PasswordHash = PasswordHasher.HashPassword(user, password);
-        
+
         return user;
     }
-    
+
     #endregion
 }

@@ -11,7 +11,7 @@ public sealed class CreateItemRequest
     /// The name of the item.
     /// </summary>
     public string? Name { get; set; }
-    
+
     /// <summary>
     /// The unit category of the item.
     /// </summary>

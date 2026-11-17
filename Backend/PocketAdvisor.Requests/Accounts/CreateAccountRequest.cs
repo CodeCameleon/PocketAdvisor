@@ -11,12 +11,12 @@ public sealed class CreateAccountRequest
     /// The name of the account.
     /// </summary>
     public string? Name { get; set; }
-    
+
     /// <summary>
     /// The starting balance of the account.
     /// </summary>
     public decimal? Balance { get; set; }
-    
+
     /// <summary>
     /// The currency code of the account.
     /// </summary>

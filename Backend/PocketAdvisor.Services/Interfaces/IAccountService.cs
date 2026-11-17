@@ -20,7 +20,7 @@ public interface IAccountService
     /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
     Task<Result> CreateAccountAsync(CreateAccountRequest request, Guid userId);
-    
+
     /// <summary>
     /// Deletes the specified account asynchronously.
     /// </summary>
@@ -31,7 +31,7 @@ public interface IAccountService
     /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
     Task<Result> DeleteAccountAsync(Guid accountId, Guid userId);
-    
+
     /// <summary>
     /// Retrieves all accounts that belong to the specified user asynchronously.
     /// </summary>
@@ -41,7 +41,7 @@ public interface IAccountService
     /// read-only list of <see cref="AccountResponse" /> representing the user's accounts.
     /// </returns>
     Task<IReadOnlyList<AccountResponse>> GetAccountsAsync(Guid userId);
-    
+
     /// <summary>
     /// Updates the name of the specified account asynchronously.
     /// </summary>

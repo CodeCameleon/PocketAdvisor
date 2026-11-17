@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using PocketAdvisor.DbContexts;
 using PocketAdvisor.Entities;
 using PocketAdvisor.Repositories.Interfaces;
@@ -12,7 +12,7 @@ public sealed class ItemRepository
     : BaseRepository<Item, ItemRepository>, IItemRepository
 {
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ItemRepository" /> class.
     /// </summary>
@@ -21,8 +21,8 @@ public sealed class ItemRepository
     public ItemRepository(ILogger<ItemRepository> logger, PocketAdvisorDbContext context)
         : base(logger, context, c => c.Items)
     {
-        
+
     }
-    
+
     #endregion
 }

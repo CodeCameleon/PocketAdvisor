@@ -1,4 +1,4 @@
-﻿namespace PocketAdvisor.Enums.Extensions;
+namespace PocketAdvisor.Enums.Extensions;
 
 /// <summary>
 /// The extensions methods for the <see cref="ECurrencyCode" /> enum.

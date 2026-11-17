@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace PocketAdvisor.Entities;
 
@@ -12,44 +12,44 @@ public class Transaction
     /// </summary>
     [Key]
     public Guid Id { get; set; }
-    
+
     /// <summary>
     /// The occurrence date and time of the transaction.
     /// </summary>
     public required DateTime OccurredAt { get; set; }
-    
+
     /// <summary>
     /// The identifier of the category to which the transaction belongs.
     /// </summary>
     public required Guid CategoryId { get; set; }
-    
+
     /// <summary>
     /// The identifier of the account from which the transaction originated.<br />
     /// If <see langword="null" />, the transaction is considered as an income.
     /// </summary>
-    public required Guid? FromAccountId  { get; set; }
-    
+    public required Guid? FromAccountId { get; set; }
+
     /// <summary>
     /// The identifier of the account to which the transaction is directed.<br />
     /// If <see langword="null" />, the transaction is considered as an expense.
     /// </summary>
-    public required Guid? ToAccountId  { get; set; }
-    
+    public required Guid? ToAccountId { get; set; }
+
     /// <summary>
     /// The navigational property of the category to which the transaction belongs.
     /// </summary>
     public virtual Category? Category { get; set; }
-    
+
     /// <summary>
     /// The navigational property of the account from which the transaction originated.
     /// </summary>
     public virtual Account? FromAccount { get; set; }
-    
+
     /// <summary>
     /// The navigational property of the account to which the transaction is directed.
     /// </summary>
     public virtual Account? ToAccount { get; set; }
-    
+
     /// <summary>
     /// The navigational property of the connection entities linking this transaction to its items.
     /// </summary>

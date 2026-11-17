@@ -18,17 +18,17 @@ public abstract class BaseController<TService>
     where TService : IBaseService
 {
     #region Constants
-    
+
     /// <summary>
     /// When the subject claim is missing from the JWT token.
     /// </summary>
     private const string UnauthorizedMessage = "Unauthorized access. Ensure the endpoint is protected with " +
         "the [Authorize] attribute and a valid JWT token is provided.";
-    
+
     #endregion
-    
+
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="BaseController{TService}" /> class.
     /// </summary>
@@ -39,14 +39,14 @@ public abstract class BaseController<TService>
     protected BaseController(TService service)
     {
         ArgumentNullException.ThrowIfNull(service);
-        
+
         Service = service;
     }
-    
+
     #endregion
-    
+
     #region Properties
-    
+
     /// <summary>
     /// The ID of the currently authenticated user, extracted from the JWT subject claim.
     /// </summary>
@@ -58,25 +58,25 @@ public abstract class BaseController<TService>
         get
         {
             string? subject = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            
+
             if (subject is null || !Guid.TryParse(subject, out Guid userId))
             {
                 throw new UnauthorizedAccessException(UnauthorizedMessage);
             }
-            
+
             return userId;
         }
     }
-    
+
     /// <summary>
     /// The service to be used by the controller.
     /// </summary>
     protected TService Service { get; }
-    
+
     #endregion
-    
+
     #region BadRequest
-    
+
     /// <summary>
     /// Creates a <see cref="BadRequestObjectResult" /> that produces a status code 400 response.
     /// </summary>
@@ -88,33 +88,33 @@ public abstract class BaseController<TService>
     protected BadRequestObjectResult BadRequest(IReadOnlyList<IError> errors)
     {
         ArgumentNullException.ThrowIfNull(errors);
-        
+
         ModelStateDictionary modelState = new();
-        
+
         foreach (IError error in errors)
         {
             string key = string.Empty;
-            
+
             if (error.Metadata.TryGetValue(ErrorMetadataKeys.PropertyName, out object? propertyName))
             {
                 key = propertyName.ToString()!;
             }
-            
+
             modelState.AddModelError(key, error.Message);
         }
-        
+
         ValidationProblemDetails validationProblemDetails = ProblemDetailsFactory.CreateValidationProblemDetails(
             HttpContext,
             modelState
         );
-        
+
         return base.BadRequest(validationProblemDetails);
     }
-    
+
     #endregion
-    
+
     #region HandleFailure
-    
+
     /// <summary>
     /// Inspects the errors of a failed <see cref="Result" /> and returns
     /// the appropriate <see cref="IActionResult" />:<br />
@@ -130,14 +130,14 @@ public abstract class BaseController<TService>
         {
             return Conflict();
         }
-        
+
         if (result.Errors.Any(e => e.Metadata.TryGetValue(ErrorMetadataKeys.NotFound, out _)))
         {
             return NotFound();
         }
-        
+
         return BadRequest(result.Errors);
     }
-    
+
     #endregion
 }

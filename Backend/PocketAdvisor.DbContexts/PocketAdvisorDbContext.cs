@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PocketAdvisor.Entities;
 using PocketAdvisor.Entities.ValueObjects;
 
@@ -11,57 +11,57 @@ public sealed class PocketAdvisorDbContext
     : DbContext
 {
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="PocketAdvisorDbContext" /> class,
     /// using the specified options.
     /// </summary>
     /// <param name="options">The options to be used by the context.</param>
     public PocketAdvisorDbContext(DbContextOptions<PocketAdvisorDbContext> options) : base(options) { }
-    
+
     #endregion
-    
+
     #region DbSets
-    
+
     /// <summary>
     /// The database table for the account entities.
     /// </summary>
-    public DbSet<Account> Accounts { get; set; }
-    
+    public DbSet<Account> Accounts => Set<Account>();
+
     /// <summary>
     /// The database table for the category entities.
     /// </summary>
-    public DbSet<Category> Categories { get; set; }
-    
+    public DbSet<Category> Categories => Set<Category>();
+
     /// <summary>
     /// The database table for the item entities.
     /// </summary>
-    public DbSet<Item> Items { get; set; }
-    
+    public DbSet<Item> Items => Set<Item>();
+
     /// <summary>
     /// The database table for the token entities.
     /// </summary>
-    public DbSet<Token> Tokens { get; set; }
-    
+    public DbSet<Token> Tokens => Set<Token>();
+
     /// <summary>
     /// The database table for the transaction entities.
     /// </summary>
-    public DbSet<Transaction> Transactions { get; set; }
-    
+    public DbSet<Transaction> Transactions => Set<Transaction>();
+
     /// <summary>
     /// The database table for the transaction and item connection entities.
     /// </summary>
-    public DbSet<TransactionItem> TransactionItems { get; set; }
-    
+    public DbSet<TransactionItem> TransactionItems => Set<TransactionItem>();
+
     /// <summary>
     /// The database table for the user entities.
     /// </summary>
-    public DbSet<User> Users { get; set; }
-    
+    public DbSet<User> Users => Set<User>();
+
     #endregion
-    
+
     #region OnModelCreating
-    
+
     /// <summary>
     /// Configures the model that was discovered by convention from the entity types
     /// exposed in <see cref="DbSet{TEntity}" /> properties on your derived context.
@@ -70,7 +70,7 @@ public sealed class PocketAdvisorDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+
         modelBuilder.Entity<Account>(entity =>
         {
             entity.HasIndex(a => new { a.Name, a.UserId }).IsUnique();
@@ -79,7 +79,7 @@ public sealed class PocketAdvisorDbContext
                 .HasForeignKey(a => a.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
-        
+
         modelBuilder.Entity<Category>(entity =>
         {
             entity.HasIndex(c => new { c.Name, c.UserId }).IsUnique();
@@ -88,7 +88,7 @@ public sealed class PocketAdvisorDbContext
                 .HasForeignKey(c => c.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
-        
+
         modelBuilder.Entity<Item>(entity =>
         {
             entity.HasIndex(i => new { i.Name, i.UserId }).IsUnique();
@@ -97,7 +97,7 @@ public sealed class PocketAdvisorDbContext
                 .HasForeignKey(i => i.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
-        
+
         modelBuilder.Entity<Token>(entity =>
         {
             entity.HasIndex(t => t.Hash).IsUnique();
@@ -106,7 +106,7 @@ public sealed class PocketAdvisorDbContext
                 .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
-        
+
         modelBuilder.Entity<Transaction>(entity =>
         {
             entity.HasOne(t => t.Category)
@@ -122,7 +122,7 @@ public sealed class PocketAdvisorDbContext
                 .HasForeignKey(t => t.ToAccountId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
-        
+
         modelBuilder.Entity<TransactionItem>(entity =>
         {
             entity.HasKey(ti => new { ti.TransactionId, ti.ItemId });
@@ -139,18 +139,18 @@ public sealed class PocketAdvisorDbContext
                 ti.Property(a => a.Value).HasColumnName(
                     nameof(TransactionItem.Amount) + nameof(Quantity.Value)
                 );
-                
+
                 ti.Property(a => a.Unit).HasColumnName(
                     nameof(TransactionItem.Amount) + nameof(Quantity.Unit)
                 );
             });
         });
-        
+
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasIndex(u => u.Email).IsUnique();
         });
     }
-    
+
     #endregion
 }

@@ -1,4 +1,4 @@
-﻿namespace PocketAdvisor.Services.Configurations;
+namespace PocketAdvisor.Services.Configurations;
 
 /// <summary>
 /// Defines the base interface for all configuration options.

@@ -1,4 +1,4 @@
-﻿namespace PocketAdvisor.Requests.Users;
+namespace PocketAdvisor.Requests.Users;
 
 /// <summary>
 /// The request model for creating a new user in the system.
@@ -9,12 +9,12 @@ public sealed class CreateUserRequest
     /// The email address of the user.
     /// </summary>
     public string? Email { get; set; }
-    
+
     /// <summary>
     /// The password of the user.
     /// </summary>
     public string? Password { get; set; }
-    
+
     /// <summary>
     /// The confirmation of the password.
     /// </summary>

@@ -1,4 +1,4 @@
-﻿namespace PocketAdvisor.Services.Interfaces;
+namespace PocketAdvisor.Services.Interfaces;
 
 /// <summary>
 /// Defines the base service interface for all services.

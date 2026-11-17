@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using Microsoft.OpenApi;
 
@@ -10,52 +10,52 @@ namespace PocketAdvisor.WebApplication.Extensions;
 public static class SwaggerExtensions
 {
     #region Constants
-    
+
     /// <summary>
     /// The format of the JWT Bearer token used in the Swagger documentation.
     /// </summary>
     private const string JwtBearerFormat = "JWT";
-    
+
     /// <summary>
     /// The name of the JWT Bearer security scheme used in the Swagger documentation.
     /// </summary>
     private const string JwtBearerScheme = "Bearer";
-    
+
     /// <summary>
     /// The description of the security scheme used in the Swagger documentation.
     /// </summary>
     private const string SchemeDescription = "Please enter a JWT Bearer token.";
-    
+
     /// <summary>
     /// The name of the security scheme used in the Swagger documentation.
     /// </summary>
     private const string SchemeName = "Authorization";
-    
+
     /// <summary>
     /// The name of the Swagger documentation.
     /// </summary>
     private const string SwaggerName = "PocketAdvisor API v1";
-    
+
     /// <summary>
     /// The title of the Swagger documentation.
     /// </summary>
     private const string SwaggerTitle = "PocketAdvisor API";
-    
+
     /// <summary>
     /// The URL of the Swagger JSON file.
     /// </summary>
     private const string SwaggerUrl = "v1/swagger.json";
-    
+
     /// <summary>
     /// The version of the Swagger documentation.
     /// </summary>
     private const string SwaggerVersion = "v1";
-    
+
     /// <summary>
     /// The template used for the generated XML documentation files, parsed once for repeated use.
     /// </summary>
     private static readonly CompositeFormat XmlFileTemplate = CompositeFormat.Parse("PocketAdvisor.{0}.xml");
-    
+
     /// <summary>
     /// The list of XML documentation files to include in the Swagger documentation.
     /// </summary>
@@ -64,11 +64,11 @@ public static class SwaggerExtensions
         "Responses",
         "WebApplication"
     );
-    
+
     #endregion
-    
+
     #region AddPocketAdvisorSwagger
-    
+
     /// <summary>
     /// Adds the services needed for Swagger to the service collection.<br />
     /// The services are only registered in the development environment.
@@ -81,9 +81,9 @@ public static class SwaggerExtensions
         {
             return;
         }
-        
+
         services.AddEndpointsApiExplorer();
-        
+
         services.AddSwaggerGen(options =>
         {
             options.SwaggerDoc(
@@ -94,9 +94,9 @@ public static class SwaggerExtensions
                     Version = SwaggerVersion
                 }
             );
-            
+
             XmlDocumentationFiles.ForEach(file => options.IncludeXmlComments(file));
-            
+
             OpenApiSecurityScheme securityScheme = new()
             {
                 Name = SchemeName,
@@ -107,18 +107,18 @@ public static class SwaggerExtensions
                 BearerFormat = JwtBearerFormat
             };
             options.AddSecurityDefinition(JwtBearerScheme, securityScheme);
-            
+
             options.AddSecurityRequirement(document => new()
             {
                 [new(JwtBearerScheme, document)] = []
             });
         });
     }
-    
+
     #endregion
-    
+
     #region UsePocketAdvisorSwagger
-    
+
     /// <summary>
     /// Adds the middleware for Swagger JSON and user interface generation.<br />
     /// Both the generated JSON document and the Swagger UI are only
@@ -131,19 +131,19 @@ public static class SwaggerExtensions
         {
             return;
         }
-        
+
         application.UseSwagger();
-        
+
         application.UseSwaggerUI(options =>
         {
             options.SwaggerEndpoint(SwaggerUrl, SwaggerName);
         });
     }
-    
+
     #endregion
-    
+
     #region InitXmlDocumentationFiles
-    
+
     /// <summary>
     /// Initializes the list of XML documentation files to include in the Swagger documentation.
     /// </summary>
@@ -152,22 +152,22 @@ public static class SwaggerExtensions
     private static List<string> InitXmlDocumentationFiles(params string[] assemblies)
     {
         List<string> xmlFiles = [];
-        
+
         foreach (string file in assemblies)
         {
             string path = Path.Combine(
                 AppContext.BaseDirectory,
                 string.Format(CultureInfo.InvariantCulture, XmlFileTemplate, file)
             );
-            
+
             if (File.Exists(path))
             {
                 xmlFiles.Add(path);
             }
         }
-        
+
         return xmlFiles;
     }
-    
+
     #endregion
 }

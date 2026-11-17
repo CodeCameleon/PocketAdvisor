@@ -19,7 +19,7 @@ public interface ICategoryService
     /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
     Task<Result> CreateGlobalCategoryAsync(CreateCategoryRequest request);
-    
+
     /// <summary>
     /// Creates a new personal category for the specified user asynchronously.
     /// </summary>
@@ -30,7 +30,7 @@ public interface ICategoryService
     /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
     Task<Result> CreatePersonalCategoryAsync(CreateCategoryRequest request, Guid userId);
-    
+
     /// <summary>
     /// Deletes the specified global category asynchronously.
     /// </summary>
@@ -40,7 +40,7 @@ public interface ICategoryService
     /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
     Task<Result> DeleteGlobalCategoryAsync(Guid categoryId);
-    
+
     /// <summary>
     /// Deletes the specified personal category asynchronously.
     /// </summary>
@@ -51,7 +51,7 @@ public interface ICategoryService
     /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
     Task<Result> DeletePersonalCategoryAsync(Guid categoryId, Guid userId);
-    
+
     /// <summary>
     /// Retrieves all categories visible to the specified user asynchronously.
     /// </summary>
@@ -61,7 +61,7 @@ public interface ICategoryService
     /// read-only list of <see cref="CategoryResponse" /> objects.
     /// </returns>
     Task<IReadOnlyList<CategoryResponse>> GetCategoriesAsync(Guid userId);
-    
+
     /// <summary>
     /// Updates the name of the specified global category asynchronously.
     /// </summary>
@@ -72,7 +72,7 @@ public interface ICategoryService
     /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
     Task<Result> UpdateGlobalCategoryNameAsync(Guid categoryId, UpdateCategoryNameRequest request);
-    
+
     /// <summary>
     /// Updates the name of the specified personal category asynchronously.
     /// </summary>

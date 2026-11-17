@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PocketAdvisor.Services.Clients.Implementations;
 using PocketAdvisor.Services.Clients.Interfaces;
@@ -15,7 +15,7 @@ namespace PocketAdvisor.Services.Extensions;
 public static class ServiceCollectionExtensions
 {
     #region AddServices
-    
+
     /// <summary>
     /// Adds the services to the service collection.
     /// </summary>
@@ -27,20 +27,20 @@ public static class ServiceCollectionExtensions
         services.AddOptions<JsonWebTokenOptions>(configuration);
         services.AddOptions<TokenExpirationsOptions>(configuration);
         services.AddOptions<TokenSecretsOptions>(configuration);
-        
+
         services.AddScoped<IEmailClient, ResendEmailClient>();
-        
+
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IItemService, ItemService>();
         services.AddScoped<ITransactionService, TransactionService>();
         services.AddScoped<IUserService, UserService>();
     }
-    
+
     #endregion
-    
+
     #region AddResendClient
-    
+
     /// <summary>
     /// Adds the Resend client to the service collection.
     /// </summary>
@@ -55,11 +55,11 @@ public static class ServiceCollectionExtensions
         });
         services.AddTransient<IResend, ResendClient>();
     }
-    
+
     #endregion
-    
+
     #region AddOptions
-    
+
     /// <summary>
     /// Adds the options of the given type to the service collection.
     /// </summary>
@@ -74,6 +74,6 @@ public static class ServiceCollectionExtensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
     }
-    
+
     #endregion
 }
