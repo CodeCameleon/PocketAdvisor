@@ -9,7 +9,7 @@ public sealed class LoginRequest
     /// The email address of the user.
     /// </summary>
     public string? Email { get; set; }
-    
+
     /// <summary>
     /// The password of the user.
     /// </summary>

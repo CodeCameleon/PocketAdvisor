@@ -17,17 +17,17 @@ public sealed class ItemController
     : BaseController<IItemService>
 {
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ItemController" /> class.
     /// </summary>
     /// <param name="itemService">The item service instance.</param>
     public ItemController(IItemService itemService) : base(itemService) { }
-    
+
     #endregion
-    
+
     #region CreateItemAsync
-    
+
     /// <summary>
     /// Creates a new item for the currently authenticated user asynchronously.
     /// </summary>
@@ -38,19 +38,19 @@ public sealed class ItemController
     public async Task<IActionResult> CreateItemAsync([FromBody] CreateItemRequest request)
     {
         Result result = await Service.CreateItemAsync(request, CurrentUserId);
-        
+
         if (result.IsFailed)
         {
             return BadRequest(result.Errors);
         }
-        
+
         return StatusCode(StatusCodes.Status201Created);
     }
-    
+
     #endregion
-    
+
     #region DeleteItemAsync
-    
+
     /// <summary>
     /// Deletes the specified item belonging to the currently authenticated user asynchronously.
     /// </summary>
@@ -61,19 +61,19 @@ public sealed class ItemController
     public async Task<IActionResult> DeleteItemAsync([FromRoute] Guid id)
     {
         Result result = await Service.DeleteItemAsync(id, CurrentUserId);
-        
+
         if (result.IsFailed)
         {
             return NotFound();
         }
-        
+
         return NoContent();
     }
-    
+
     #endregion
-    
+
     #region GetItemsAsync
-    
+
     /// <summary>
     /// Retrieves all items belonging to the currently authenticated user asynchronously.
     /// </summary>
@@ -84,11 +84,11 @@ public sealed class ItemController
         IReadOnlyList<ItemResponse> response = await Service.GetItemsAsync(CurrentUserId);
         return Ok(response);
     }
-    
+
     #endregion
-    
+
     #region UpdateItemNameAsync
-    
+
     /// <summary>
     /// Updates the name of the specified item belonging to the currently authenticated user asynchronously.
     /// </summary>
@@ -102,14 +102,14 @@ public sealed class ItemController
         [FromBody] UpdateItemNameRequest request)
     {
         Result result = await Service.UpdateItemNameAsync(id, request, CurrentUserId);
-        
+
         if (result.IsFailed)
         {
             return HandleFailure(result);
         }
-        
+
         return NoContent();
     }
-    
+
     #endregion
 }

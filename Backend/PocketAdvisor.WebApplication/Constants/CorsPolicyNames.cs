@@ -1,4 +1,4 @@
-﻿namespace PocketAdvisor.WebApplication.Constants;
+namespace PocketAdvisor.WebApplication.Constants;
 
 /// <summary>
 /// Represents the CORS policy names used in the application.

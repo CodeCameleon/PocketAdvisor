@@ -10,13 +10,13 @@ public sealed class JsonWebTokenOptions
 {
     /// <inheritdoc />
     public static string SectionName => "JsonWebToken";
-    
+
     /// <summary>
     /// The issuer of the JSON Web Token.
     /// </summary>
     [Required]
     public required string Issuer { get; init; }
-    
+
     /// <summary>
     /// The audience of the JSON Web Token.
     /// </summary>

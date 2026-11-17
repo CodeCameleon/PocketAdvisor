@@ -1,4 +1,4 @@
-﻿namespace PocketAdvisor.Enums.Extensions;
+namespace PocketAdvisor.Enums.Extensions;
 
 /// <summary>
 /// The extensions methods for the <see cref="ECurrencyCode" /> enum.
@@ -12,6 +12,6 @@ public static class ECurrencyCodeExtensions
     /// <returns>The ISO 4217 code of the currency code.</returns>
     public static string GetIsoCode(this ECurrencyCode currencyCode)
     {
-        return currencyCode.ToString().ToUpper();
+        return currencyCode.ToString().ToUpperInvariant();
     }
 }

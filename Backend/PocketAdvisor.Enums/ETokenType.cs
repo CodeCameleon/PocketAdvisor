@@ -1,4 +1,4 @@
-﻿namespace PocketAdvisor.Enums;
+namespace PocketAdvisor.Enums;
 
 /// <summary>
 /// The enumeration containing the possible token types in the system.
@@ -9,12 +9,12 @@ public enum ETokenType
     /// The email verification token type.
     /// </summary>
     EmailVerification = 1,
-    
+
     /// <summary>
     /// The password reset token type.
     /// </summary>
     PasswordReset = 2,
-    
+
     /// <summary>
     /// The refresh token type.
     /// </summary>

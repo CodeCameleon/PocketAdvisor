@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using PocketAdvisor.DbContexts;
 using PocketAdvisor.Entities;
 using PocketAdvisor.Repositories.Interfaces;
@@ -12,7 +12,7 @@ public sealed class AccountRepository
     : BaseRepository<Account, AccountRepository>, IAccountRepository
 {
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="AccountRepository" /> class.
     /// </summary>
@@ -21,8 +21,8 @@ public sealed class AccountRepository
     public AccountRepository(ILogger<AccountRepository> logger, PocketAdvisorDbContext context)
         : base(logger, context, c => c.Accounts)
     {
-        
+
     }
-    
+
     #endregion
 }

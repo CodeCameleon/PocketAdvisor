@@ -13,7 +13,7 @@ public abstract class BaseService<TService>
     where TService : class, IBaseService
 {
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="BaseService{TService}" /> class.
     /// </summary>
@@ -24,23 +24,23 @@ public abstract class BaseService<TService>
     protected BaseService(ILogger<TService> logger)
     {
         ArgumentNullException.ThrowIfNull(logger);
-        
+
         Logger = logger;
     }
-    
+
     #endregion
-    
+
     #region Properties
-    
+
     /// <summary>
     /// The logger for the class.
     /// </summary>
     protected ILogger<TService> Logger { get; }
-    
+
     #endregion
-    
+
     #region CreateConflictError
-    
+
     /// <summary>
     /// Creates a new conflict <see cref="Error" /> that can be returned in a <see cref="Result" /> object.
     /// </summary>
@@ -54,14 +54,14 @@ public abstract class BaseService<TService>
                 [ErrorMetadataKeys.Conflict] = true
             }
         };
-        
+
         return error;
     }
-    
+
     #endregion
-    
+
     #region CreateNotFoundError
-    
+
     /// <summary>
     /// Creates a new not found <see cref="Error" /> that can be returned in a <see cref="Result" /> object.
     /// </summary>
@@ -75,14 +75,14 @@ public abstract class BaseService<TService>
                 [ErrorMetadataKeys.NotFound] = true
             }
         };
-        
+
         return error;
     }
-    
+
     #endregion
-    
+
     #region CreateError
-    
+
     /// <summary>
     /// Creates a new <see cref="Error" /> that can be returned in a <see cref="Result" /> object.
     /// </summary>
@@ -98,9 +98,9 @@ public abstract class BaseService<TService>
                 [ErrorMetadataKeys.PropertyName] = propertyName
             }
         };
-        
+
         return error;
     }
-    
+
     #endregion
 }

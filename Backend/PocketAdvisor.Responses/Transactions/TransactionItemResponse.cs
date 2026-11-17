@@ -1,4 +1,4 @@
-﻿using PocketAdvisor.Enums;
+using PocketAdvisor.Enums;
 
 namespace PocketAdvisor.Responses.Transactions;
 
@@ -11,17 +11,17 @@ public sealed class TransactionItemResponse
     /// The identifier of the item associated with the transaction.
     /// </summary>
     public required Guid ItemId { get; set; }
-    
+
     /// <summary>
     /// The total price of the item at the time of the transaction.
     /// </summary>
     public required decimal TotalPrice { get; set; }
-    
+
     /// <summary>
     /// The amount of the item on the transaction.
     /// </summary>
     public required decimal AmountValue { get; set; }
-    
+
     /// <summary>
     /// The unit of the item on the transaction.
     /// </summary>

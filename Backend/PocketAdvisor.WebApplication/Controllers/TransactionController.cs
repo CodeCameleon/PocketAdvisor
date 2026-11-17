@@ -17,17 +17,17 @@ public sealed class TransactionController
     : BaseController<ITransactionService>
 {
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="TransactionController" /> class.
     /// </summary>
     /// <param name="transactionService">The transaction service instance.</param>
     public TransactionController(ITransactionService transactionService) : base(transactionService) { }
-    
+
     #endregion
-    
+
     #region CreateTransactionAsync
-    
+
     /// <summary>
     /// Creates a new transaction together with its items for the currently authenticated user asynchronously.
     /// </summary>
@@ -39,19 +39,19 @@ public sealed class TransactionController
     public async Task<IActionResult> CreateTransactionAsync([FromBody] CreateTransactionRequest request)
     {
         Result result = await Service.CreateTransactionAsync(request, CurrentUserId);
-        
+
         if (result.IsFailed)
         {
             return HandleFailure(result);
         }
-        
+
         return StatusCode(StatusCodes.Status201Created);
     }
-    
+
     #endregion
-    
+
     #region DeleteTransactionAsync
-    
+
     /// <summary>
     /// Deletes the specified transaction and all of its items for the currently authenticated user asynchronously.
     /// </summary>
@@ -62,19 +62,19 @@ public sealed class TransactionController
     public async Task<IActionResult> DeleteTransactionAsync([FromRoute] Guid id)
     {
         Result result = await Service.DeleteTransactionAsync(id, CurrentUserId);
-        
+
         if (result.IsFailed)
         {
             return NotFound();
         }
-        
+
         return NoContent();
     }
-    
+
     #endregion
-    
+
     #region DeleteTransactionItemAsync
-    
+
     /// <summary>
     /// Deletes a single item from the specified transaction for the currently authenticated user asynchronously.
     /// </summary>
@@ -88,19 +88,19 @@ public sealed class TransactionController
         [FromRoute] Guid itemId)
     {
         Result result = await Service.DeleteTransactionItemAsync(transactionId, itemId, CurrentUserId);
-        
+
         if (result.IsFailed)
         {
             return HandleFailure(result);
         }
-        
+
         return NoContent();
     }
-    
+
     #endregion
-    
+
     #region GetTransactionsAsync
-    
+
     /// <summary>
     /// Retrieves all transactions associated with the specified account or item for the
     /// currently authenticated user asynchronously.
@@ -116,29 +116,29 @@ public sealed class TransactionController
         {
             return NotFound();
         }
-        
+
         if (accountId.HasValue)
         {
             IReadOnlyList<TransactionResponse> response = await Service.GetTransactionsAsync(
                 accountId.Value,
                 CurrentUserId
             );
-            
+
             return Ok(response);
         }
-        
+
         if (itemId.HasValue)
         {
             IReadOnlyList<TransactionResponse> response = await Service.GetTransactionsByItemAsync(
                 itemId.Value,
                 CurrentUserId
             );
-            
+
             return Ok(response);
         }
-        
+
         return NotFound();
     }
-    
+
     #endregion
 }

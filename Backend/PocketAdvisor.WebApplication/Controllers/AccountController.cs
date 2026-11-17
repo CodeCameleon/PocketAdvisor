@@ -17,17 +17,17 @@ public sealed class AccountController
     : BaseController<IAccountService>
 {
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="AccountController" /> class.
     /// </summary>
     /// <param name="accountService">The account service instance.</param>
     public AccountController(IAccountService accountService) : base(accountService) { }
-    
+
     #endregion
-    
+
     #region CreateAccountAsync
-    
+
     /// <summary>
     /// Creates a new account for the currently authenticated user asynchronously.
     /// </summary>
@@ -38,19 +38,19 @@ public sealed class AccountController
     public async Task<IActionResult> CreateAccountAsync([FromBody] CreateAccountRequest request)
     {
         Result result = await Service.CreateAccountAsync(request, CurrentUserId);
-        
+
         if (result.IsFailed)
         {
             return BadRequest(result.Errors);
         }
-        
+
         return StatusCode(StatusCodes.Status201Created);
     }
-    
+
     #endregion
-    
+
     #region DeleteAccountAsync
-    
+
     /// <summary>
     /// Deletes the specified account belonging to the currently authenticated user asynchronously.
     /// </summary>
@@ -61,19 +61,19 @@ public sealed class AccountController
     public async Task<IActionResult> DeleteAccountAsync([FromRoute] Guid id)
     {
         Result result = await Service.DeleteAccountAsync(id, CurrentUserId);
-        
+
         if (result.IsFailed)
         {
             return NotFound();
         }
-        
+
         return NoContent();
     }
-    
+
     #endregion
-    
+
     #region GetAccountsAsync
-    
+
     /// <summary>
     /// Retrieves all accounts belonging to the currently authenticated user asynchronously.
     /// </summary>
@@ -84,11 +84,11 @@ public sealed class AccountController
         IReadOnlyList<AccountResponse> response = await Service.GetAccountsAsync(CurrentUserId);
         return Ok(response);
     }
-    
+
     #endregion
-    
+
     #region UpdateAccountNameAsync
-    
+
     /// <summary>
     /// Updates the name of the specified account belonging to the currently authenticated user asynchronously.
     /// </summary>
@@ -102,14 +102,14 @@ public sealed class AccountController
         [FromBody] UpdateAccountNameRequest request)
     {
         Result result = await Service.UpdateAccountNameAsync(id, request, CurrentUserId);
-        
+
         if (result.IsFailed)
         {
             return HandleFailure(result);
         }
-        
+
         return NoContent();
     }
-    
+
     #endregion
 }

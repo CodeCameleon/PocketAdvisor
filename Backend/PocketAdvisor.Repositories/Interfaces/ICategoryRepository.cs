@@ -1,4 +1,4 @@
-﻿using PocketAdvisor.Entities;
+using PocketAdvisor.Entities;
 
 namespace PocketAdvisor.Repositories.Interfaces;
 
@@ -8,5 +8,5 @@ namespace PocketAdvisor.Repositories.Interfaces;
 public interface ICategoryRepository
     : IBaseRepository<Category>
 {
-    
+
 }

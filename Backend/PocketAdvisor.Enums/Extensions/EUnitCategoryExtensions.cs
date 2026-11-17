@@ -1,4 +1,4 @@
-﻿using System.Collections.Frozen;
+using System.Collections.Frozen;
 
 namespace PocketAdvisor.Enums.Extensions;
 
@@ -8,122 +8,122 @@ namespace PocketAdvisor.Enums.Extensions;
 public static class EUnitCategoryExtensions
 {
     #region Constants
-    
+
     /// <summary>
     /// When the conversion is not possible because the units belong to different categories.
     /// </summary>
     private const string CategoryMismatchMessage = "Units must belong to the same category.";
-    
+
     /// <summary>
     /// When the unit category does not have a base unit.
     /// </summary>
     private const string NoBaseUnitMessage = "The category does not have a base unit.";
-    
+
     /// <summary>
     /// When the conversion is not possible because one of the units belongs to the uncategorized category.
     /// </summary>
     private const string UncategorizedMessage = "Uncategorized units cannot be converted.";
-    
+
     /// <summary>
     /// The dictionary containing the base unit of each category.
     /// </summary>
     private static readonly FrozenDictionary<EUnitCategory, EUnit> BaseUnits;
-    
+
     /// <summary>
     /// The dictionary containing the units of each category.
     /// </summary>
     private static readonly FrozenDictionary<EUnitCategory, FrozenSet<EUnit>> Categories;
-    
+
     /// <summary>
     /// The dictionary containing the conversion factors of each unit.
     /// </summary>
     private static readonly FrozenDictionary<EUnit, decimal> Factors;
-    
+
     /// <summary>
     /// The dictionary containing the category of each unit.
     /// </summary>
     private static readonly FrozenDictionary<EUnit, EUnitCategory> UnitCategories;
-    
+
     #endregion
-    
-    #region Constuctor
-    
+
+    #region Constructors
+
     /// <summary>
     /// Initializes the only instance of the <see cref="EUnitCategoryExtensions" /> class.
     /// </summary>
     static EUnitCategoryExtensions()
     {
-        const int range = 100;
+        const int CategoryRange = 100;
         Dictionary<EUnitCategory, FrozenSet<EUnit>> categories = [];
-        
+
         foreach (EUnitCategory unitCategory in Enum.GetValues<EUnitCategory>())
         {
-            int min = ((int)unitCategory - 1) * range;
-            
+            int min = ((int)unitCategory - 1) * CategoryRange;
+
             IEnumerable<EUnit> units = Enum.GetValues<EUnit>().Where(u =>
                 (int)u >= min &&
-                (int)u < min + range
+                (int)u < min + CategoryRange
             );
-            
+
             categories.Add(unitCategory, units.ToFrozenSet());
         }
-        
+
         Categories = categories.ToFrozenDictionary();
-        
+
         UnitCategories = Categories.SelectMany(pair =>
             pair.Value.Select(unit => (unit, pair.Key))
         ).ToFrozenDictionary(x => x.unit, x => x.Key);
-        
+
         Dictionary<EUnit, decimal> factors = new()
         {
             { EUnit.Millimeter, 0.001m },
             { EUnit.Centimeter, 0.01m },
             { EUnit.Meter, 1m },
             { EUnit.Kilometer, 1000m },
-            
+
             { EUnit.Milligram, 1e-6m },
             { EUnit.Gram, 0.001m },
             { EUnit.Kilogram, 1m },
             { EUnit.Tonne, 1000m },
-            
+
             { EUnit.SquareMeter, 1m },
             { EUnit.SquareKilometer, 1e6m },
             { EUnit.Acre, 4046.85642m },
             { EUnit.Hectare, 1e4m },
-            
+
             { EUnit.Milliliter, 0.001m },
             { EUnit.Liter, 1m },
             { EUnit.CubicMeter, 1000m },
-            
+
             { EUnit.Second, 1m },
             { EUnit.Minute, 60m },
             { EUnit.Hour, 3600m },
             { EUnit.Day, 86400m },
             { EUnit.Month, 2629800m }, // Average month (30.4375 days)
             { EUnit.Year, 31557600m }, // Average year (365.25 days)
-            
+
             { EUnit.Joule, 1m },
             { EUnit.Kilojoule, 1000m },
             { EUnit.KilowattHour, 3600000m },
-            
+
             { EUnit.Byte, 9.536743164e-7m },
             { EUnit.Kilobyte, 9.765625e-4m },
             { EUnit.Megabyte, 1m },
             { EUnit.Gigabyte, 1024m },
             { EUnit.Terabyte, 1048576m },
         };
-        
+
         Factors = factors.ToFrozenDictionary();
-        
+
         BaseUnits = factors.Where(pair =>
             pair.Value == 1m
         ).ToFrozenDictionary(pair => pair.Key.GetUnitCategory(), pair => pair.Key);
     }
-    
+
     #endregion
-    
+
     #region GetBaseUnit
-    
+
     /// <summary>
     /// Gets the base unit of the category.
     /// </summary>
@@ -138,14 +138,14 @@ public static class EUnitCategoryExtensions
         {
             return unit;
         }
-        
+
         throw new ArgumentException(NoBaseUnitMessage);
     }
-    
+
     #endregion
-    
+
     #region GetCategoryUnitList
-    
+
     /// <summary>
     /// Gets the list of units that belong to the category.
     /// </summary>
@@ -155,11 +155,11 @@ public static class EUnitCategoryExtensions
     {
         return Categories[unitCategory].ToList();
     }
-    
+
     #endregion
-    
+
     #region GetUnitCategory
-    
+
     /// <summary>
     /// Gets the category of the unit.
     /// </summary>
@@ -169,11 +169,11 @@ public static class EUnitCategoryExtensions
     {
         return UnitCategories[unit];
     }
-    
+
     #endregion
-    
+
     #region GetUnitFactor
-    
+
     /// <summary>
     /// Gets the factor needed to convert the base unit to the target unit.
     /// </summary>
@@ -188,19 +188,19 @@ public static class EUnitCategoryExtensions
     {
         EUnitCategory baseCategory = baseUnit.GetUnitCategory();
         EUnitCategory targetCategory = targetUnit.GetUnitCategory();
-        
+
         if (baseCategory == EUnitCategory.Uncategorized || targetCategory == EUnitCategory.Uncategorized)
         {
             throw new ArgumentException(UncategorizedMessage);
         }
-        
+
         if (baseCategory != targetCategory)
         {
             throw new ArgumentException(CategoryMismatchMessage);
         }
-        
+
         return Factors[baseUnit] / Factors[targetUnit];
     }
-    
+
     #endregion
 }

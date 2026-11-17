@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using PocketAdvisor.Repositories.Implementations;
 using PocketAdvisor.Repositories.Interfaces;
 

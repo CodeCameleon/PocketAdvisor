@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PocketAdvisor.Services.Clients.Interfaces;
@@ -9,45 +11,45 @@ namespace PocketAdvisor.Services.Clients.Implementations;
 /// <summary>
 /// Represents the client implementation for sending out transactional emails through Resend.
 /// </summary>
-public sealed class ResendEmailClient
+public sealed partial class ResendEmailClient
     : IEmailClient
 {
     #region Constants
-    
+
     /// <summary>
     /// The name of the variable used to store the hour value in the email templates.
     /// </summary>
     private const string Hours = "Hours";
-    
+
     /// <summary>
     /// The name of the variable used to store the minute value in the email templates.
     /// </summary>
     private const string Minutes = "Minutes";
-    
+
     /// <summary>
     /// The name of the variable used to store the URL value in the email templates.
     /// </summary>
     private const string Url = "Url";
-    
-    /// <summary>
-    /// The template used to build the URL of emails.
-    /// </summary>
-    private const string UrlTemplate = "{0}{1}?token={2}";
-    
+
     /// <summary>
     /// The unique identifier of the email template used for email verification.
     /// </summary>
     private const string EmailVerificationTemplateId = "399c5102-326d-4300-88c5-ca6cc194577b";
-    
+
     /// <summary>
     /// The unique identifier of the email template used for password reset.
     /// </summary>
     private const string PasswordResetTemplateId = "4f196197-f7e1-4724-bdf4-7540c27bdaab";
-    
+
+    /// <summary>
+    /// The template used to build the URL of emails, parsed once for repeated use.
+    /// </summary>
+    private static readonly CompositeFormat UrlTemplate = CompositeFormat.Parse("{0}{1}?token={2}");
+
     #endregion
-    
+
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ResendEmailClient" /> class.
     /// </summary>
@@ -69,49 +71,81 @@ public sealed class ResendEmailClient
         ArgumentNullException.ThrowIfNull(frontendOptions);
         ArgumentNullException.ThrowIfNull(tokenExpirationsOptions);
         ArgumentNullException.ThrowIfNull(resend);
-        
+
         Logger = logger;
         FrontendOptions = frontendOptions;
         TokenExpirationsOptions = tokenExpirationsOptions;
         Resend = resend;
     }
-    
+
     #endregion
-    
+
     #region Properties
-    
+
     /// <summary>
     /// The logger for the class.
     /// </summary>
     private ILogger<ResendEmailClient> Logger { get; }
-    
+
     /// <summary>
     /// The frontend options for accessing the frontend configuration values.
     /// </summary>
     private IOptions<FrontendOptions> FrontendOptions { get; }
-    
+
     /// <summary>
     /// The token expirations options for accessing the token expirations configuration values.
     /// </summary>
     private IOptions<TokenExpirationsOptions> TokenExpirationsOptions { get; }
-    
+
     /// <summary>
     /// The Resend client for sending out emails.
     /// </summary>
     private IResend Resend { get; }
-    
+
     #endregion
-    
+
+    #region LogMessages
+
+    /// <summary>
+    /// Logs that an email verification email is being sent.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "Sending email verification email...")]
+    private static partial void LogSendingEmailVerification(ILogger logger);
+
+    /// <summary>
+    /// Logs that the email verification email was sent.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 2, Level = LogLevel.Information, Message = "Email verification email sent successfully.")]
+    private static partial void LogEmailVerificationSent(ILogger logger);
+
+    /// <summary>
+    /// Logs that a password reset email is being sent.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 3, Level = LogLevel.Information, Message = "Sending password reset email...")]
+    private static partial void LogSendingPasswordReset(ILogger logger);
+
+    /// <summary>
+    /// Logs that the password reset email was sent.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    [LoggerMessage(EventId = 4, Level = LogLevel.Information, Message = "Password reset email sent successfully.")]
+    private static partial void LogPasswordResetSent(ILogger logger);
+
+    #endregion
+
     #region SendEmailVerificationAsync
-    
+
     /// <inheritdoc />
     public async Task SendEmailVerificationAsync(string email, string token)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(email);
         ArgumentException.ThrowIfNullOrWhiteSpace(token);
-        
-        Logger.LogInformation("Sending email verification email...");
-        
+
+        LogSendingEmailVerification(Logger);
+
         await SendTemplateEmailAsync(
             email,
             EmailVerificationTemplateId,
@@ -125,22 +159,22 @@ public sealed class ResendEmailClient
                 }
             }
         );
-        
-        Logger.LogInformation("Email verification email sent successfully.");
+
+        LogEmailVerificationSent(Logger);
     }
-    
+
     #endregion
-    
+
     #region SendPasswordResetAsync
-    
+
     /// <inheritdoc />
     public async Task SendPasswordResetAsync(string email, string token)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(email);
         ArgumentException.ThrowIfNullOrWhiteSpace(token);
-        
-        Logger.LogInformation("Sending password reset email...");
-        
+
+        LogSendingPasswordReset(Logger);
+
         await SendTemplateEmailAsync(
             email,
             PasswordResetTemplateId,
@@ -154,14 +188,14 @@ public sealed class ResendEmailClient
                 }
             }
         );
-        
-        Logger.LogInformation("Password reset email sent successfully.");
+
+        LogPasswordResetSent(Logger);
     }
-    
+
     #endregion
-    
+
     #region BuildUrl
-    
+
     /// <summary>
     /// Builds the absolute frontend URL for the given path with the token as a query parameter.
     /// </summary>
@@ -171,17 +205,18 @@ public sealed class ResendEmailClient
     private string BuildUrl(string path, string token)
     {
         return string.Format(
+            CultureInfo.InvariantCulture,
             UrlTemplate,
             FrontendOptions.Value.BaseUrl,
             path,
             Uri.EscapeDataString(token)
         );
     }
-    
+
     #endregion
-    
+
     #region SendTemplateEmailAsync
-    
+
     /// <summary>
     /// Sends an email based on a Resend template to the given email address asynchronously.
     /// </summary>
@@ -203,9 +238,9 @@ public sealed class ResendEmailClient
                 Variables = variables
             }
         };
-        
+
         await Resend.EmailSendAsync(emailMessage);
     }
-    
+
     #endregion
 }

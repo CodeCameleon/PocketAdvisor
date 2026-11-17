@@ -17,17 +17,17 @@ public sealed class CategoryController
     : BaseController<ICategoryService>
 {
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="CategoryController" /> class.
     /// </summary>
     /// <param name="categoryService">The category service instance.</param>
     public CategoryController(ICategoryService categoryService) : base(categoryService) { }
-    
+
     #endregion
-    
+
     #region CreateGlobalCategoryAsync
-    
+
     /// <summary>
     /// Creates a new global category available to all users asynchronously.
     /// Requires the <c>Administrator</c> role.
@@ -41,19 +41,19 @@ public sealed class CategoryController
     public async Task<IActionResult> CreateGlobalCategoryAsync([FromBody] CreateCategoryRequest request)
     {
         Result result = await Service.CreateGlobalCategoryAsync(request);
-        
+
         if (result.IsFailed)
         {
             return BadRequest(result.Errors);
         }
-        
+
         return StatusCode(StatusCodes.Status201Created);
     }
-    
+
     #endregion
-    
+
     #region CreatePersonalCategoryAsync
-    
+
     /// <summary>
     /// Creates a new personal category for the currently authenticated user asynchronously.
     /// </summary>
@@ -64,19 +64,19 @@ public sealed class CategoryController
     public async Task<IActionResult> CreatePersonalCategoryAsync([FromBody] CreateCategoryRequest request)
     {
         Result result = await Service.CreatePersonalCategoryAsync(request, CurrentUserId);
-        
+
         if (result.IsFailed)
         {
             return BadRequest(result.Errors);
         }
-        
+
         return StatusCode(StatusCodes.Status201Created);
     }
-    
+
     #endregion
-    
+
     #region DeleteGlobalCategoryAsync
-    
+
     /// <summary>
     /// Deletes the specified global category asynchronously.
     /// Requires the <c>Administrator</c> role.
@@ -91,19 +91,19 @@ public sealed class CategoryController
     public async Task<IActionResult> DeleteGlobalCategoryAsync([FromRoute] Guid id)
     {
         Result result = await Service.DeleteGlobalCategoryAsync(id);
-        
+
         if (result.IsFailed)
         {
             return HandleFailure(result);
         }
-        
+
         return NoContent();
     }
-    
+
     #endregion
-    
+
     #region DeletePersonalCategoryAsync
-    
+
     /// <summary>
     /// Deletes the specified personal category belonging to the currently authenticated user asynchronously.
     /// </summary>
@@ -115,19 +115,19 @@ public sealed class CategoryController
     public async Task<IActionResult> DeletePersonalCategoryAsync([FromRoute] Guid id)
     {
         Result result = await Service.DeletePersonalCategoryAsync(id, CurrentUserId);
-        
+
         if (result.IsFailed)
         {
             return HandleFailure(result);
         }
-        
+
         return NoContent();
     }
-    
+
     #endregion
-    
+
     #region GetCategoriesAsync
-    
+
     /// <summary>
     /// Retrieves all categories visible to the currently authenticated user asynchronously.
     /// </summary>
@@ -138,11 +138,11 @@ public sealed class CategoryController
         IReadOnlyList<CategoryResponse> response = await Service.GetCategoriesAsync(CurrentUserId);
         return Ok(response);
     }
-    
+
     #endregion
-    
+
     #region UpdateGlobalCategoryNameAsync
-    
+
     /// <summary>
     /// Updates the name of the specified global category asynchronously.
     /// Requires the <c>Administrator</c> role.
@@ -159,19 +159,19 @@ public sealed class CategoryController
         [FromBody] UpdateCategoryNameRequest request)
     {
         Result result = await Service.UpdateGlobalCategoryNameAsync(id, request);
-        
+
         if (result.IsFailed)
         {
             return HandleFailure(result);
         }
-        
+
         return NoContent();
     }
-    
+
     #endregion
-    
+
     #region UpdatePersonalCategoryNameAsync
-    
+
     /// <summary>
     /// Updates the name of the specified personal category belonging to the currently authenticated user
     /// asynchronously.
@@ -186,14 +186,14 @@ public sealed class CategoryController
         [FromBody] UpdateCategoryNameRequest request)
     {
         Result result = await Service.UpdatePersonalCategoryNameAsync(id, request, CurrentUserId);
-        
+
         if (result.IsFailed)
         {
             return HandleFailure(result);
         }
-        
+
         return NoContent();
     }
-    
+
     #endregion
 }

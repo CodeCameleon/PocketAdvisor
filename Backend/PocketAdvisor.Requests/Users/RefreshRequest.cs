@@ -1,4 +1,4 @@
-﻿namespace PocketAdvisor.Requests.Users;
+namespace PocketAdvisor.Requests.Users;
 
 /// <summary>
 /// The request model for refreshing an expired JSON Web Token or ending a session.

@@ -18,7 +18,7 @@ public sealed class LoginRequestValidator
             .NotEmpty().WithMessage(ValidationMessages.EmailRequired)
             .MaximumLength(100).WithMessage(ValidationMessages.EmailTooLong)
             .EmailAddress().WithMessage(ValidationMessages.EmailInvalid);
-        
+
         RuleFor(lr => lr.Password).Cascade(CascadeMode.Stop)
             .NotEmpty().WithMessage(ValidationMessages.PasswordRequired)
             .MaximumLength(100).WithMessage(ValidationMessages.PasswordTooLong);

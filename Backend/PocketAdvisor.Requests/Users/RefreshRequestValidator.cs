@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using PocketAdvisor.Requests.Resources;
 
 namespace PocketAdvisor.Requests.Users;

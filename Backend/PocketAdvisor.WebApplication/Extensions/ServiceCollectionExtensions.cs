@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
@@ -18,42 +18,42 @@ namespace PocketAdvisor.WebApplication.Extensions;
 public static class ServiceCollectionExtensions
 {
     #region Constants
-    
+
     /// <summary>
     /// The number of segments a single sliding rate limiting window is divided into.
     /// </summary>
     private const int SegmentsPerWindow = 6;
-    
+
     /// <summary>
     /// The detail message returned when the caller has exceeded the rate limit.
     /// </summary>
     private const string TooManyRequestsMessage = "Too many requests. Please try again later.";
-    
+
     /// <summary>
     /// The title returned when the caller has exceeded the rate limit.
     /// </summary>
     private const string TooManyRequestsTitle = "Too Many Requests";
-    
+
     /// <summary>
     /// The link to the specification of the status code returned when the caller
     /// has exceeded the rate limit.
     /// </summary>
     private const string TooManyRequestsType = "https://tools.ietf.org/html/rfc6585#section-4";
-    
+
     /// <summary>
     /// The rate limiting partition key used when the IP address of the caller is unknown.
     /// </summary>
     private const string UnknownPartitionKey = "Unknown";
-    
+
     /// <summary>
     /// The JSON serializer options used to serialize the problem details response.
     /// </summary>
     private static readonly JsonSerializerOptions JsonSerializerOptions = new(JsonSerializerDefaults.Web);
-    
+
     #endregion
-    
+
     #region AddPocketAdvisorAuthentication
-    
+
     /// <summary>
     /// Adds JWT Bearer authentication to the service collection.
     /// </summary>
@@ -78,11 +78,11 @@ public static class ServiceCollectionExtensions
             };
         });
     }
-    
+
     #endregion
-    
+
     #region AddPocketAdvisorCors
-    
+
     /// <summary>
     /// Adds the global CORS policy to the service collection.
     /// </summary>
@@ -98,11 +98,11 @@ public static class ServiceCollectionExtensions
             });
         });
     }
-    
+
     #endregion
-    
+
     #region AddPocketAdvisorRateLimiter
-    
+
     /// <summary>
     /// Adds the rate limiter policies to the service collection.
     /// </summary>
@@ -123,16 +123,16 @@ public static class ServiceCollectionExtensions
                 RateLimiterPolicyNames.Authentication,
                 context => CreatePartition(context, authenticationPermitLimit, windowSeconds)
             );
-            
+
             options.AddPolicy(
                 RateLimiterPolicyNames.Refresh,
                 context => CreatePartition(context, refreshPermitLimit, windowSeconds)
             );
-            
+
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             options.OnRejected = OnRejectedAsync;
         });
-        
+
         services.Configure<ApiBehaviorOptions>(options =>
         {
             options.ClientErrorMapping[StatusCodes.Status429TooManyRequests] = new()
@@ -142,11 +142,11 @@ public static class ServiceCollectionExtensions
             };
         });
     }
-    
+
     #endregion
-    
+
     #region CreatePartition
-    
+
     /// <summary>
     /// Creates the sliding window rate limiting partition of the caller for the given request.
     /// </summary>
@@ -158,7 +158,7 @@ public static class ServiceCollectionExtensions
         int windowSeconds)
     {
         string partitionKey = context.Connection.RemoteIpAddress?.ToString() ?? UnknownPartitionKey;
-        
+
         return RateLimitPartition.GetSlidingWindowLimiter(partitionKey, _ => new()
         {
             PermitLimit = permitLimit,
@@ -169,11 +169,11 @@ public static class ServiceCollectionExtensions
             AutoReplenishment = true
         });
     }
-    
+
     #endregion
-    
+
     #region OnRejectedAsync
-    
+
     /// <summary>
     /// Writes a structured problem details response when a request is rejected by the rate limiter.
     /// </summary>
@@ -183,30 +183,30 @@ public static class ServiceCollectionExtensions
         CancellationToken cancellationToken)
     {
         HttpContext httpContext = context.HttpContext;
-        
+
         if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out TimeSpan retryAfter))
         {
             httpContext.Response.Headers.RetryAfter = ((int)retryAfter.TotalSeconds).ToString(
                 CultureInfo.InvariantCulture
             );
         }
-        
+
         ProblemDetailsFactory problemDetailsFactory = httpContext.RequestServices
             .GetRequiredService<ProblemDetailsFactory>();
-        
+
         ProblemDetails problemDetails = problemDetailsFactory.CreateProblemDetails(
             httpContext,
             StatusCodes.Status429TooManyRequests,
             detail: TooManyRequestsMessage
         );
-        
+
         string json = JsonSerializer.Serialize(problemDetails, JsonSerializerOptions);
-        
+
         httpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
         httpContext.Response.ContentType = MediaTypeNames.Application.ProblemJson;
-        
+
         await httpContext.Response.WriteAsync(json, cancellationToken);
     }
-    
+
     #endregion
 }

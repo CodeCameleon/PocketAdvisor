@@ -16,31 +16,31 @@ public sealed class SessionController
     : BaseController<IUserService>
 {
     #region Constants
-    
+
     /// <summary>
     /// The route template of the controller.
     /// </summary>
     private const string RouteTemplate = "api/sessions";
-    
+
     /// <summary>
     /// The path of the refresh token cookie, so it is only sent to the session endpoints.
     /// </summary>
     private const string RefreshTokenCookiePath = "/" + RouteTemplate;
-    
+
     #endregion
-    
+
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="SessionController" /> class.
     /// </summary>
     /// <param name="userService">The user service instance.</param>
     public SessionController(IUserService userService) : base(userService) { }
-    
+
     #endregion
-    
+
     #region CreateRefreshTokenCookieOptions
-    
+
     /// <summary>
     /// Creates the options of the refresh token cookie.
     /// </summary>
@@ -58,11 +58,11 @@ public sealed class SessionController
             IsEssential = true
         };
     }
-    
+
     #endregion
-    
+
     #region LoginAsync
-    
+
     /// <summary>
     /// Authenticates a user and issues a JSON Web Token and refresh token asynchronously.
     /// </summary>
@@ -75,12 +75,12 @@ public sealed class SessionController
     public async Task<IActionResult> LoginAsync([FromBody] LoginRequest request)
     {
         Result<SessionResponse> result = await Service.LoginAsync(request);
-        
+
         if (result.IsFailed)
         {
             return BadRequest(result.Errors);
         }
-        
+
         Response.Cookies.Append(
             CookieNames.RefreshToken,
             result.Value.RefreshToken,
@@ -88,17 +88,17 @@ public sealed class SessionController
                 new DateTimeOffset(result.Value.RefreshTokenExpiryAt, TimeSpan.Zero)
             )
         );
-        
+
         return StatusCode(StatusCodes.Status201Created, new LoginResponse
         {
             JsonWebToken = result.Value.JsonWebToken
         });
     }
-    
+
     #endregion
-    
+
     #region LogoutAsync
-    
+
     /// <summary>
     /// Revokes the refresh token of the current session and clears its cookie asynchronously.
     /// </summary>
@@ -112,18 +112,18 @@ public sealed class SessionController
         {
             RefreshToken = Request.Cookies[CookieNames.RefreshToken]
         };
-        
+
         await Service.LogoutAsync(request);
-        
+
         Response.Cookies.Delete(CookieNames.RefreshToken, CreateRefreshTokenCookieOptions());
-        
+
         return NoContent();
     }
-    
+
     #endregion
-    
+
     #region RefreshAsync
-    
+
     /// <summary>
     /// Validates the refresh token cookie, rotates it, and issues a new JSON Web Token and
     /// refresh token asynchronously.
@@ -139,16 +139,16 @@ public sealed class SessionController
         {
             RefreshToken = Request.Cookies[CookieNames.RefreshToken]
         };
-        
+
         Result<SessionResponse> result = await Service.RefreshAsync(request);
-        
+
         if (result.IsFailed)
         {
             Response.Cookies.Delete(CookieNames.RefreshToken, CreateRefreshTokenCookieOptions());
-            
+
             return BadRequest(result.Errors);
         }
-        
+
         Response.Cookies.Append(
             CookieNames.RefreshToken,
             result.Value.RefreshToken,
@@ -156,12 +156,12 @@ public sealed class SessionController
                 new DateTimeOffset(result.Value.RefreshTokenExpiryAt, TimeSpan.Zero)
             )
         );
-        
+
         return StatusCode(StatusCodes.Status201Created, new LoginResponse
         {
             JsonWebToken = result.Value.JsonWebToken
         });
     }
-    
+
     #endregion
 }

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace PocketAdvisor.Entities;
 
@@ -12,25 +12,25 @@ public class Category
     /// </summary>
     [Key]
     public Guid Id { get; set; }
-    
+
     /// <summary>
     /// The name of the category.
     /// </summary>
     [Required]
     [MaxLength(100)]
     public required string Name { get; set; }
-    
+
     /// <summary>
     /// The identifier of the user, to whom the category belongs.<br />
     /// If <see langword="null" />, the category is global and can be used by all users.
     /// </summary>
     public required Guid? UserId { get; set; }
-    
+
     /// <summary>
     /// The navigational property of the user, to whom the category belongs.
     /// </summary>
     public virtual User? User { get; set; }
-    
+
     /// <summary>
     /// The navigational property of the transactions, which belong to the category.
     /// </summary>

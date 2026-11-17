@@ -20,7 +20,7 @@ public interface IItemService
     /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
     Task<Result> CreateItemAsync(CreateItemRequest request, Guid userId);
-    
+
     /// <summary>
     /// Deletes the specified item asynchronously.
     /// </summary>
@@ -31,7 +31,7 @@ public interface IItemService
     /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
     Task<Result> DeleteItemAsync(Guid itemId, Guid userId);
-    
+
     /// <summary>
     /// Retrieves all items that belong to the specified user asynchronously.
     /// </summary>
@@ -41,7 +41,7 @@ public interface IItemService
     /// read-only list of <see cref="ItemResponse" /> objects.
     /// </returns>
     Task<IReadOnlyList<ItemResponse>> GetItemsAsync(Guid userId);
-    
+
     /// <summary>
     /// Updates the name of the specified item asynchronously.
     /// </summary>

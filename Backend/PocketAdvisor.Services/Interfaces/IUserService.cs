@@ -1,4 +1,4 @@
-﻿using FluentResults;
+using FluentResults;
 using PocketAdvisor.Requests.Users;
 using PocketAdvisor.Responses.Users;
 
@@ -19,7 +19,7 @@ public interface IUserService
     /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
     Task<Result> CreateUserAsync(CreateUserRequest request);
-    
+
     /// <summary>
     /// Generates a password reset token for the given email address and sends out
     /// the password reset email asynchronously.
@@ -30,7 +30,7 @@ public interface IUserService
     /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
     Task<Result> ForgotPasswordAsync(ForgotPasswordRequest request);
-    
+
     /// <summary>
     /// Authenticates a user and issues a JSON Web Token and refresh token asynchronously.
     /// </summary>
@@ -41,7 +41,7 @@ public interface IUserService
     /// If successful, the result contains the issued <see cref="SessionResponse" />.
     /// </returns>
     Task<Result<SessionResponse>> LoginAsync(LoginRequest request);
-    
+
     /// <summary>
     /// Revokes the given refresh token, ending the session it belongs asynchronously.
     /// </summary>
@@ -51,7 +51,7 @@ public interface IUserService
     /// <see cref="Result" />, which is always successful. Regardless if the refresh token was valid or not.
     /// </returns>
     Task<Result> LogoutAsync(RefreshRequest request);
-    
+
     /// <summary>
     /// Validates a refresh token, rotates it, and issues a new JSON Web Token and refresh token asynchronously.
     /// </summary>
@@ -62,7 +62,7 @@ public interface IUserService
     /// If successful, the result contains the newly issued <see cref="SessionResponse" />.
     /// </returns>
     Task<Result<SessionResponse>> RefreshAsync(RefreshRequest request);
-    
+
     /// <summary>
     /// Resets the password of a user using the supplied password reset token asynchronously.
     /// </summary>
@@ -72,7 +72,7 @@ public interface IUserService
     /// <see cref="Result" /> indicating the success or failure of the operation.
     /// </returns>
     Task<Result> ResetPasswordAsync(ResetPasswordRequest request);
-    
+
     /// <summary>
     /// Verifies the email address of a user using the supplied verification token asynchronously.
     /// </summary>

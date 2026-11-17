@@ -10,7 +10,7 @@ public sealed class CreateAccountRequestValidator
     : AbstractValidator<CreateAccountRequest>
 {
     #region Constructors
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="CreateAccountRequestValidator" /> class.
     /// </summary>
@@ -19,15 +19,15 @@ public sealed class CreateAccountRequestValidator
         RuleFor(car => car.Name).Cascade(CascadeMode.Stop)
             .NotEmpty().WithMessage(ValidationMessages.AccountNameRequired)
             .MaximumLength(100).WithMessage(ValidationMessages.AccountNameTooLong);
-        
+
         RuleFor(car => car.Balance).Cascade(CascadeMode.Stop)
             .NotNull().WithMessage(ValidationMessages.AccountBalanceRequired)
             .GreaterThanOrEqualTo(0).WithMessage(ValidationMessages.AccountBalanceNegative);
-        
+
         RuleFor(car => car.CurrencyCode).Cascade(CascadeMode.Stop)
             .NotNull().WithMessage(ValidationMessages.AccountCurrencyCodeRequired)
             .IsInEnum().WithMessage(ValidationMessages.AccountCurrencyCodeInvalid);
     }
-    
+
     #endregion
 }

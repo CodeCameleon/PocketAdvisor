@@ -1,4 +1,4 @@
-﻿using NeoSmart.SecureStore;
+using NeoSmart.SecureStore;
 
 namespace PocketAdvisor.WebApplication.Extensions;
 
@@ -8,7 +8,7 @@ namespace PocketAdvisor.WebApplication.Extensions;
 public static class WebApplicationBuilderExtensions
 {
     #region AddPocketAdvisorSecrets
-    
+
     /// <summary>
     /// Adds the secrets from the secure store to the configuration.
     /// </summary>
@@ -18,17 +18,17 @@ public static class WebApplicationBuilderExtensions
         using SecretsManager secretsManager = SecretsManager.LoadStore(
             builder.Configuration.GetSecureStorePath()
         );
-        
+
         secretsManager.LoadKeyFromFile(
             builder.Configuration.GetSecureStoreKeyFilePath()
         );
-        
+
         IReadOnlyDictionary<string, string?> secrets = secretsManager.Keys.Select(k =>
             new KeyValuePair<string, string?>(k, secretsManager.Get(k))
         ).ToDictionary();
-        
+
         builder.Configuration.AddInMemoryCollection(secrets);
     }
-    
+
     #endregion
 }

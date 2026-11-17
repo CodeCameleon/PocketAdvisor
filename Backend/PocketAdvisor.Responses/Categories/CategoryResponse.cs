@@ -9,12 +9,12 @@ public sealed class CategoryResponse
     /// The unique identifier of the category.
     /// </summary>
     public required Guid Id { get; init; }
-    
+
     /// <summary>
     /// The name of the category.
     /// </summary>
     public required string Name { get; init; }
-    
+
     /// <summary>
     /// Indicates whether the category is global (available to all users) or personal.
     /// </summary>

@@ -1,4 +1,4 @@
-﻿namespace PocketAdvisor.DbContexts.Interfaces;
+namespace PocketAdvisor.DbContexts.Interfaces;
 
 /// <summary>
 /// Defines the interface for seeding initial data into the database.

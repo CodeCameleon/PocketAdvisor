@@ -9,12 +9,12 @@ public sealed class ResetPasswordRequest
     /// The plain-text password reset token sent to the user's email address.
     /// </summary>
     public string? Token { get; set; }
-    
+
     /// <summary>
     /// The new password for the user.
     /// </summary>
     public string? Password { get; set; }
-    
+
     /// <summary>
     /// The confirmation of the new password.
     /// </summary>
