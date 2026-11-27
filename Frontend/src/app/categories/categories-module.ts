@@ -5,9 +5,6 @@ import { CategoriesRoutingModule } from './categories-routing-module';
 
 @NgModule({
   declarations: [],
-  imports: [
-    CommonModule,
-    CategoriesRoutingModule
-  ]
+  imports: [CommonModule, CategoriesRoutingModule],
 })
 export class CategoriesModule {}

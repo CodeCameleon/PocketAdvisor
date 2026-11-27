@@ -19,10 +19,10 @@ import { ApiErrorService } from '../../core/services/api-error';
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
   ],
   templateUrl: './create-global-category-dialog.html',
-  styleUrl: './create-global-category-dialog.css'
+  styleUrl: './create-global-category-dialog.css',
 })
 export class CreateGlobalCategoryDialog {
   private readonly fb = inject(FormBuilder);

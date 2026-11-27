@@ -25,7 +25,7 @@ const PINNED_CURRENCY_CODES: CurrencyCode[] = [
   CurrencyCode.Eur,
   CurrencyCode.Gbp,
   CurrencyCode.Huf,
-  CurrencyCode.Usd
+  CurrencyCode.Usd,
 ];
 
 /** Builds a human-readable "USD – US Dollar" label from a CurrencyCode enum member. */
@@ -42,9 +42,10 @@ function buildCurrencyLabel(key: string): string {
 
 /** All CurrencyCode entries as { label, value } pairs, sorted alphabetically. */
 function buildAllOptions(): CurrencyOption[] {
-  return Object.entries(CurrencyCode).filter(([, v]) => typeof v === 'number').map(([key, value]) =>
-    ({ label: buildCurrencyLabel(key), value: value as CurrencyCode })
-  ).sort((a, b) => a.label.localeCompare(b.label));
+  return Object.entries(CurrencyCode)
+    .filter(([, v]) => typeof v === 'number')
+    .map(([key, value]) => ({ label: buildCurrencyLabel(key), value: value as CurrencyCode }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 }
 
 @Component({
@@ -57,10 +58,10 @@ function buildAllOptions(): CurrencyOption[] {
     MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
-    MatSelectModule
+    MatSelectModule,
   ],
   templateUrl: './create-account-dialog.html',
-  styleUrl: './create-account-dialog.css'
+  styleUrl: './create-account-dialog.css',
 })
 export class CreateAccountDialog {
   private readonly fb = inject(FormBuilder);
@@ -68,7 +69,7 @@ export class CreateAccountDialog {
   private readonly accountService = inject(AccountService);
   private readonly apiErrorService = inject(ApiErrorService);
 
-  readonly pinnedOptions: CurrencyOption[] = PINNED_CURRENCY_CODES.map(code => {
+  readonly pinnedOptions: CurrencyOption[] = PINNED_CURRENCY_CODES.map((code) => {
     const key = CurrencyCode[code];
     return { label: buildCurrencyLabel(key), value: code };
   });

@@ -18,7 +18,9 @@ export const sessionInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   const jwt = sessionService.getJwt();
-  const authReq = jwt ? req.clone({ headers: req.headers.set('Authorization', `Bearer ${jwt}`) }) : req;
+  const authReq = jwt
+    ? req.clone({ headers: req.headers.set('Authorization', `Bearer ${jwt}`) })
+    : req;
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -29,16 +31,16 @@ export const sessionInterceptor: HttpInterceptorFn = (req, next) => {
       return sessionService.refresh().pipe(
         switchMap(() => {
           const retryReq = req.clone({
-            headers: req.headers.set('Authorization', `Bearer ${sessionService.getJwt()!}`)
+            headers: req.headers.set('Authorization', `Bearer ${sessionService.getJwt()!}`),
           });
           return next(retryReq);
         }),
-        catchError(refreshError => {
+        catchError((refreshError) => {
           sessionService.clear();
           router.navigate(['/auth/login']);
           return throwError(() => refreshError);
-        })
+        }),
       );
-    })
+    }),
   );
 };

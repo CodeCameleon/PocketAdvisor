@@ -23,7 +23,7 @@ import { AuthCard } from '../auth-card/auth-card';
     MatProgressSpinnerModule,
     AuthCard,
   ],
-  templateUrl: './register.html'
+  templateUrl: './register.html',
 })
 export class Register {
   private readonly fb = inject(FormBuilder);
@@ -60,10 +60,10 @@ export class Register {
   }
 
   togglePassword(): void {
-    this.hidePassword.update(v => !v);
+    this.hidePassword.update((v) => !v);
   }
 
   toggleConfirm(): void {
-    this.hideConfirm.update(v => !v);
+    this.hideConfirm.update((v) => !v);
   }
 }

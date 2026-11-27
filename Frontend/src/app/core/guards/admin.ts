@@ -20,7 +20,10 @@ export const adminGuard: CanActivateFn = () => {
 function isAdministrator(jwt: string): boolean {
   try {
     const payload = JSON.parse(atob(jwt.split('.')[1]));
-    const role: unknown = payload['role'] ?? payload['roles'] ?? payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+    const role: unknown =
+      payload['role'] ??
+      payload['roles'] ??
+      payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
 
     if (Array.isArray(role)) {
       return role.includes('Administrator');

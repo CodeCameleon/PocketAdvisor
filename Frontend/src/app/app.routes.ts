@@ -8,35 +8,35 @@ export const routes: Routes = [
   {
     path: '',
     redirectTo: 'auth/login',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   {
     path: 'accounts',
     canActivate: [authGuard],
-    loadChildren: () => import('./accounts/accounts-module').then(m => m.AccountsModule)
+    loadChildren: () => import('./accounts/accounts-module').then((m) => m.AccountsModule),
   },
   {
     path: 'admin',
     canActivate: [adminGuard],
-    loadChildren: () => import('./admin/admin-module').then(m => m.AdminModule)
+    loadChildren: () => import('./admin/admin-module').then((m) => m.AdminModule),
   },
   {
     path: 'auth',
     canActivate: [noAuthGuard],
-    loadChildren: () => import('./auth/auth-module').then(m => m.AuthModule)
+    loadChildren: () => import('./auth/auth-module').then((m) => m.AuthModule),
   },
   {
     path: 'categories',
     canActivate: [authGuard],
-    loadChildren: () => import('./categories/categories-module').then(m => m.CategoriesModule)
+    loadChildren: () => import('./categories/categories-module').then((m) => m.CategoriesModule),
   },
   {
     path: 'items',
     canActivate: [authGuard],
-    loadChildren: () => import('./items/items-module').then(m => m.ItemsModule)
+    loadChildren: () => import('./items/items-module').then((m) => m.ItemsModule),
   },
   {
     path: '**',
-    redirectTo: 'auth/login'
-  }
+    redirectTo: 'auth/login',
+  },
 ];

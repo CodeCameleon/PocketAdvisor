@@ -18,7 +18,6 @@ interface ValidationProblemDetails {
   providedIn: 'root',
 })
 export class ApiErrorService {
-
   /**
    * Applies validation errors from a failed HTTP response to a FormGroup.
    *

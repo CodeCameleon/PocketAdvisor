@@ -28,10 +28,12 @@ export class SessionService {
 
   /** Authenticates a user. The backend sets the refresh token cookie. */
   login(request: LoginRequest): Observable<void> {
-    return this.http.post<LoginResponse>(`${this.base}/login`, request, { withCredentials: true }).pipe(
-      tap(response => this._jwt.set(response.jsonWebToken)),
-      map(() => void 0)
-    );
+    return this.http
+      .post<LoginResponse>(`${this.base}/login`, request, { withCredentials: true })
+      .pipe(
+        tap((response) => this._jwt.set(response.jsonWebToken)),
+        map(() => void 0),
+      );
   }
 
   /**
@@ -39,12 +41,14 @@ export class SessionService {
    * is single-use, so concurrent callers share one request instead of racing.
    */
   refresh(): Observable<void> {
-    this.refresh$ ??= this.http.post<LoginResponse>(`${this.base}/refresh`, null, { withCredentials: true }).pipe(
-      tap(response => this._jwt.set(response.jsonWebToken)),
-      map(() => void 0),
-      finalize(() => (this.refresh$ = null)),
-      shareReplay(1)
-    );
+    this.refresh$ ??= this.http
+      .post<LoginResponse>(`${this.base}/refresh`, null, { withCredentials: true })
+      .pipe(
+        tap((response) => this._jwt.set(response.jsonWebToken)),
+        map(() => void 0),
+        finalize(() => (this.refresh$ = null)),
+        shareReplay(1),
+      );
 
     return this.refresh$;
   }
@@ -56,7 +60,7 @@ export class SessionService {
   logout(): Observable<void> {
     return this.http.post<void>(`${this.base}/logout`, null, { withCredentials: true }).pipe(
       catchError(() => of(void 0)),
-      map(() => this.clear())
+      map(() => this.clear()),
     );
   }
 

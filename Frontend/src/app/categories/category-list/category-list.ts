@@ -13,14 +13,9 @@ import { UpdateCategoryNameDialog } from '../update-category-name-dialog/update-
 
 @Component({
   selector: 'app-category-list',
-  imports: [
-    MatButtonModule,
-    MatIconModule,
-    MatMenuModule,
-    MatProgressSpinnerModule
-  ],
+  imports: [MatButtonModule, MatIconModule, MatMenuModule, MatProgressSpinnerModule],
   templateUrl: './category-list.html',
-  styleUrl: './category-list.css'
+  styleUrl: './category-list.css',
 })
 export class CategoryList implements OnInit {
   private readonly categoryService = inject(CategoryService);

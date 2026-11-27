@@ -24,10 +24,10 @@ export interface UpdateCategoryNameDialogData {
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
   ],
   templateUrl: './update-category-name-dialog.html',
-  styleUrl: './update-category-name-dialog.css'
+  styleUrl: './update-category-name-dialog.css',
 })
 export class UpdateCategoryNameDialog {
   private readonly fb = inject(FormBuilder);
@@ -47,16 +47,18 @@ export class UpdateCategoryNameDialog {
     this.loading.set(true);
     this.errorMessage.set('');
 
-    this.categoryService.updatePersonalCategoryName(this.data.id, this.form.getRawValue()).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.dialogRef.close(true);
-      },
-      error: (err) => {
-        this.loading.set(false);
-        this.errorMessage.set(this.apiErrorService.applyErrors(err, this.form));
-      },
-    });
+    this.categoryService
+      .updatePersonalCategoryName(this.data.id, this.form.getRawValue())
+      .subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.dialogRef.close(true);
+        },
+        error: (err) => {
+          this.loading.set(false);
+          this.errorMessage.set(this.apiErrorService.applyErrors(err, this.form));
+        },
+      });
   }
 
   onCancel(): void {

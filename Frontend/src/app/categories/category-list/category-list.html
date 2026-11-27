@@ -1,13 +1,9 @@
 <div class="categories-page">
   <div class="categories-header">
     <div class="categories-header-text">
-      <h1 class="categories-title">
-        Categories
-      </h1>
+      <h1 class="categories-title">Categories</h1>
 
-      <p class="categories-subtitle">
-        Organise your transactions with categories
-      </p>
+      <p class="categories-subtitle">Organise your transactions with categories</p>
     </div>
 
     <button mat-flat-button class="add-category-button" (click)="openCreateDialog()">
@@ -26,16 +22,14 @@
       <mat-icon>error_outline</mat-icon>
 
       <span>
-        {{errorMessage()}}
+        {{ errorMessage() }}
       </span>
     </div>
   } @else if (categories().length === 0) {
     <div class="categories-empty">
       <mat-icon class="categories-empty-icon">label_outline</mat-icon>
 
-      <p class="categories-empty-title">
-        No categories yet
-      </p>
+      <p class="categories-empty-title">No categories yet</p>
 
       <p class="categories-empty-subtitle">
         Add your first category to start organising your transactions.
@@ -47,15 +41,23 @@
         <div class="category-card">
           <div class="category-card-header">
             <div class="category-icon-wrap" [class.global]="category.isGlobal">
-              <mat-icon class="category-icon">{{category.isGlobal ? 'public' : 'label'}}</mat-icon>
+              <mat-icon class="category-icon">{{
+                category.isGlobal ? 'public' : 'label'
+              }}</mat-icon>
             </div>
 
             <span class="category-name">
-              {{category.name}}
+              {{ category.name }}
             </span>
 
             @if (!category.isGlobal) {
-              <button mat-icon-button class="category-menu-btn" [matMenuTriggerFor]="categoryMenu" (click)="$event.stopPropagation()" aria-label="Category options">
+              <button
+                mat-icon-button
+                class="category-menu-btn"
+                [matMenuTriggerFor]="categoryMenu"
+                (click)="$event.stopPropagation()"
+                aria-label="Category options"
+              >
                 <mat-icon>more_vert</mat-icon>
               </button>
 

@@ -28,21 +28,22 @@ interface UnitOption {
   value: Unit;
 }
 
-
 /** Maps UnitCategory enum values to the Unit hundred-range they occupy.
  *  Uncategorized (1) → units 1–99, Length (2) → 101–199, etc. */
 const UNITS_BY_CATEGORY: Record<UnitCategory, UnitOption[]> = (() => {
   const map = {} as Record<UnitCategory, UnitOption[]>;
 
-  for (const cat of Object.values(UnitCategory).filter((v): v is UnitCategory => typeof v === 'number')) {
+  for (const cat of Object.values(UnitCategory).filter(
+    (v): v is UnitCategory => typeof v === 'number',
+  )) {
     map[cat] = Object.values(Unit)
       .filter((v): v is Unit => typeof v === 'number')
-      .filter(v => {
+      .filter((v) => {
         if (cat === UnitCategory.Uncategorized) return v < 100;
         const hundred = (cat - 1) * 100; // Length(2)→100, Mass(3)→200, …
         return v > hundred && v < hundred + 100;
       })
-      .map(v => ({ label: UNIT_LABELS[v], value: v }))
+      .map((v) => ({ label: UNIT_LABELS[v], value: v }))
       .sort((a, b) => a.label.localeCompare(b.label));
   }
 
@@ -51,7 +52,7 @@ const UNITS_BY_CATEGORY: Record<UnitCategory, UnitOption[]> = (() => {
 
 const ALL_UNIT_OPTIONS: UnitOption[] = Object.values(Unit)
   .filter((v): v is Unit => typeof v === 'number')
-  .map(v => ({ label: UNIT_LABELS[v], value: v }))
+  .map((v) => ({ label: UNIT_LABELS[v], value: v }))
   .sort((a, b) => a.label.localeCompare(b.label));
 
 @Component({
@@ -64,10 +65,10 @@ const ALL_UNIT_OPTIONS: UnitOption[] = Object.values(Unit)
     MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
-    MatSelectModule
+    MatSelectModule,
   ],
   templateUrl: './create-transaction-dialog.html',
-  styleUrl: './create-transaction-dialog.css'
+  styleUrl: './create-transaction-dialog.css',
 })
 export class CreateTransactionDialog implements OnInit {
   private readonly fb = inject(FormBuilder);
@@ -125,7 +126,7 @@ export class CreateTransactionDialog implements OnInit {
     const itemId = this.itemsArray.at(index).get('itemId')?.value as string;
     if (!itemId) return ALL_UNIT_OPTIONS;
 
-    const item = this.items().find(i => i.id === itemId);
+    const item = this.items().find((i) => i.id === itemId);
     if (!item) return ALL_UNIT_OPTIONS;
 
     return UNITS_BY_CATEGORY[item.unitCategory] ?? ALL_UNIT_OPTIONS;
@@ -162,27 +163,29 @@ export class CreateTransactionDialog implements OnInit {
     const isIncome = type === 'income';
     const isTransfer = !isExpense && !isIncome;
 
-    this.transactionService.createTransaction({
-      occurredAt: new Date(occurredAt).toISOString(),
-      categoryId: categoryId || null,
-      fromAccountId: isExpense || isTransfer ? accountId : null,
-      toAccountId: isIncome ? accountId : isTransfer ? type : null,
-      items: items.map(i => ({
-        itemId: i.itemId || null,
-        totalPrice: i.totalPrice,
-        amount: i.amount,
-        unit: i.unit,
-      })),
-    }).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.dialogRef.close(true);
-      },
-      error: (err) => {
-        this.loading.set(false);
-        this.errorMessage.set(this.apiErrorService.applyErrors(err, this.form));
-      },
-    });
+    this.transactionService
+      .createTransaction({
+        occurredAt: new Date(occurredAt).toISOString(),
+        categoryId: categoryId || null,
+        fromAccountId: isExpense || isTransfer ? accountId : null,
+        toAccountId: isIncome ? accountId : isTransfer ? type : null,
+        items: items.map((i) => ({
+          itemId: i.itemId || null,
+          totalPrice: i.totalPrice,
+          amount: i.amount,
+          unit: i.unit,
+        })),
+      })
+      .subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.dialogRef.close(true);
+        },
+        error: (err) => {
+          this.loading.set(false);
+          this.errorMessage.set(this.apiErrorService.applyErrors(err, this.form));
+        },
+      });
   }
 
   onCancel(): void {

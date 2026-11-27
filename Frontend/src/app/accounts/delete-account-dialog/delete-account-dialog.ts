@@ -14,14 +14,9 @@ export interface DeleteAccountDialogData {
 
 @Component({
   selector: 'app-delete-account-dialog',
-  imports: [
-    MatButtonModule,
-    MatDialogModule,
-    MatIconModule,
-    MatProgressSpinnerModule
-  ],
+  imports: [MatButtonModule, MatDialogModule, MatIconModule, MatProgressSpinnerModule],
   templateUrl: './delete-account-dialog.html',
-  styleUrl: './delete-account-dialog.css'
+  styleUrl: './delete-account-dialog.css',
 })
 export class DeleteAccountDialog {
   private readonly dialogRef = inject(MatDialogRef<DeleteAccountDialog>);

@@ -1,18 +1,20 @@
-<h2 mat-dialog-title class="dialog-title">
-  Add transaction
-</h2>
+<h2 mat-dialog-title class="dialog-title">Add transaction</h2>
 
 <mat-dialog-content>
-  <p class="dialog-subtitle">
-    Record a new transaction for this account.
-  </p>
+  <p class="dialog-subtitle">Record a new transaction for this account.</p>
 
   @if (loadingData()) {
     <div class="data-loading">
       <mat-spinner diameter="32" />
     </div>
   } @else {
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate id="create-transaction-form" class="dialog-form">
+    <form
+      [formGroup]="form"
+      (ngSubmit)="onSubmit()"
+      novalidate
+      id="create-transaction-form"
+      class="dialog-form"
+    >
       <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
         <mat-label>Date</mat-label>
 
@@ -22,7 +24,7 @@
 
         @if (form.controls.occurredAt.hasError('serverError')) {
           <mat-error>
-            {{form.controls.occurredAt.getError('serverError')}}
+            {{ form.controls.occurredAt.getError('serverError') }}
           </mat-error>
         }
       </mat-form-field>
@@ -33,14 +35,14 @@
         <mat-select formControlName="categoryId">
           @for (cat of categories(); track cat.id) {
             <mat-option [value]="cat.id">
-              {{cat.name}}
+              {{ cat.name }}
             </mat-option>
           }
         </mat-select>
 
         @if (form.controls.categoryId.hasError('serverError')) {
           <mat-error>
-            {{form.controls.categoryId.getError('serverError')}}
+            {{ form.controls.categoryId.getError('serverError') }}
           </mat-error>
         }
       </mat-form-field>
@@ -49,20 +51,14 @@
         <mat-label>Type</mat-label>
 
         <mat-select formControlName="type">
-          <mat-option value="expense">
-            Expense (money out)
-          </mat-option>
+          <mat-option value="expense"> Expense (money out) </mat-option>
 
-          <mat-option value="income">
-            Income (money in)
-          </mat-option>
+          <mat-option value="income"> Income (money in) </mat-option>
 
           @if (otherAccounts.length > 0) {
             <mat-optgroup label="Transfer to">
               @for (account of otherAccounts; track account.id) {
-                <mat-option [value]="account.id">
-                  {{account.name}} (transfer)
-                </mat-option>
+                <mat-option [value]="account.id"> {{ account.name }} (transfer) </mat-option>
               }
             </mat-optgroup>
           }
@@ -71,9 +67,7 @@
 
       <div class="items-section" formArrayName="items">
         <div class="items-section-header">
-          <span class="items-section-label">
-            Items
-          </span>
+          <span class="items-section-label"> Items </span>
 
           <button mat-button type="button" class="add-item-button" (click)="addItem()">
             <mat-icon>add</mat-icon>
@@ -91,14 +85,14 @@
                 <mat-select formControlName="itemId" (selectionChange)="onItemChange(i)">
                   @for (item of items(); track item.id) {
                     <mat-option [value]="item.id">
-                      {{item.name}}
+                      {{ item.name }}
                     </mat-option>
                   }
                 </mat-select>
 
                 @if (itemsArray.at(i).get('itemId')?.hasError('serverError')) {
                   <mat-error>
-                    {{itemsArray.at(i).get('itemId')?.getError('serverError')}}
+                    {{ itemsArray.at(i).get('itemId')?.getError('serverError') }}
                   </mat-error>
                 }
               </mat-form-field>
@@ -110,7 +104,7 @@
 
                 @if (itemsArray.at(i).get('totalPrice')?.hasError('serverError')) {
                   <mat-error>
-                    {{itemsArray.at(i).get('totalPrice')?.getError('serverError')}}
+                    {{ itemsArray.at(i).get('totalPrice')?.getError('serverError') }}
                   </mat-error>
                 }
               </mat-form-field>
@@ -122,7 +116,7 @@
 
                 @if (itemsArray.at(i).get('amount')?.hasError('serverError')) {
                   <mat-error>
-                    {{itemsArray.at(i).get('amount')?.getError('serverError')}}
+                    {{ itemsArray.at(i).get('amount')?.getError('serverError') }}
                   </mat-error>
                 }
               </mat-form-field>
@@ -133,21 +127,27 @@
                 <mat-select formControlName="unit">
                   @for (opt of unitOptionsForRow(i); track opt.value) {
                     <mat-option [value]="opt.value">
-                      {{opt.label}}
+                      {{ opt.label }}
                     </mat-option>
                   }
                 </mat-select>
 
                 @if (itemsArray.at(i).get('unit')?.hasError('serverError')) {
                   <mat-error>
-                    {{itemsArray.at(i).get('unit')?.getError('serverError')}}
+                    {{ itemsArray.at(i).get('unit')?.getError('serverError') }}
                   </mat-error>
                 }
               </mat-form-field>
             </div>
 
             @if (itemsArray.length > 1) {
-              <button mat-icon-button type="button" class="remove-item-button" (click)="removeItem(i)" aria-label="Remove item">
+              <button
+                mat-icon-button
+                type="button"
+                class="remove-item-button"
+                (click)="removeItem(i)"
+                aria-label="Remove item"
+              >
                 <mat-icon>remove_circle_outline</mat-icon>
               </button>
             }
@@ -160,7 +160,7 @@
           <mat-icon>error_outline</mat-icon>
 
           <span>
-            {{errorMessage()}}
+            {{ errorMessage() }}
           </span>
         </div>
       }
@@ -169,11 +169,15 @@
 </mat-dialog-content>
 
 <mat-dialog-actions class="dialog-actions">
-  <button mat-button type="button" (click)="onCancel()" [disabled]="loading()">
-    Cancel
-  </button>
+  <button mat-button type="button" (click)="onCancel()" [disabled]="loading()">Cancel</button>
 
-  <button mat-flat-button class="submit-button" type="submit" form="create-transaction-form" [disabled]="loading() || loadingData()">
+  <button
+    mat-flat-button
+    class="submit-button"
+    type="submit"
+    form="create-transaction-form"
+    [disabled]="loading() || loadingData()"
+  >
     @if (loading()) {
       <mat-spinner diameter="18" class="submit-spinner" />
     } @else {

@@ -15,14 +15,9 @@ import { UpdateItemNameDialog } from '../update-item-name-dialog/update-item-nam
 
 @Component({
   selector: 'app-item-list',
-  imports: [
-    MatButtonModule,
-    MatIconModule,
-    MatMenuModule,
-    MatProgressSpinnerModule
-  ],
+  imports: [MatButtonModule, MatIconModule, MatMenuModule, MatProgressSpinnerModule],
   templateUrl: './item-list.html',
-  styleUrl: './item-list.css'
+  styleUrl: './item-list.css',
 })
 export class ItemList implements OnInit {
   private readonly itemService = inject(ItemService);
@@ -96,14 +91,22 @@ export class ItemList implements OnInit {
   /** Returns a Material icon name appropriate for a given UnitCategory. */
   unitCategoryIcon(category: UnitCategory): string {
     switch (category) {
-      case UnitCategory.Length:    return 'straighten';
-      case UnitCategory.Mass:      return 'scale';
-      case UnitCategory.Area:      return 'crop_free';
-      case UnitCategory.Volume:    return 'water_drop';
-      case UnitCategory.Time:      return 'schedule';
-      case UnitCategory.Energy:    return 'bolt';
-      case UnitCategory.DataSize:  return 'storage';
-      default:                     return 'category';
+      case UnitCategory.Length:
+        return 'straighten';
+      case UnitCategory.Mass:
+        return 'scale';
+      case UnitCategory.Area:
+        return 'crop_free';
+      case UnitCategory.Volume:
+        return 'water_drop';
+      case UnitCategory.Time:
+        return 'schedule';
+      case UnitCategory.Energy:
+        return 'bolt';
+      case UnitCategory.DataSize:
+        return 'storage';
+      default:
+        return 'category';
     }
   }
 

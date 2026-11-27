@@ -13,14 +13,9 @@ import { UpdateGlobalCategoryNameDialog } from '../update-global-category-name-d
 
 @Component({
   selector: 'app-global-category-list',
-  imports: [
-    MatButtonModule,
-    MatIconModule,
-    MatMenuModule,
-    MatProgressSpinnerModule
-  ],
+  imports: [MatButtonModule, MatIconModule, MatMenuModule, MatProgressSpinnerModule],
   templateUrl: './global-category-list.html',
-  styleUrl: './global-category-list.css'
+  styleUrl: './global-category-list.css',
 })
 export class GlobalCategoryList implements OnInit {
   private readonly categoryService = inject(CategoryService);
@@ -87,7 +82,7 @@ export class GlobalCategoryList implements OnInit {
 
     this.categoryService.getCategories().subscribe({
       next: (categories) => {
-        this.categories.set(categories.filter(c => c.isGlobal));
+        this.categories.set(categories.filter((c) => c.isGlobal));
         this.loading.set(false);
       },
       error: () => {

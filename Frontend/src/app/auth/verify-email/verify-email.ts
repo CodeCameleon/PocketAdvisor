@@ -10,15 +10,9 @@ import { AuthCard } from '../auth-card/auth-card';
 
 @Component({
   selector: 'app-verify-email',
-  imports: [
-    RouterLink,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    AuthCard
-  ],
+  imports: [RouterLink, MatButtonModule, MatIconModule, MatProgressSpinnerModule, AuthCard],
   templateUrl: './verify-email.html',
-  styleUrl: './verify-email.css'
+  styleUrl: './verify-email.css',
 })
 export class VerifyEmail {
   private readonly route = inject(ActivatedRoute);

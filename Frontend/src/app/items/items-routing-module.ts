@@ -6,11 +6,11 @@ import { ItemDetail } from './item-detail/item-detail';
 
 const routes: Routes = [
   { path: '', component: ItemList },
-  { path: ':id', component: ItemDetail }
+  { path: ':id', component: ItemDetail },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class ItemsRoutingModule {}

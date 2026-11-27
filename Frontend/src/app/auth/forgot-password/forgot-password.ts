@@ -24,7 +24,7 @@ import { AuthCard } from '../auth-card/auth-card';
     AuthCard,
   ],
   templateUrl: './forgot-password.html',
-  styleUrl: './forgot-password.css'
+  styleUrl: './forgot-password.css',
 })
 export class ForgotPassword {
   private readonly fb = inject(FormBuilder);

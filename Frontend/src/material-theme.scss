@@ -2,136 +2,171 @@
 @use 'sass:map';
 
 $pocket-primary-palette: (
-  0:   #000000,
-  10:  #071550,   // --color-primary-950
-  20:  #122D8A,   // --color-primary-800
-  25:  #1A3CAA,
-  30:  #1D45BE,
-  35:  #204DCB,
-  40:  #2355D8,   // --color-primary-600-base
-  50:  #3869E8,
-  60:  #4E7CF6,   // --color-primary-400
-  70:  #6F96F8,
-  80:  #8FABF5,   // --color-primary-200
-  90:  #C7D7FF,   // --color-primary-100
-  95:  #E0EBFF,
-  98:  #F3F6FF,
-  99:  #F9FAFF,
-  100: #FFFFFF,
+  0: #000000,
+  10: #071550,
+  // --color-primary-950
+  20: #122d8a,
+  // --color-primary-800
+  25: #1a3caa,
+  30: #1d45be,
+  35: #204dcb,
+  40: #2355d8,
+  // --color-primary-600-base
+  50: #3869e8,
+  60: #4e7cf6,
+  // --color-primary-400
+  70: #6f96f8,
+  80: #8fabf5,
+  // --color-primary-200
+  90: #c7d7ff,
+  // --color-primary-100
+  95: #e0ebff,
+  98: #f3f6ff,
+  99: #f9faff,
+  100: #ffffff,
 );
 
 $pocket-secondary-palette: (
-  0:   #000000,
-  10:  #150A52,   // --color-secondary-950
-  20:  #341B9E,   // --color-secondary-800
-  25:  #422AB8,
-  30:  #4D30CC,
-  35:  #5534E0,
-  40:  #5E38F5,   // --color-secondary-600-base
-  50:  #7050F6,
-  60:  #8A6EFF,   // --color-secondary-400
-  70:  #A08BFF,
-  80:  #B8A8FF,   // --color-secondary-200
-  90:  #DDD5FF,   // --color-secondary-100
-  95:  #EEE9FF,
-  98:  #F8F6FF,
-  99:  #FBFAFF,
-  100: #FFFFFF,
+  0: #000000,
+  10: #150a52,
+  // --color-secondary-950
+  20: #341b9e,
+  // --color-secondary-800
+  25: #422ab8,
+  30: #4d30cc,
+  35: #5534e0,
+  40: #5e38f5,
+  // --color-secondary-600-base
+  50: #7050f6,
+  60: #8a6eff,
+  // --color-secondary-400
+  70: #a08bff,
+  80: #b8a8ff,
+  // --color-secondary-200
+  90: #ddd5ff,
+  // --color-secondary-100
+  95: #eee9ff,
+  98: #f8f6ff,
+  99: #fbfaff,
+  100: #ffffff,
 );
 
 $pocket-tertiary-palette: (
-  0:   #000000,
-  10:  #02312E,   // --color-tertiary-950
-  20:  #066B66,   // --color-tertiary-800
-  25:  #088580,
-  30:  #099690,
-  35:  #0BA099,
-  40:  #0DAAA1,   // --color-tertiary-600-base
-  50:  #12C2B8,
-  60:  #1DDCD0,   // --color-tertiary-400
-  70:  #4CE5DB,
-  80:  #78F2E8,   // --color-tertiary-200
-  90:  #BDFBF5,   // --color-tertiary-100
-  95:  #DDFDFB,
-  98:  #F2FFFE,
-  99:  #F8FFFF,
-  100: #FFFFFF,
+  0: #000000,
+  10: #02312e,
+  // --color-tertiary-950
+  20: #066b66,
+  // --color-tertiary-800
+  25: #088580,
+  30: #099690,
+  35: #0ba099,
+  40: #0daaa1,
+  // --color-tertiary-600-base
+  50: #12c2b8,
+  60: #1ddcd0,
+  // --color-tertiary-400
+  70: #4ce5db,
+  80: #78f2e8,
+  // --color-tertiary-200
+  90: #bdfbf5,
+  // --color-tertiary-100
+  95: #ddfdfb,
+  98: #f2fffe,
+  99: #f8ffff,
+  100: #ffffff,
 );
 
 $pocket-error-palette: (
-  0:   #000000,
-  10:  #430508,   // --color-error-950
-  20:  #8C0E14,   // --color-error-800
-  25:  #A81018,
-  30:  #C0131D,
-  35:  #D41721,
-  40:  #E31B26,   // --color-error-600-base
-  50:  #F03038,
-  60:  #FF5C65,   // --color-error-400
-  70:  #FF8088,
-  80:  #FFAAB0,   // --color-error-200
-  90:  #FFD6D8,   // --color-error-100
-  95:  #FFECEC,
-  98:  #FFF8F8,
-  99:  #FFFBFB,
-  100: #FFFFFF,
+  0: #000000,
+  10: #430508,
+  // --color-error-950
+  20: #8c0e14,
+  // --color-error-800
+  25: #a81018,
+  30: #c0131d,
+  35: #d41721,
+  40: #e31b26,
+  // --color-error-600-base
+  50: #f03038,
+  60: #ff5c65,
+  // --color-error-400
+  70: #ff8088,
+  80: #ffaab0,
+  // --color-error-200
+  90: #ffd6d8,
+  // --color-error-100
+  95: #ffecec,
+  98: #fff8f8,
+  99: #fffbfb,
+  100: #ffffff,
 );
 
 $pocket-neutral-palette: (
-  0:   #000000,
-  4:   #050609,
-  6:   #080A10,
-  10:  #0C0E18,   // --color-neutral-950
-  12:  #101320,
-  17:  #161924,
-  22:  #1A1E2B,
-  24:  #1C2030,
-  20:  #1E2130,   // --color-neutral-800
-  25:  #282C3E,
-  30:  #32374A,
-  35:  #3C4256,
-  40:  #4A4F5E,   // --color-neutral-600-base
-  50:  #636878,
-  60:  #7D8293,
-  70:  #979BAE,
-  80:  #B1B5C6,
-  87:  #D3D6DF,
-  90:  #E2E4E9,   // --color-neutral-100
-  92:  #EAECF1,
-  94:  #EFF1F4,
-  95:  #F4F5F7,   // --color-neutral-50
-  96:  #F6F7F9,
-  98:  #F9FAFB,
-  99:  #FBFCFD,
-  100: #FFFFFF,
+  0: #000000,
+  4: #050609,
+  6: #080a10,
+  10: #0c0e18,
+  // --color-neutral-950
+  12: #101320,
+  17: #161924,
+  22: #1a1e2b,
+  24: #1c2030,
+  20: #1e2130,
+  // --color-neutral-800
+  25: #282c3e,
+  30: #32374a,
+  35: #3c4256,
+  40: #4a4f5e,
+  // --color-neutral-600-base
+  50: #636878,
+  60: #7d8293,
+  70: #979bae,
+  80: #b1b5c6,
+  87: #d3d6df,
+  90: #e2e4e9,
+  // --color-neutral-100
+  92: #eaecf1,
+  94: #eff1f4,
+  95: #f4f5f7,
+  // --color-neutral-50
+  96: #f6f7f9,
+  98: #f9fafb,
+  99: #fbfcfd,
+  100: #ffffff,
 );
 
 $pocket-neutral-variant-palette: (
-  0:   #000000,
-  10:  #0D0F28,   // --color-neutral-variant-950
-  20:  #1E2145,   // --color-neutral-variant-800
-  25:  #272A57,
-  30:  #30346A,
-  35:  #383D7C,
-  40:  #3D4473,   // --color-neutral-variant-600-base
-  50:  #525A90,
-  60:  #7A82B0,   // --color-neutral-variant-400
-  70:  #9AA1C7,
-  80:  #C2C6E0,   // --color-neutral-variant-200
-  90:  #E0E2F0,   // --color-neutral-variant-100
-  95:  #EFF0F8,
-  98:  #F8F8FC,
-  99:  #FBFBFE,
-  100: #FFFFFF,
+  0: #000000,
+  10: #0d0f28,
+  // --color-neutral-variant-950
+  20: #1e2145,
+  // --color-neutral-variant-800
+  25: #272a57,
+  30: #30346a,
+  35: #383d7c,
+  40: #3d4473,
+  // --color-neutral-variant-600-base
+  50: #525a90,
+  60: #7a82b0,
+  // --color-neutral-variant-400
+  70: #9aa1c7,
+  80: #c2c6e0,
+  // --color-neutral-variant-200
+  90: #e0e2f0,
+  // --color-neutral-variant-100
+  95: #eff0f8,
+  98: #f8f8fc,
+  99: #fbfbfe,
+  100: #ffffff,
 );
 
 $pocket-theme-palette: map.merge(
   $pocket-primary-palette,
   (
-    secondary:       $pocket-secondary-palette,
-    neutral:         $pocket-neutral-palette,
+    secondary: $pocket-secondary-palette,
+    neutral: $pocket-neutral-palette,
     neutral-variant: $pocket-neutral-variant-palette,
-    error:           $pocket-error-palette,
+    error: $pocket-error-palette,
   )
 );
 
@@ -142,7 +177,7 @@ html {
   @include mat.theme(
     (
       color: (
-        primary:  $pocket-theme-palette,
+        primary: $pocket-theme-palette,
         tertiary: $pocket-tertiary-palette,
       ),
       typography: Roboto,

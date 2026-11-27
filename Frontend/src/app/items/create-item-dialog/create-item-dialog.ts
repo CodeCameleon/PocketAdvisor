@@ -20,13 +20,13 @@ interface UnitCategoryOption {
 
 const UNIT_CATEGORY_OPTIONS: UnitCategoryOption[] = [
   { label: 'Uncategorized', value: UnitCategory.Uncategorized },
-  { label: 'Area',          value: UnitCategory.Area          },
-  { label: 'Data Size',     value: UnitCategory.DataSize      },
-  { label: 'Energy',        value: UnitCategory.Energy        },
-  { label: 'Length',        value: UnitCategory.Length        },
-  { label: 'Mass',          value: UnitCategory.Mass          },
-  { label: 'Time',          value: UnitCategory.Time          },
-  { label: 'Volume',        value: UnitCategory.Volume        },
+  { label: 'Area', value: UnitCategory.Area },
+  { label: 'Data Size', value: UnitCategory.DataSize },
+  { label: 'Energy', value: UnitCategory.Energy },
+  { label: 'Length', value: UnitCategory.Length },
+  { label: 'Mass', value: UnitCategory.Mass },
+  { label: 'Time', value: UnitCategory.Time },
+  { label: 'Volume', value: UnitCategory.Volume },
 ];
 
 @Component({
@@ -39,10 +39,10 @@ const UNIT_CATEGORY_OPTIONS: UnitCategoryOption[] = [
     MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
-    MatSelectModule
+    MatSelectModule,
   ],
   templateUrl: './create-item-dialog.html',
-  styleUrl: './create-item-dialog.css'
+  styleUrl: './create-item-dialog.css',
 })
 export class CreateItemDialog {
   private readonly fb = inject(FormBuilder);

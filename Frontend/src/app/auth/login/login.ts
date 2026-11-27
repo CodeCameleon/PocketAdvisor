@@ -23,7 +23,7 @@ import { AuthCard } from '../auth-card/auth-card';
     MatProgressSpinnerModule,
     AuthCard,
   ],
-  templateUrl: './login.html'
+  templateUrl: './login.html',
 })
 export class Login {
   private readonly fb = inject(FormBuilder);
@@ -57,6 +57,6 @@ export class Login {
   }
 
   togglePasswordVisibility(): void {
-    this.hidePassword.update(v => !v);
+    this.hidePassword.update((v) => !v);
   }
 }

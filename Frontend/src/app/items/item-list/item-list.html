@@ -1,13 +1,9 @@
 <div class="items-page">
   <div class="items-header">
     <div class="items-header-text">
-      <h1 class="items-title">
-        Items
-      </h1>
+      <h1 class="items-title">Items</h1>
 
-      <p class="items-subtitle">
-        Your tracked items and their units
-      </p>
+      <p class="items-subtitle">Your tracked items and their units</p>
     </div>
 
     <button mat-flat-button class="add-item-button" (click)="openCreateDialog()">
@@ -26,16 +22,14 @@
       <mat-icon>error_outline</mat-icon>
 
       <span>
-        {{errorMessage()}}
+        {{ errorMessage() }}
       </span>
     </div>
   } @else if (items().length === 0) {
     <div class="items-empty">
       <mat-icon class="items-empty-icon">inventory_2</mat-icon>
 
-      <p class="items-empty-title">
-        No items yet
-      </p>
+      <p class="items-empty-title">No items yet</p>
 
       <p class="items-empty-subtitle">
         Add your first item to start tracking quantities and values.
@@ -44,17 +38,30 @@
   } @else {
     <div class="items-grid">
       @for (item of items(); track item.id) {
-        <div class="item-card" (click)="openDetail(item)" role="button" tabindex="0" (keydown.enter)="openDetail(item)" (keydown.space)="openDetail(item)">
+        <div
+          class="item-card"
+          (click)="openDetail(item)"
+          role="button"
+          tabindex="0"
+          (keydown.enter)="openDetail(item)"
+          (keydown.space)="openDetail(item)"
+        >
           <div class="item-card-header">
             <div class="item-icon-wrap">
-              <mat-icon class="item-icon">{{unitCategoryIcon(item.unitCategory)}}</mat-icon>
+              <mat-icon class="item-icon">{{ unitCategoryIcon(item.unitCategory) }}</mat-icon>
             </div>
 
             <span class="item-name">
-              {{item.name}}
+              {{ item.name }}
             </span>
 
-            <button mat-icon-button class="item-menu-btn" [matMenuTriggerFor]="itemMenu" (click)="$event.stopPropagation()" aria-label="Item options">
+            <button
+              mat-icon-button
+              class="item-menu-btn"
+              [matMenuTriggerFor]="itemMenu"
+              (click)="$event.stopPropagation()"
+              aria-label="Item options"
+            >
               <mat-icon>more_vert</mat-icon>
             </button>
 
@@ -75,7 +82,7 @@
 
           <div class="item-card-footer">
             <span class="item-category-badge">
-              {{unitCategoryLabel(item.unitCategory)}}
+              {{ unitCategoryLabel(item.unitCategory) }}
             </span>
           </div>
         </div>

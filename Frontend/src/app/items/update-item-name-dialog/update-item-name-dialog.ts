@@ -24,10 +24,10 @@ export interface UpdateItemNameDialogData {
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
   ],
   templateUrl: './update-item-name-dialog.html',
-  styleUrl: './update-item-name-dialog.css'
+  styleUrl: './update-item-name-dialog.css',
 })
 export class UpdateItemNameDialog {
   private readonly fb = inject(FormBuilder);

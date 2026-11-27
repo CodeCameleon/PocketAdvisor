@@ -24,10 +24,10 @@ export interface UpdateGlobalCategoryNameDialogData {
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
   ],
   templateUrl: './update-global-category-name-dialog.html',
-  styleUrl: './update-global-category-name-dialog.css'
+  styleUrl: './update-global-category-name-dialog.css',
 })
 export class UpdateGlobalCategoryNameDialog {
   private readonly fb = inject(FormBuilder);

@@ -20,27 +20,21 @@ import { DeleteTransactionDialog } from '../delete-transaction-dialog/delete-tra
 
 @Component({
   selector: 'app-account-transactions',
-  imports: [
-    CurrencyPipe,
-    DatePipe,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule
-  ],
+  imports: [CurrencyPipe, DatePipe, MatButtonModule, MatIconModule, MatProgressSpinnerModule],
   templateUrl: './account-transactions.html',
   styleUrl: './account-transactions.css',
   animations: [
     trigger('expandCollapse', [
       transition(':enter', [
         style({ height: 0, opacity: 0, overflow: 'hidden' }),
-        animate('180ms ease-out', style({ height: '*', opacity: 1 }))
+        animate('180ms ease-out', style({ height: '*', opacity: 1 })),
       ]),
       transition(':leave', [
         style({ overflow: 'hidden' }),
-        animate('150ms ease-in', style({ height: 0, opacity: 0 }))
-      ])
-    ])
-  ]
+        animate('150ms ease-in', style({ height: 0, opacity: 0 })),
+      ]),
+    ]),
+  ],
 })
 export class AccountTransactions implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -72,7 +66,7 @@ export class AccountTransactions implements OnInit {
   }
 
   toggleExpand(txId: string): void {
-    this.expandedTxId.update(current => (current === txId ? null : txId));
+    this.expandedTxId.update((current) => (current === txId ? null : txId));
   }
 
   deleteItem(tx: TransactionResponse, itemId: string, event: MouseEvent): void {
@@ -82,19 +76,17 @@ export class AccountTransactions implements OnInit {
     this.deletingItemId.set(itemId);
     this.transactionService.deleteTransactionItem(tx.id, itemId).subscribe({
       next: () => {
-        this.transactions.update(txs =>
-          txs.map(t =>
-            t.id === tx.id
-              ? { ...t, items: t.items.filter(i => i.itemId !== itemId) }
-              : t
-          )
+        this.transactions.update((txs) =>
+          txs.map((t) =>
+            t.id === tx.id ? { ...t, items: t.items.filter((i) => i.itemId !== itemId) } : t,
+          ),
         );
         this.deletingItemId.set(null);
 
         // Refresh account balance
         this.accountService.getAccounts().subscribe({
-          next: accounts => {
-            const found = accounts.find(a => a.id === this.accountId) ?? null;
+          next: (accounts) => {
+            const found = accounts.find((a) => a.id === this.accountId) ?? null;
             this.account.set(found);
           },
         });
@@ -122,12 +114,12 @@ export class AccountTransactions implements OnInit {
 
     ref.afterClosed().subscribe((deleted: boolean) => {
       if (deleted) {
-        this.transactions.update(txs => txs.filter(t => t.id !== tx.id));
+        this.transactions.update((txs) => txs.filter((t) => t.id !== tx.id));
 
         // Refresh account balance
         this.accountService.getAccounts().subscribe({
-          next: accounts => {
-            const found = accounts.find(a => a.id === this.accountId) ?? null;
+          next: (accounts) => {
+            const found = accounts.find((a) => a.id === this.accountId) ?? null;
             this.account.set(found);
           },
         });
@@ -143,7 +135,7 @@ export class AccountTransactions implements OnInit {
       restoreFocus: true,
       data: {
         accountId: this.accountId,
-        otherAccounts: this.allAccounts.filter(a => a.id !== this.accountId)
+        otherAccounts: this.allAccounts.filter((a) => a.id !== this.accountId),
       },
     });
 
@@ -186,13 +178,13 @@ export class AccountTransactions implements OnInit {
     }).subscribe({
       next: ({ accounts, items }) => {
         this.allAccounts = accounts;
-        this.account.set(accounts.find(a => a.id === this.accountId) ?? null);
-        this.itemNames = new Map(items.map(i => [i.id, i.name]));
+        this.account.set(accounts.find((a) => a.id === this.accountId) ?? null);
+        this.itemNames = new Map(items.map((i) => [i.id, i.name]));
 
         this.transactionService.getTransactions(this.accountId).subscribe({
           next: (txs) => {
             const sorted = [...txs].sort(
-              (a, b) => new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime()
+              (a, b) => new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime(),
             );
             this.transactions.set(sorted);
             this.loading.set(false);

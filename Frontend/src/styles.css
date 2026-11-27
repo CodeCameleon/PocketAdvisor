@@ -1,51 +1,51 @@
 :root {
   /* Primary — deep cobalt blue */
-  --color-primary-100: #C7D7FF;
-  --color-primary-200: #8FABF5;
-  --color-primary-400: #4E7CF6;
-  --color-primary-600-base: #2355D8;
-  --color-primary-800: #122D8A;
+  --color-primary-100: #c7d7ff;
+  --color-primary-200: #8fabf5;
+  --color-primary-400: #4e7cf6;
+  --color-primary-600-base: #2355d8;
+  --color-primary-800: #122d8a;
   --color-primary-950: #071550;
 
   /* Secondary — electric indigo-violet */
-  --color-secondary-100: #DDD5FF;
-  --color-secondary-200: #B8A8FF;
-  --color-secondary-400: #8A6EFF;
-  --color-secondary-600-base: #5E38F5;
-  --color-secondary-800: #341B9E;
-  --color-secondary-950: #150A52;
+  --color-secondary-100: #ddd5ff;
+  --color-secondary-200: #b8a8ff;
+  --color-secondary-400: #8a6eff;
+  --color-secondary-600-base: #5e38f5;
+  --color-secondary-800: #341b9e;
+  --color-secondary-950: #150a52;
 
   /* Tertiary — teal-cyan pop */
-  --color-tertiary-100: #BDFBF5;
-  --color-tertiary-200: #78F2E8;
-  --color-tertiary-400: #1DDCD0;
-  --color-tertiary-600-base: #0DAAA1;
-  --color-tertiary-800: #066B66;
-  --color-tertiary-950: #02312E;
+  --color-tertiary-100: #bdfbf5;
+  --color-tertiary-200: #78f2e8;
+  --color-tertiary-400: #1ddcd0;
+  --color-tertiary-600-base: #0daaa1;
+  --color-tertiary-800: #066b66;
+  --color-tertiary-950: #02312e;
 
   /* Error — vivid crimson */
-  --color-error-100: #FFD6D8;
-  --color-error-200: #FFAAB0;
-  --color-error-400: #FF5C65;
-  --color-error-600-base: #E31B26;
-  --color-error-800: #8C0E14;
+  --color-error-100: #ffd6d8;
+  --color-error-200: #ffaab0;
+  --color-error-400: #ff5c65;
+  --color-error-600-base: #e31b26;
+  --color-error-800: #8c0e14;
   --color-error-950: #430508;
 
   /* Neutral — backgrounds, surfaces, text */
-  --color-neutral-50: #F4F5F7;
-  --color-neutral-100: #E2E4E9;
-  --color-neutral-300: #9BA0AE;
-  --color-neutral-600-base: #4A4F5E;
-  --color-neutral-800: #1E2130;
-  --color-neutral-950: #0C0E18;
+  --color-neutral-50: #f4f5f7;
+  --color-neutral-100: #e2e4e9;
+  --color-neutral-300: #9ba0ae;
+  --color-neutral-600-base: #4a4f5e;
+  --color-neutral-800: #1e2130;
+  --color-neutral-950: #0c0e18;
 
   /* Neutral Variant — borders, dividers, subtle fills */
-  --color-neutral-variant-100: #E0E2F0;
-  --color-neutral-variant-200: #C2C6E0;
-  --color-neutral-variant-400: #7A82B0;
-  --color-neutral-variant-600-base: #3D4473;
-  --color-neutral-variant-800: #1E2145;
-  --color-neutral-variant-950: #0D0F28;
+  --color-neutral-variant-100: #e0e2f0;
+  --color-neutral-variant-200: #c2c6e0;
+  --color-neutral-variant-400: #7a82b0;
+  --color-neutral-variant-600-base: #3d4473;
+  --color-neutral-variant-800: #1e2145;
+  --color-neutral-variant-950: #0d0f28;
 }
 
 /* ─── Auth pages — shared layout ─────────────────────────────────────────── */

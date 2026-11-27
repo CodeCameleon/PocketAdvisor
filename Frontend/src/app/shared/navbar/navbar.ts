@@ -8,15 +8,9 @@ import { SessionService } from '../../core/services/session';
 
 @Component({
   selector: 'app-navbar',
-  imports: [
-    RouterLink,
-    RouterLinkActive,
-    MatToolbarModule,
-    MatButtonModule,
-    MatIconModule
-  ],
+  imports: [RouterLink, RouterLinkActive, MatToolbarModule, MatButtonModule, MatIconModule],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.css'
+  styleUrl: './navbar.css',
 })
 export class Navbar {
   private readonly sessionService = inject(SessionService);
@@ -33,7 +27,10 @@ export class Navbar {
 
     try {
       const payload = JSON.parse(atob(jwt.split('.')[1]));
-      const role: unknown = payload['role'] ?? payload['roles'] ?? payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+      const role: unknown =
+        payload['role'] ??
+        payload['roles'] ??
+        payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
 
       if (Array.isArray(role)) {
         return role.includes('Administrator');

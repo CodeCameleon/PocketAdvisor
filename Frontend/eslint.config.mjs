@@ -11,7 +11,7 @@ export default defineConfig([
       js.configs.recommended,
       tseslint.configs.recommended,
       tseslint.configs.stylistic,
-      angular.configs.tsRecommended
+      angular.configs.tsRecommended,
     ],
     processor: angular.processInlineTemplates,
     rules: {
@@ -20,7 +20,7 @@ export default defineConfig([
         {
           type: 'attribute',
           prefix: 'app',
-          style: 'camelCase'
+          style: 'camelCase',
         },
       ],
       '@angular-eslint/component-selector': [
@@ -28,14 +28,14 @@ export default defineConfig([
         {
           type: 'element',
           prefix: 'app',
-          style: 'kebab-case'
-        }
-      ]
-    }
+          style: 'kebab-case',
+        },
+      ],
+    },
   },
   {
     files: ['**/*.html'],
     extends: [angular.configs.templateRecommended, angular.configs.templateAccessibility],
-    rules: {}
+    rules: {},
   },
 ]);

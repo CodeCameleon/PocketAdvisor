@@ -16,15 +16,9 @@ export interface DeleteTransactionDialogData {
 
 @Component({
   selector: 'app-delete-transaction-dialog',
-  imports: [
-    DatePipe,
-    MatButtonModule,
-    MatDialogModule,
-    MatIconModule,
-    MatProgressSpinnerModule
-  ],
+  imports: [DatePipe, MatButtonModule, MatDialogModule, MatIconModule, MatProgressSpinnerModule],
   templateUrl: './delete-transaction-dialog.html',
-  styleUrl: './delete-transaction-dialog.css'
+  styleUrl: './delete-transaction-dialog.css',
 })
 export class DeleteTransactionDialog {
   private readonly dialogRef = inject(MatDialogRef<DeleteTransactionDialog>);
