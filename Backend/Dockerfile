@@ -36,10 +36,6 @@ RUN dotnet publish PocketAdvisor.WebApplication/PocketAdvisor.WebApplication.csp
 # -----------------------------------------------------------------------------
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
-    && rm -rf /var/lib/apt/lists/*
-
 ARG APP_VERSION=development
 LABEL org.opencontainers.image.title="PocketAdvisor API" \
       org.opencontainers.image.version=$APP_VERSION \

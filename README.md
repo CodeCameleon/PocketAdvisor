@@ -200,3 +200,23 @@ npm run audit:prod
 `npm run format:check` runs Prettier in check mode, and `npm run format` fixes the findings. `npm run lint` runs ESLint through `ng lint` with the ESLint, typescript-eslint and angular-eslint recommended rules, including the template and accessibility rules for the HTML templates (`eslint.config.mjs`). `npm run audit:prod` fails on any known high or critical vulnerability in the production dependencies, the code that is shipped to the browser. Development tooling is left out of this gate, but a plain `npm audit` lists its findings as well.
 
 After adding, removing or updating a package, commit the updated `package-lock.json` together with `package.json`, because `npm ci` installs exactly the locked versions and fails if the two files disagree.
+
+---
+
+## 4. Dockerfile linting
+
+Both Dockerfiles are checked with [hadolint](https://github.com/hadolint/hadolint), which lints the Dockerfile instructions and, through ShellCheck, the shell commands in the `RUN` steps. Run it from the root of the repository, because hadolint reads its configuration (`.hadolint.yaml`) from the directory it is started in. The planned CI pipeline will run the same command, so a change that passes it locally will also pass its Dockerfile lint stage.
+
+```bash
+docker run --rm -v "${PWD}:/repo:ro" -w /repo hadolint/hadolint:v2.14.0@sha256:27086352fd5e1907ea2b934eb1023f217c5ae087992eb59fde121dce9c9ff21e /bin/hadolint Backend/Dockerfile Frontend/Dockerfile
+```
+
+The command works the same in Bash and PowerShell. The repository is mounted read-only. The image is pinned by its digest as well as its tag: a tag can be moved to different content, but the digest always refers to the same image, so everyone runs exactly the same hadolint build and rules. To update hadolint, change both the tag and the digest. A standalone binary of the same version from the [releases page](https://github.com/hadolint/hadolint/releases/tag/v2.14.0) works too: `hadolint Backend/Dockerfile Frontend/Dockerfile`.
+
+`.hadolint.yaml` sets the following rules on top of the built-in ones:
+
+- `failure-threshold: style` makes the run fail on every finding, down to the style level, in the same way that the backend treats every warning as an error.
+- `trustedRegistries` only allows base images from `mcr.microsoft.com` and Docker Hub.
+- `label-schema` with `strict-labels` requires every final image to have the `org.opencontainers.image.title`, `version` and `source` labels, and rejects any other label.
+
+If a finding has to be accepted rather than fixed, put an inline `# hadolint ignore=<rule>` on the line before the instruction, together with a comment that gives the reason. Do not turn the rule off for the whole repository in `.hadolint.yaml`.

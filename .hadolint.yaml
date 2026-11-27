@@ -1,0 +1,16 @@
+# Hadolint configuration for every Dockerfile in the repository.
+
+# Fail on every finding, down to the style level, the same way the backend treats every warning as an error.
+failure-threshold: style
+
+# Base images may only come from these registries.
+trustedRegistries:
+  - mcr.microsoft.com
+  - docker.io
+
+# Every final image has to carry these OCI labels, and no other label is allowed.
+label-schema:
+  org.opencontainers.image.title: text
+  org.opencontainers.image.version: text
+  org.opencontainers.image.source: url
+strict-labels: true
