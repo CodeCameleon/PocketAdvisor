@@ -29,7 +29,7 @@ const PINNED_CURRENCY_CODES: CurrencyCode[] = [
 ];
 
 /** Builds a human-readable "USD – US Dollar" label from a CurrencyCode enum member. */
-function buildCurrencyLabel(key: string, value: CurrencyCode): string {
+function buildCurrencyLabel(key: string): string {
   const alpha = key.toUpperCase();
 
   try {
@@ -43,7 +43,7 @@ function buildCurrencyLabel(key: string, value: CurrencyCode): string {
 /** All CurrencyCode entries as { label, value } pairs, sorted alphabetically. */
 function buildAllOptions(): CurrencyOption[] {
   return Object.entries(CurrencyCode).filter(([, v]) => typeof v === 'number').map(([key, value]) =>
-    ({ label: buildCurrencyLabel(key, value as CurrencyCode), value: value as CurrencyCode })
+    ({ label: buildCurrencyLabel(key), value: value as CurrencyCode })
   ).sort((a, b) => a.label.localeCompare(b.label));
 }
 
@@ -70,7 +70,7 @@ export class CreateAccountDialog {
 
   readonly pinnedOptions: CurrencyOption[] = PINNED_CURRENCY_CODES.map(code => {
     const key = CurrencyCode[code];
-    return { label: buildCurrencyLabel(key, code), value: code };
+    return { label: buildCurrencyLabel(key), value: code };
   });
 
   readonly allOptions: CurrencyOption[] = buildAllOptions();

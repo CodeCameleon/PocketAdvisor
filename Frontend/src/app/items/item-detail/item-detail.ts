@@ -24,8 +24,17 @@ import { AccountResponse } from '../../core/models/account-response';
 import { CurrencyCode } from '../../core/enums/currency-code';
 import { Unit, UNIT_LABELS } from '../../core/enums/unit';
 
-// Chart.js is loaded globally via index.html CDN script
-declare const Chart: any;
+// Chart.js is loaded globally via index.html CDN script.
+// Minimal typings for the parts of the UMD bundle used by this component.
+interface ChartInstance {
+  destroy(): void;
+}
+
+interface ChartTooltipContext {
+  parsed: { y: number };
+}
+
+declare const Chart: new (canvas: HTMLCanvasElement, config: unknown) => ChartInstance;
 
 @Component({
   selector: 'app-item-detail',
@@ -60,7 +69,7 @@ export class ItemDetail implements OnInit, AfterViewInit, OnDestroy {
 
   private itemId = '';
   private accountsById = new Map<string, AccountResponse>();
-  private chartInstance: any = null;
+  private chartInstance: ChartInstance | null = null;
   private viewReady = false;
   private dataReady = false;
 
@@ -205,7 +214,7 @@ export class ItemDetail implements OnInit, AfterViewInit, OnDestroy {
           legend: { display: false },
           tooltip: {
             callbacks: {
-              label: (ctx: any) => ` ${ctx.parsed.y.toFixed(2)}`,
+              label: (ctx: ChartTooltipContext) => ` ${ctx.parsed.y.toFixed(2)}`,
             },
           },
         },

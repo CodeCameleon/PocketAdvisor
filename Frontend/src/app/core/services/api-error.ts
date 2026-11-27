@@ -101,7 +101,7 @@ export class ApiErrorService {
    */
   private parsePath(key: string): (string | number)[] {
     const segments: (string | number)[] = [];
-    const re = /([^\.\[\]]+)|\[(\d+)\]/g;
+    const re = /([^.[\]]+)|\[(\d+)\]/g;
     let match: RegExpExecArray | null;
 
     while ((match = re.exec(key)) !== null) {
