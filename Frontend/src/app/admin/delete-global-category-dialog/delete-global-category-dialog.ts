@@ -18,14 +18,9 @@ interface ValidationProblemDetails {
 
 @Component({
   selector: 'app-delete-global-category-dialog',
-  imports: [
-    MatButtonModule,
-    MatDialogModule,
-    MatIconModule,
-    MatProgressSpinnerModule
-  ],
+  imports: [MatButtonModule, MatDialogModule, MatIconModule, MatProgressSpinnerModule],
   templateUrl: './delete-global-category-dialog.html',
-  styleUrl: './delete-global-category-dialog.css'
+  styleUrl: './delete-global-category-dialog.css',
 })
 export class DeleteGlobalCategoryDialog {
   private readonly dialogRef = inject(MatDialogRef<DeleteGlobalCategoryDialog>);

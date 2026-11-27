@@ -185,3 +185,18 @@ The API only accepts calls from the configured frontend origin (`Frontend:BaseUr
 > **Open the app at `http://localhost:4200`, not at `http://127.0.0.1:4200`.** The browser treats the two addresses as different origins, so CORS rejects every API call from `127.0.0.1` and the login fails with a CORS error in the browser console. The port link of the container in Docker Desktop opens `127.0.0.1`, because the port is published on the loopback interface only.
 
 nginx serves every unknown path with `index.html`, so reloading a deep link such as `/accounts` still loads the app, while a missing `.js` or `.css` file is a real `404`. `index.html` is revalidated on every request and the hashed bundle files are cached for a year, so a new image is picked up on the next page load. Every response carries security headers, including a Content-Security-Policy that only allows scripts from the app itself and jsDelivr (Chart.js), and network calls only to the app and the API.
+
+### 3.4 Static checks
+
+Run these from the `Frontend/` directory. The planned CI pipeline will run the same commands, so a change that passes them locally will also pass its static-check stage.
+
+```bash
+npm ci
+npm run format:check
+npm run lint
+npm run audit:prod
+```
+
+`npm run format:check` runs Prettier in check mode, and `npm run format` fixes the findings. `npm run lint` runs ESLint through `ng lint` with the ESLint, typescript-eslint and angular-eslint recommended rules, including the template and accessibility rules for the HTML templates (`eslint.config.mjs`). `npm run audit:prod` fails on any known high or critical vulnerability in the production dependencies, the code that is shipped to the browser. Development tooling is left out of this gate, but a plain `npm audit` lists its findings as well.
+
+After adding, removing or updating a package, commit the updated `package-lock.json` together with `package.json`, because `npm ci` installs exactly the locked versions and fails if the two files disagree.

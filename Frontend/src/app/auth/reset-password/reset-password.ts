@@ -21,9 +21,9 @@ import { AuthCard } from '../auth-card/auth-card';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    AuthCard
+    AuthCard,
   ],
-  templateUrl: './reset-password.html'
+  templateUrl: './reset-password.html',
 })
 export class ResetPassword {
   private readonly route = inject(ActivatedRoute);
@@ -69,10 +69,10 @@ export class ResetPassword {
   }
 
   togglePassword(): void {
-    this.hidePassword.update(v => !v);
+    this.hidePassword.update((v) => !v);
   }
 
   toggleConfirm(): void {
-    this.hideConfirm.update(v => !v);
+    this.hideConfirm.update((v) => !v);
   }
 }

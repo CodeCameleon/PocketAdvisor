@@ -6,11 +6,11 @@ import { AccountTransactions } from './account-transactions/account-transactions
 
 const routes: Routes = [
   { path: '', component: AccountList },
-  { path: ':id/transactions', component: AccountTransactions }
+  { path: ':id/transactions', component: AccountTransactions },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class AccountsRoutingModule {}

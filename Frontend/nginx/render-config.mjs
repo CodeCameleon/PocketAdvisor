@@ -13,8 +13,9 @@ if (!build.configurations[configuration]) {
 
 // The same file replacement the Angular build applies (see angular.json).
 const environmentFile = 'src/environments/environment.ts';
-const replacement = (build.configurations[configuration].fileReplacements ?? [])
-  .find((fileReplacement) => fileReplacement.replace === environmentFile);
+const replacement = (build.configurations[configuration].fileReplacements ?? []).find(
+  (fileReplacement) => fileReplacement.replace === environmentFile,
+);
 const { environment } = await import(pathToFileURL(replacement?.with ?? environmentFile).href);
 
 if (typeof environment.apiUrl !== 'string' || !/^https?:\/\/\S+[^/]$/.test(environment.apiUrl)) {
@@ -23,4 +24,6 @@ if (typeof environment.apiUrl !== 'string' || !/^https?:\/\/\S+[^/]$/.test(envir
 
 const template = readFileSync('nginx/default.conf.template', 'utf8');
 writeFileSync(output, template.replaceAll('${API_URL}', environment.apiUrl));
-console.log(`nginx configuration rendered for ${configuration}: connect-src ${environment.apiUrl}/`);
+console.log(
+  `nginx configuration rendered for ${configuration}: connect-src ${environment.apiUrl}/`,
+);

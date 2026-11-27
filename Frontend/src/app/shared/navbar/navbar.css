@@ -30,7 +30,9 @@
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .navbar-left a:hover {
@@ -74,7 +76,9 @@
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .nav-auth-button:hover,

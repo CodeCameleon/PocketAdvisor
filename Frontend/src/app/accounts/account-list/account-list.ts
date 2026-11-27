@@ -16,15 +16,9 @@ import { UpdateAccountNameDialog } from '../update-account-name-dialog/update-ac
 
 @Component({
   selector: 'app-account-list',
-  imports: [
-    CurrencyPipe,
-    MatButtonModule,
-    MatIconModule,
-    MatMenuModule,
-    MatProgressSpinnerModule
-  ],
+  imports: [CurrencyPipe, MatButtonModule, MatIconModule, MatMenuModule, MatProgressSpinnerModule],
   templateUrl: './account-list.html',
-  styleUrl: './account-list.css'
+  styleUrl: './account-list.css',
 })
 export class AccountList implements OnInit {
   private readonly accountService = inject(AccountService);

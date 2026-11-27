@@ -109,7 +109,9 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
   cursor: pointer;
 }
 
@@ -160,7 +162,9 @@
   flex-shrink: 0;
   color: var(--color-neutral-300);
   opacity: 0;
-  transition: opacity 0.15s ease, color 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    color 0.15s ease;
 }
 
 .item-card:hover .item-menu-btn,

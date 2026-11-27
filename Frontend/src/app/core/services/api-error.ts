@@ -18,7 +18,6 @@ interface ValidationProblemDetails {
   providedIn: 'root',
 })
 export class ApiErrorService {
-
   /**
    * Applies validation errors from a failed HTTP response to a FormGroup.
    *
@@ -101,7 +100,7 @@ export class ApiErrorService {
    */
   private parsePath(key: string): (string | number)[] {
     const segments: (string | number)[] = [];
-    const re = /([^\.\[\]]+)|\[(\d+)\]/g;
+    const re = /([^.[\]]+)|\[(\d+)\]/g;
     let match: RegExpExecArray | null;
 
     while ((match = re.exec(key)) !== null) {

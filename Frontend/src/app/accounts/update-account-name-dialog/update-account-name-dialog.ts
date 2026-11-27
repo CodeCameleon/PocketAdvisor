@@ -24,10 +24,10 @@ export interface UpdateAccountNameDialogData {
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
   ],
   templateUrl: './update-account-name-dialog.html',
-  styleUrl: './update-account-name-dialog.css'
+  styleUrl: './update-account-name-dialog.css',
 })
 export class UpdateAccountNameDialog {
   private readonly fb = inject(FormBuilder);

@@ -7,15 +7,13 @@
     <div class="detail-header-text">
       <h1 class="detail-title">
         @if (item()) {
-          {{item()!.name}}
+          {{ item()!.name }}
         } @else {
           Item
         }
       </h1>
 
-      <p class="detail-subtitle">
-        Spending history
-      </p>
+      <p class="detail-subtitle">Spending history</p>
     </div>
 
     @if (!loading() && !errorMessage() && transactions().length > 0 && headerCurrencyAlpha()) {
@@ -23,7 +21,7 @@
         <span class="stat-label">Total spent</span>
 
         <span class="stat-value">
-          {{grandTotal | currency : headerCurrencyAlpha()! : 'symbol-narrow' : '1.2-2'}}
+          {{ grandTotal | currency: headerCurrencyAlpha()! : 'symbol-narrow' : '1.2-2' }}
         </span>
       </div>
     }
@@ -38,20 +36,16 @@
       <mat-icon>error_outline</mat-icon>
 
       <span>
-        {{errorMessage()}}
+        {{ errorMessage() }}
       </span>
     </div>
   } @else if (transactions().length === 0) {
     <div class="detail-empty">
       <mat-icon class="detail-empty-icon">bar_chart</mat-icon>
 
-      <p class="detail-empty-title">
-        No transactions yet
-      </p>
+      <p class="detail-empty-title">No transactions yet</p>
 
-      <p class="detail-empty-subtitle">
-        Transactions that include this item will appear here.
-      </p>
+      <p class="detail-empty-subtitle">Transactions that include this item will appear here.</p>
     </div>
   } @else {
     <div class="chart-card">
@@ -63,26 +57,36 @@
     <div class="tx-list">
       @for (tx of transactions(); track tx.id) {
         <div class="tx-card" [class.expanded]="expandedTxId() === tx.id">
-          <div class="tx-row" (click)="toggleExpand(tx.id)" role="button" tabindex="0" [attr.aria-expanded]="expandedTxId() === tx.id" (keydown.enter)="toggleExpand(tx.id)" (keydown.space)="toggleExpand(tx.id)">
+          <div
+            class="tx-row"
+            (click)="toggleExpand(tx.id)"
+            role="button"
+            tabindex="0"
+            [attr.aria-expanded]="expandedTxId() === tx.id"
+            (keydown.enter)="toggleExpand(tx.id)"
+            (keydown.space)="toggleExpand(tx.id)"
+          >
             <div class="tx-icon-wrap">
               <mat-icon class="tx-icon">receipt</mat-icon>
             </div>
 
             <div class="tx-info">
               <span class="tx-date">
-                {{tx.occurredAt | date : 'MMM d, y'}}
+                {{ tx.occurredAt | date: 'MMM d, y' }}
               </span>
 
               <span class="tx-items-count">
-                {{tx.items.length}} {{tx.items.length === 1 ? 'item' : 'items'}} in transaction
+                {{ tx.items.length }} {{ tx.items.length === 1 ? 'item' : 'items' }} in transaction
               </span>
             </div>
 
             <div class="tx-amount">
-              {{itemTotalForTx(tx) | currency : currencyAlpha(tx) : 'symbol-narrow' : '1.2-2'}}
+              {{ itemTotalForTx(tx) | currency: currencyAlpha(tx) : 'symbol-narrow' : '1.2-2' }}
             </div>
 
-            <mat-icon class="expand-chevron" [class.open]="expandedTxId() === tx.id">expand_more</mat-icon>
+            <mat-icon class="expand-chevron" [class.open]="expandedTxId() === tx.id"
+              >expand_more</mat-icon
+            >
           </div>
 
           @if (expandedTxId() === tx.id) {
@@ -94,16 +98,18 @@
 
                     <div class="item-details">
                       <span class="item-name">
-                        {{item()!.name}}
+                        {{ item()!.name }}
                       </span>
 
                       <span class="item-qty">
-                        {{txItem.amountValue}} {{unitLabel(txItem.amountUnit)}}
+                        {{ txItem.amountValue }} {{ unitLabel(txItem.amountUnit) }}
                       </span>
                     </div>
 
                     <span class="item-price">
-                      {{txItem.totalPrice | currency : currencyAlpha(tx) : 'symbol-narrow' : '1.2-2'}}
+                      {{
+                        txItem.totalPrice | currency: currencyAlpha(tx) : 'symbol-narrow' : '1.2-2'
+                      }}
                     </span>
                   </div>
                 }

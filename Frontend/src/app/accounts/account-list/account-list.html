@@ -1,13 +1,9 @@
 <div class="accounts-page">
   <div class="accounts-header">
     <div class="accounts-header-text">
-      <h1 class="accounts-title">
-        Accounts
-      </h1>
+      <h1 class="accounts-title">Accounts</h1>
 
-      <p class="accounts-subtitle">
-        Your linked financial accounts
-      </p>
+      <p class="accounts-subtitle">Your linked financial accounts</p>
     </div>
 
     <button mat-flat-button class="add-account-button" (click)="openCreateDialog()">
@@ -26,35 +22,45 @@
       <mat-icon>error_outline</mat-icon>
 
       <span>
-        {{errorMessage()}}
+        {{ errorMessage() }}
       </span>
     </div>
   } @else if (accounts().length === 0) {
     <div class="accounts-empty">
       <mat-icon class="accounts-empty-icon">account_balance_wallet</mat-icon>
 
-      <p class="accounts-empty-title">
-        No accounts yet
-      </p>
+      <p class="accounts-empty-title">No accounts yet</p>
 
-      <p class="accounts-empty-subtitle">
-        Add your first account to start tracking your finances.
-      </p>
+      <p class="accounts-empty-subtitle">Add your first account to start tracking your finances.</p>
     </div>
   } @else {
     <div class="accounts-grid">
       @for (account of accounts(); track account.id) {
-        <div class="account-card" (click)="openTransactions(account)" role="button" tabindex="0" (keydown.enter)="openTransactions(account)" (keydown.space)="openTransactions(account)" [attr.aria-label]="'View transactions for ' + account.name">
+        <div
+          class="account-card"
+          (click)="openTransactions(account)"
+          role="button"
+          tabindex="0"
+          (keydown.enter)="openTransactions(account)"
+          (keydown.space)="openTransactions(account)"
+          [attr.aria-label]="'View transactions for ' + account.name"
+        >
           <div class="account-card-header">
             <div class="account-icon-wrap">
               <mat-icon class="account-icon">account_balance</mat-icon>
             </div>
 
             <span class="account-name">
-              {{account.name}}
+              {{ account.name }}
             </span>
 
-            <button mat-icon-button class="account-menu-btn" [matMenuTriggerFor]="accountMenu" (click)="$event.stopPropagation()" aria-label="Account options">
+            <button
+              mat-icon-button
+              class="account-menu-btn"
+              [matMenuTriggerFor]="accountMenu"
+              (click)="$event.stopPropagation()"
+              aria-label="Account options"
+            >
               <mat-icon>more_vert</mat-icon>
             </button>
 
@@ -74,18 +80,19 @@
           </div>
 
           <div class="account-card-balance">
-            <span class="account-balance-label">
-              Balance
-            </span>
+            <span class="account-balance-label"> Balance </span>
 
             <span class="account-balance-value">
-              {{account.calculatedBalance | currency : currencyAlpha(account.currencyCode) : 'symbol-narrow' : '1.2-2'}}
+              {{
+                account.calculatedBalance
+                  | currency: currencyAlpha(account.currencyCode) : 'symbol-narrow' : '1.2-2'
+              }}
             </span>
           </div>
 
           <div class="account-card-footer">
             <span class="account-currency-badge">
-              {{currencyAlpha(account.currencyCode)}}
+              {{ currencyAlpha(account.currencyCode) }}
             </span>
           </div>
         </div>

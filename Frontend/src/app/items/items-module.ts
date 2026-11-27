@@ -5,9 +5,6 @@ import { ItemsRoutingModule } from './items-routing-module';
 
 @NgModule({
   declarations: [],
-  imports: [
-    CommonModule,
-    ItemsRoutingModule
-  ]
+  imports: [CommonModule, ItemsRoutingModule],
 })
 export class ItemsModule {}

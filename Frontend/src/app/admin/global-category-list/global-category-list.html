@@ -1,13 +1,9 @@
 <div class="categories-page">
   <div class="categories-header">
     <div class="categories-header-text">
-      <h1 class="categories-title">
-        Global Categories
-      </h1>
+      <h1 class="categories-title">Global Categories</h1>
 
-      <p class="categories-subtitle">
-        Manage the global categories available to all users
-      </p>
+      <p class="categories-subtitle">Manage the global categories available to all users</p>
     </div>
 
     <button mat-flat-button class="add-category-button" (click)="openCreateDialog()">
@@ -26,16 +22,14 @@
       <mat-icon>error_outline</mat-icon>
 
       <span>
-        {{errorMessage()}}
+        {{ errorMessage() }}
       </span>
     </div>
   } @else if (categories().length === 0) {
     <div class="categories-empty">
       <mat-icon class="categories-empty-icon">public</mat-icon>
 
-      <p class="categories-empty-title">
-        No global categories yet
-      </p>
+      <p class="categories-empty-title">No global categories yet</p>
 
       <p class="categories-empty-subtitle">
         Add your first global category to make it available to all users.
@@ -51,10 +45,16 @@
             </div>
 
             <span class="category-name">
-              {{category.name}}
+              {{ category.name }}
             </span>
 
-            <button mat-icon-button class="category-menu-btn" [matMenuTriggerFor]="categoryMenu" (click)="$event.stopPropagation()" aria-label="Category options">
+            <button
+              mat-icon-button
+              class="category-menu-btn"
+              [matMenuTriggerFor]="categoryMenu"
+              (click)="$event.stopPropagation()"
+              aria-label="Category options"
+            >
               <mat-icon>more_vert</mat-icon>
             </button>
 

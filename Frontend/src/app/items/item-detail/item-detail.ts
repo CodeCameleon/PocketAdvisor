@@ -24,20 +24,23 @@ import { AccountResponse } from '../../core/models/account-response';
 import { CurrencyCode } from '../../core/enums/currency-code';
 import { Unit, UNIT_LABELS } from '../../core/enums/unit';
 
-// Chart.js is loaded globally via index.html CDN script
-declare const Chart: any;
+// Chart.js is loaded globally via index.html CDN script.
+// Minimal typings for the parts of the UMD bundle used by this component.
+interface ChartInstance {
+  destroy(): void;
+}
+
+interface ChartTooltipContext {
+  parsed: { y: number };
+}
+
+declare const Chart: new (canvas: HTMLCanvasElement, config: unknown) => ChartInstance;
 
 @Component({
   selector: 'app-item-detail',
-  imports: [
-    CurrencyPipe,
-    DatePipe,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule
-  ],
+  imports: [CurrencyPipe, DatePipe, MatButtonModule, MatIconModule, MatProgressSpinnerModule],
   templateUrl: './item-detail.html',
-  styleUrl: './item-detail.css'
+  styleUrl: './item-detail.css',
 })
 export class ItemDetail implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('chartCanvas') private chartCanvas!: ElementRef<HTMLCanvasElement>;
@@ -60,7 +63,7 @@ export class ItemDetail implements OnInit, AfterViewInit, OnDestroy {
 
   private itemId = '';
   private accountsById = new Map<string, AccountResponse>();
-  private chartInstance: any = null;
+  private chartInstance: ChartInstance | null = null;
   private viewReady = false;
   private dataReady = false;
 
@@ -86,7 +89,7 @@ export class ItemDetail implements OnInit, AfterViewInit, OnDestroy {
   }
 
   toggleExpand(txId: string): void {
-    this.expandedTxId.update(current => (current === txId ? null : txId));
+    this.expandedTxId.update((current) => (current === txId ? null : txId));
   }
 
   unitLabel(unit: Unit): string {
@@ -103,15 +106,14 @@ export class ItemDetail implements OnInit, AfterViewInit, OnDestroy {
 
   /** Returns the total price paid for this item within a given transaction. */
   itemTotalForTx(tx: TransactionResponse): number {
-    return tx.items.filter(i => i.itemId === this.itemId).reduce((sum, i) => sum + i.totalPrice, 0);
+    return tx.items
+      .filter((i) => i.itemId === this.itemId)
+      .reduce((sum, i) => sum + i.totalPrice, 0);
   }
 
   /** Grand total across all transactions (only meaningful when all share the same currency). */
   get grandTotal(): number {
-    return this.transactions().reduce(
-      (sum, tx) => sum + this.itemTotalForTx(tx),
-      0
-    );
+    return this.transactions().reduce((sum, tx) => sum + this.itemTotalForTx(tx), 0);
   }
 
   private loadData(): void {
@@ -124,17 +126,16 @@ export class ItemDetail implements OnInit, AfterViewInit, OnDestroy {
       transactions: this.transactionService.getTransactionsByItem(this.itemId),
     }).subscribe({
       next: ({ items, accounts, transactions }) => {
-        this.item.set(items.find(i => i.id === this.itemId) ?? null);
-        this.accountsById = new Map(accounts.map(a => [a.id, a]));
+        this.item.set(items.find((i) => i.id === this.itemId) ?? null);
+        this.accountsById = new Map(accounts.map((a) => [a.id, a]));
 
         const sorted = [...transactions].sort(
-          (a, b) =>
-            new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime()
+          (a, b) => new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime(),
         );
         this.transactions.set(sorted);
 
         // Determine header currency: show it only when all transactions share the same one
-        const currencies = new Set(sorted.map(tx => this.currencyAlpha(tx)));
+        const currencies = new Set(sorted.map((tx) => this.currencyAlpha(tx)));
         this.headerCurrencyAlpha.set(currencies.size === 1 ? [...currencies][0] : null);
 
         this.loading.set(false);
@@ -163,9 +164,7 @@ export class ItemDetail implements OnInit, AfterViewInit, OnDestroy {
       spendByDate.set(day, (spendByDate.get(day) ?? 0) + spent);
     }
 
-    const sorted = [...spendByDate.entries()].sort(([a], [b]) =>
-      a.localeCompare(b)
-    );
+    const sorted = [...spendByDate.entries()].sort(([a], [b]) => a.localeCompare(b));
 
     const labels = sorted.map(([date]) => {
       const [year, month, day] = date.split('-').map(Number);
@@ -205,7 +204,7 @@ export class ItemDetail implements OnInit, AfterViewInit, OnDestroy {
           legend: { display: false },
           tooltip: {
             callbacks: {
-              label: (ctx: any) => ` ${ctx.parsed.y.toFixed(2)}`,
+              label: (ctx: ChartTooltipContext) => ` ${ctx.parsed.y.toFixed(2)}`,
             },
           },
         },
